@@ -1,15 +1,24 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { motion } from "framer-motion";
 import Image from "next/image";
 import axios from "axios";
 import Popup from "../../component/popup";
 import logo from "../../images/logo.jpg";
 export default function AdminLoginPage() {
+  const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ email: "", password: "", name: "" ,phone:"",confirmPassword:""});
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    name: "",
+    phone: "",
+    confirmPassword: "",
+  });
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
@@ -28,40 +37,46 @@ export default function AdminLoginPage() {
       setPopupColor("red");
       setShowPopup(true);
       return;
-    } else if (isSignUp && form.password !== form.confirmPassword ) {
+    } else if (isSignUp && form.password !== form.confirmPassword) {
       setPopupMessage("Passwords do not match.");
       setPopupColor("red");
       setShowPopup(true);
       return;
-    }else if(isSignUp && isNaN(form.phone)){
-	  setPopupMessage("Please enter a valid phone number.");
-	  setPopupColor("red");
-	  setShowPopup(true);
-	  return;	
-	}
+    } else if (isSignUp && isNaN(form.phone)) {
+      setPopupMessage("Please enter a valid phone number.");
+      setPopupColor("red");
+      setShowPopup(true);
+      return;
+    }
     setLoading(true);
     // Mock request delay
     await new Promise((r) => setTimeout(r, 800));
     setLoading(false);
     if (isSignUp) {
-		handleSignup();
+      handleSignup();
     } else {
-		handleLogin();
+      handleLogin();
     }
   };
   const handleLogin = async () => {
     // Implement login logic here
-    const response = await axios.post(`${backendUrl}/user/admin/login`, {
-      email: form.email,
-      password: form.password,
-    });
+    try {
+      const response = await axios.post(`${backendUrl}/user/admin/login`, {
+        email: form.email,
+        password: form.password,
+      });
 
-    localStorage.setItem("adminToken", response.data.token);
-	if (response.status === 200) {
-      setPopupMessage("Admin login successful!");
-      setPopupColor("green");
-      setShowPopup(true);
-    } else {
+      localStorage.setItem("adminToken", response.data.token);
+      if (response.status === 200) {
+        setPopupMessage("Admin login successful!");
+        setPopupColor("green");
+        setShowPopup(true);
+      } else {
+        setPopupMessage("Login failed. Please check your credentials.");
+        setPopupColor("red");
+        setShowPopup(true);
+      }
+    } catch (error) {
       setPopupMessage("Login failed. Please check your credentials.");
       setPopupColor("red");
       setShowPopup(true);
@@ -70,18 +85,24 @@ export default function AdminLoginPage() {
 
   const handleSignup = async () => {
     // Implement signup logic here
-    const response = await axios.post(`${backendUrl}/user/admin`, {
-      name: form.name,
-      email: form.email,
-      password: form.password,
-	  phone: form.phone,
-    });
-	console.log(response);
-    if (response.status === 201) {
-      setPopupMessage("Signup successful!");
-      setPopupColor("green");
-      setShowPopup(true);
-    } else {
+    try {
+      const response = await axios.post(`${backendUrl}/user/admin`, {
+        name: form.name,
+        email: form.email,
+        password: form.password,
+        phone: form.phone,
+      });
+      console.log(response);
+      if (response.status === 201) {
+        setPopupMessage("Signup successful!");
+        setPopupColor("green");
+        setShowPopup(true);
+      } else {
+        setPopupMessage("Signup failed. Please check your details.");
+        setPopupColor("red");
+        setShowPopup(true);
+      }
+    } catch (error) {
       setPopupMessage("Signup failed. Please check your details.");
       setPopupColor("red");
       setShowPopup(true);
@@ -326,33 +347,41 @@ export default function AdminLoginPage() {
                   </div>
                 </div>
               )}
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  marginTop: 6,
-                }}
-              >
-                <div className="muted">
-                  {isSignUp
-                    ? "Create a new admin account"
-                    : "Welcome back — please sign in"}
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.98 }}
-                  whileHover={{ y: -2 }}
-                  className="submit"
-                  type="submit"
-                  disabled={loading}
+              <div className="flex flex-col ">
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginTop: 6,
+                  }}
                 >
-                  {loading
-                    ? "Please wait..."
-                    : isSignUp
-                    ? "Create account"
-                    : "Sign in"}
-                </motion.button>
+                  <div className="muted">
+                    {isSignUp
+                      ? "Create a new admin account"
+                      : "Welcome back — please sign in"}
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.98 }}
+                    whileHover={{ y: -2 }}
+                    className="submit"
+                    type="submit"
+                    disabled={loading}
+                  >
+                    {loading
+                      ? "Please wait..."
+                      : isSignUp
+                      ? "Create account"
+                      : "Sign in"}
+                  </motion.button>
+                </div>
+                <div>
+                  {!isSignUp && (
+                    <button className="text-sm text-blue-500 underline cursor-pointer" onClick={() => router.push("/forgetpassword")}>
+                      forget password
+                    </button>
+                  )}
+                </div>
               </div>
             </form>
           </motion.div>

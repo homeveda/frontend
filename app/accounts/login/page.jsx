@@ -245,10 +245,7 @@ export default function UserLoginPage() {
         variants={cardVariants}
       >
         <div className="brand">
-          <h1>
-            home<span style={{ color: "var(--primary)" }}>veda</span>
-          </h1>
-          <p>User portal</p>
+          <h1>User portal</h1>
 
           <motion.div
             className="art "

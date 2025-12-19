@@ -155,9 +155,8 @@ export default function ForgetPasswordPage() {
       >
         <div className="brand">
           <h1 className="font-bold text-4xl">
-            home<span className="text-[#e07b63]">veda</span>
+              Reset your password
           </h1>
-          <p>Reset your password</p>
 
           <motion.div
             className="art"

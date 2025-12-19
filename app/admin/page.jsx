@@ -77,6 +77,7 @@ export default function AdminLoginPage() {
         setShowPopup(true);
       }
     } catch (error) {
+      console.log(error);
       setPopupMessage("Login failed. Please check your credentials.");
       setPopupColor("red");
       setShowPopup(true);
@@ -223,9 +224,8 @@ export default function AdminLoginPage() {
       >
         <div className="brand">
           <h1 className="font-bold text-4xl">
-            home<span className="text-[#e07b63]">veda</span>
+            Admin portal
           </h1>
-          <p>Admin portal</p>
 
           <motion.div
             className="art "

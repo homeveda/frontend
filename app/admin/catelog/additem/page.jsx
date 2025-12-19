@@ -82,6 +82,7 @@ export default function AddItemPage() {
         if (!validate()) return;
         setLoading(true);
         try {
+            const token = localStorage.getItem("adminToken");  
             const imageFile = imageInputRef.current?.files?.[0];
             const videoFile = videoInputRef.current?.files?.[0];
             const fd = new FormData();
@@ -95,7 +96,10 @@ export default function AddItemPage() {
             if (form.type === "Premium" && videoFile) fd.append("video", videoFile);
 
             const resp = await axios.post(`${backendUrl}/catelog`, fd, {
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { 
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
+                },
             });
 
             if (resp.status === 201) {

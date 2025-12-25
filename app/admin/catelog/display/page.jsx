@@ -122,7 +122,7 @@ export default function CatelogSearchPage() {
         </div>
       </div>
 
-      {loading && <div className="text-sm" style={{ color: '#8f8f8f' }}>Loading...</div>}
+      {loading && <LoadingSpinner />}
       {error && <div className="text-sm" style={{ color: '#e07b63' }}>{error}</div>}
 
       <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

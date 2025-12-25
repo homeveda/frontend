@@ -86,7 +86,7 @@ export default function UserLoginPage() {
 
   const handleSignup = async () => {
     try {
-      const response = await axios.post(`${backendUrl}/user/register`, {
+      const response = await axios.post(`${backendUrl}/user`, {
         name: form.name,
         email: form.email,
         password: form.password,

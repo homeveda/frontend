@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Popup from "../../../../component/popup";
+import LoadingSpinner from "../../../../component/loadingSpinner";
 
 export default function UpdateLeadPage() {
   const router = useRouter();
@@ -105,7 +106,7 @@ export default function UpdateLeadPage() {
     }
   };
 
-  if (loading) return (<div className="p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}><div style={{ color: '#8f8f8f' }}>Loading...</div></div>);
+  if (loading) return (<div className="p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}><LoadingSpinner /></div>);
   if (!lead) return (<div className="p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}><div style={{ color: '#e07b63' }}>Lead not found</div></div>);
 
   const architectOptions = ["Account Created", "Account Not Created"];

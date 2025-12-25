@@ -4,6 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Popup from "../../../../component/popup";
+import LoadingSpinner from "../../../../component/loadingSpinner";
 
 export default function UpdateItemPage() {
   const searchParams = useSearchParams();
@@ -138,7 +139,7 @@ export default function UpdateItemPage() {
   if (loading) {
     return (
       <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
-        <div style={{ color: "#8f8f8f" }}>Loading...</div>
+        <LoadingSpinner />
       </div>
     );
   }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import LeadCard from "../../../../component/leadCard";
+import LoadingSpinner from "../../../../component/loadingSpinner";
 import ConfirmationDialogueBox from "../../../../component/confirmationDialogueBox";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -169,7 +170,7 @@ export default function LeadsDisplayPage() {
         </div>
       </div>
 
-      {loading && <div className="text-sm" style={{ color: "#8f8f8f" }}>Loading...</div>}
+      {loading && <LoadingSpinner />}
       {error && <div className="text-sm" style={{ color: "#e07b63" }}>{error}</div>}
 
       <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

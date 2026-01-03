@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import CatelogCard from "../../../../component/catelogCard";
 import ConfirmationDialogueBox from "../../../../component/confirmationDialogueBox";
+import LoadingSpinner from "../../../../component/loadingSpinner";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CatelogSearchPage() {

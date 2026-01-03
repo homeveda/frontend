@@ -1,17 +1,54 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ConfirmationDialogueBox from "./confirmationDialogueBox";
+import Popup from "./popup";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 export default function ProjectCard({ project }) {
   const p = project || {};
   const router = useRouter();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [popupColor, setPopupColor] = useState("green");
+
+  const triggerPopup = (message, color = "green") => {
+    setPopupMessage(message);
+    setPopupColor(color);
+    setShowPopup(true);
+  };
+
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+  const handleDelete = async () => {
+    if (!backendUrl) {
+      triggerPopup("Backend URL not configured", "red");
+      return;
+    }
+    setIsDeleting(true);
+    try {
+      const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+      await axios.delete(`${backendUrl}/project/${p.id || p._id}`, {
+        headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
+      });
+      setConfirmOpen(false);
+      triggerPopup("Project deleted successfully", "green");
+      setTimeout(() => window.location.reload(), 900);
+    } catch (err) {
+      console.error("Delete project failed:", err);
+      triggerPopup(err?.response?.data?.message || err.message || "Failed to delete project", "red");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   return (
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
-      className="overflow-hidden bg-white flex flex-col hover:shadow-lg transition-shadow duration-300 cursor-pointer"
+      className="overflow-hidden bg-white flex flex-col hover:shadow-lg transition-shadow duration-300 cursor-default"
       style={{
         borderRadius: "10px",
         boxShadow: "0 10px 30px rgba(16,16,16,0.08)",
@@ -64,12 +101,12 @@ export default function ProjectCard({ project }) {
                       <div className="mt-3 grid grid-cols-3 gap-2">
                         {p.kitchen.layoutPlan.map((src) => (
                           <div
-                            key={src}
+                            key={src||Math.random()}
                             className="w-full h-20 rounded-[8px] overflow-hidden flex items-center justify-center"
                             style={{ backgroundColor: "#f5f5f5" }}
                           >
                             <img
-                              src={src}
+                              src={src||null}
                               alt="layout"
                               className="object-contain max-h-full max-w-full"
                             />
@@ -118,7 +155,7 @@ export default function ProjectCard({ project }) {
 
         <div className="grid grid-cols-2 gap-3 content-between ">
           <button
-            className="mt-4 text-white px-4 py-2 rounded-[10px] font-semibold transition"
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
             style={{ backgroundColor: "#e07b63" }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
@@ -129,7 +166,7 @@ export default function ProjectCard({ project }) {
             Quotation
           </button>
           <button
-            className="mt-4 text-white px-4 py-2 rounded-[10px] font-semibold transition"
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
             style={{ backgroundColor: "#e07b63" }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
@@ -140,21 +177,27 @@ export default function ProjectCard({ project }) {
             Designs
           </button>
           <button
-            className="mt-4 text-white px-4 py-2 rounded-[10px] font-semibold transition"
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
             style={{ backgroundColor: "#e07b63" }}
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
-            onClick={() => {}}
+            onClick={() => {
+              router.push(`/admin/projects/${p.id || p._id}/update`)  
+            }}
           >
             Update Project
           </button>
           <button
-            className="mt-4  text-white px-4 py-2 rounded-[10px] font-semibold transition bg-red-500 hover:bg-red-800"
-            onClick={() => {}}
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition bg-red-500 hover:bg-red-800"
+            onClick={() => setConfirmOpen(true)}
           >
             Delete Project
           </button>
         </div>
+        <ConfirmationDialogueBox open={confirmOpen} title="Delete project?" description="This will permanently delete the project and its data. Continue?" onConfirm={handleDelete} onCancel={() => setConfirmOpen(false)} confirmText={isDeleting ? "Deleting..." : "Delete"} />
+        {showPopup && (
+          <Popup message={popupMessage} color={popupColor} onClose={() => setShowPopup(false)} />
+        )}
       </div>
     </motion.article>
   );

@@ -50,8 +50,13 @@ export default function AdminLoginPage() {
     }
     setLoading(true);
     // Mock request delay
-    await new Promise((r) => setTimeout(r, 800));
+    await new Promise((resolve) => {
+      setTimeout(resolve, 800);
+    });
+
     setLoading(false);
+    router.push("/admin/dashboard");
+
     if (isSignUp) {
       handleSignup();
     } else {
@@ -223,9 +228,7 @@ export default function AdminLoginPage() {
         variants={cardVariants}
       >
         <div className="brand">
-          <h1 className="font-bold text-4xl">
-            Admin portal
-          </h1>
+          <h1 className="font-bold text-4xl">Admin portal</h1>
 
           <motion.div
             className="art "
@@ -377,7 +380,10 @@ export default function AdminLoginPage() {
                 </div>
                 <div>
                   {!isSignUp && (
-                    <button className="text-sm text-blue-500 underline cursor-pointer" onClick={() => router.push("/forgetpassword")}>
+                    <button
+                      className="text-sm text-blue-500 underline cursor-pointer"
+                      onClick={() => router.push("/forgetpassword")}
+                    >
                       forget password
                     </button>
                   )}

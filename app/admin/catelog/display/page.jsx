@@ -12,7 +12,18 @@ export default function CatelogSearchPage() {
 
   const categories = ["Builder","Economy","Standard","VedaX"];
   const types = ["All","Normal","Premium"];
-  const workTypes = ["All","Wood Work","Main Hardware","Other Hardware","Miscellaneous","Countertop"];
+  const workTypes = [
+    "All",
+    "Carcass",
+    "Shutters",
+    "Visibles",
+    "Base And Back",
+    "Main Hardware",
+    "Other Hardware",
+    "Miscellaneous",
+    "Countertop",
+    "Appliances",
+  ];
 
   const [category, setCategory] = useState("Economy");
   const [type, setType] = useState("All");

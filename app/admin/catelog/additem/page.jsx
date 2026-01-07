@@ -11,7 +11,7 @@ export default function AddItemPage() {
         name: "",
         description: "",
         category: "Builder",
-        workType: "Wood Work",
+        workType: "Carcass",
         price: "",
         type: "Normal",
     });
@@ -54,7 +54,17 @@ export default function AddItemPage() {
     };
 
     const categories = ["Builder", "Economy", "Standard", "VedaX"];
-    const workTypes = ["Wood Work", "Main Hardware", "Other Hardware", "Miscellaneous"];
+    const workTypes = [
+        "Carcass",
+        "Shutters",
+        "Visibles",
+        "Base And Back",
+        "Main Hardware",
+        "Other Hardware",
+        "Miscellaneous",
+        "Countertop",
+        "Appliances",
+    ];
 
     const validate = () => {
         if (!form.name || !form.category || !form.price || !form.type) {

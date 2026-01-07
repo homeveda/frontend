@@ -29,6 +29,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "app/admin/projects/[id]/quotation/add/page.jsx"  ],
   "exclude": ["node_modules"]
 }

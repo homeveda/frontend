@@ -26,7 +26,7 @@ export default function UpdateItemPage() {
     category: "Economy",
     price: "",
     type: "Normal",
-    workType: "Wood Work",
+    workType: "Carcass",
   });
   const [imageFile, setImageFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
@@ -154,7 +154,17 @@ export default function UpdateItemPage() {
 
   const categories = ["Builder", "Economy", "Standard", "VedaX"];
   const types = ["Normal", "Premium"];
-  const workTypes = ["Wood Work", "Main Hardware", "Other Hardware", "Miscellaneous", "Countertop"];
+  const workTypes = [
+    "Carcass",
+    "Shutters",
+    "Visibles",
+    "Base And Back",
+    "Main Hardware",
+    "Other Hardware",
+    "Miscellaneous",
+    "Countertop",
+    "Appliances",
+  ];
 
   return (
     <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>

@@ -106,7 +106,7 @@ export default function AddDesignPage() {
     }
 
     if (!newImageFile && !newDesignFile) {
-      triggerPopup("Please select an image file or a design file.", "red");
+      triggerPopup("Please select an Customer Layout file or a Proposed Layout  file.", "red");
       return;
     }
 
@@ -300,7 +300,7 @@ export default function AddDesignPage() {
               </div>
               <div>
                 <div className="mb-4">
-                  <label htmlFor="update-image-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Image File (png, jpeg, jpg)</label>
+                  <label htmlFor="update-image-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Customer Layout File (png, jpeg, jpg)</label>
                   <input id="update-image-file" type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
@@ -315,7 +315,7 @@ export default function AddDesignPage() {
                   )}
                 </div>
                 <div>
-                  <label htmlFor="update-design-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Design File (png, jpeg, jpg)</label>
+                  <label htmlFor="update-design-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Proposed Layout File (png, jpeg, jpg)</label>
                   <input id="update-design-file" type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
@@ -349,7 +349,7 @@ export default function AddDesignPage() {
                     </div>
                     <div className="flex gap-4 flex-wrap">
                       <div>
-                        <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Image: {item.imageFile ? item.imageFile.name : item.imagePreview ? 'Current' : 'None'}</p>
+                        <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Customer Layout: {item.imageFile ? item.imageFile.name : item.imagePreview ? 'Current' : 'None'}</p>
                         {item.imagePreview ? (
                           <img src={item.imagePreview} alt={`${item.name} image`} className="preview-img" />
                         ) : (
@@ -358,7 +358,7 @@ export default function AddDesignPage() {
                         <div className="mt-2"><input type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => handleImageFileChange(e, idx)} className="input-styled file-input-styled" id={`image-file-${item.id}`} /></div>
                       </div>
                       <div>
-                        <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Design: {item.designFile ? item.designFile.name : item.designPreview ? 'Current' : 'None'}</p>
+                        <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Proposed Layout: {item.designFile ? item.designFile.name : item.designPreview ? 'Current' : 'None'}</p>
                         {item.designPreview ? (
                           <img src={item.designPreview} alt={`${item.name} design`} className="preview-img" />
                         ) : (

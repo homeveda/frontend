@@ -27,6 +27,21 @@ export default function LeadCard({ lead, onDelete }) {
             <h3 className="text-sm font-semibold" style={{ color: '#111111' }}>{lead.name}</h3>
             <p className="text-xs mt-1" style={{ color: '#8f8f8f' }}>{lead.address}</p>
             <div className="text-xs mt-2" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.contactNumber}</span></div>
+            
+            {(lead.architectName || lead.architectContact || lead.architectCity) && (
+              <div className="mt-3 pt-3" style={{ borderTop: '1px solid #e9e6e3' }}>
+                <p className="text-xs font-semibold" style={{ color: '#111111' }}>Architect Details</p>
+                {lead.architectName && (
+                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Name: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectName}</span></div>
+                )}
+                {lead.architectContact && (
+                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectContact}</span></div>
+                )}
+                {lead.architectCity && (
+                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>City: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectCity}</span></div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col items-end gap-2">

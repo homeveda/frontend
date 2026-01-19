@@ -16,7 +16,7 @@ export default function UpdateLeadPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [lead, setLead] = useState(null);
-  const [form, setForm] = useState({ name: "", address: "", contactNumber: "", architectStatus: "Account Not Created", leadStatus: "New" });
+  const [form, setForm] = useState({ name: "", address: "", contactNumber: "", architectStatus: "Account Not Created", architectName: "", architectContact: "", architectCity: "", leadStatus: "New" });
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
@@ -38,6 +38,9 @@ export default function UpdateLeadPage() {
           address: data.address || "",
           contactNumber: data.contactNumber || "",
           architectStatus: data.architectStatus || "Account Not Created",
+          architectName: data.architectName || "",
+          architectContact: data.architectContact || "",
+          architectCity: data.architectCity || "",
           leadStatus: data.leadStatus || "New",
         });
       } catch (err) {
@@ -89,6 +92,9 @@ export default function UpdateLeadPage() {
         address: form.address.trim(),
         contactNumber: form.contactNumber.trim(),
         architectStatus: form.architectStatus,
+        architectName: form.architectName.trim(),
+        architectContact: form.architectContact.trim(),
+        architectCity: form.architectCity.trim(),
         leadStatus: form.leadStatus,
       };
       await axios.patch(`${backendUrl}/initialLead/${leadId}`, payload, { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } });
@@ -96,7 +102,7 @@ export default function UpdateLeadPage() {
       setPopupMessage("Lead updated successfully");
       setPopupColor("green");
       setShowPopup(true);
-      setTimeout(() => router.push("/admin/initiallead/display"), 1200);
+      setTimeout(() => router.push("/admin/initiallead"), 1200);
     } catch (error) {
       setPopupMessage(error?.response?.data?.message || "Failed to update lead");
       setPopupColor("red");
@@ -155,6 +161,23 @@ export default function UpdateLeadPage() {
                 <select name="leadStatus" value={form.leadStatus} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
                   {leadStatusOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
                 </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Name</label>
+                <input name="architectName" value={form.architectName} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }} />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Contact</label>
+                <input name="architectContact" value={form.architectContact} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }} />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect City</label>
+                <input name="architectCity" value={form.architectCity} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }} />
               </div>
             </div>
 

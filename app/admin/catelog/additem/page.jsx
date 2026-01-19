@@ -14,6 +14,7 @@ export default function AddItemPage() {
         workType: "Carcass",
         price: "",
         type: "Normal",
+        displayedToClients: true,
     });
 
     const imageInputRef = useRef(null);
@@ -102,6 +103,7 @@ export default function AddItemPage() {
             fd.append("workType", form.workType || "");
             fd.append("price", form.price);
             fd.append("type", form.type);
+            fd.append("displayedToClients", form.displayedToClients);
             if (imageFile) fd.append("image", imageFile);
             if (form.type === "Premium" && videoFile) fd.append("video", videoFile);
 
@@ -244,6 +246,24 @@ export default function AddItemPage() {
                             <div className="col">
                                 <label htmlFor="description">Description</label>
                                 <textarea id="description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={4} placeholder="Short description" />
+                            </div>
+
+                            <div style={{ marginTop: 12, padding: 12, backgroundColor: '#f9f7f5', borderRadius: 10, border: '1px solid #e9e6e3' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                    <input 
+                                        type="checkbox" 
+                                        id="displayToggle"
+                                        checked={form.displayedToClients}
+                                        onChange={(e) => setForm({ ...form, displayedToClients: e.target.checked })}
+                                        style={{ width: 20, height: 20, cursor: 'pointer' ,accentColor: 'var(--primary)'}}
+                                    />
+                                    <label htmlFor="displayToggle" style={{ cursor: 'pointer', margin: 0, fontSize: 14, fontWeight: 600 }}>
+                                        Display to Clients
+                                    </label>
+                                </div>
+                                <p style={{ fontSize: 12, color: 'var(--muted)', margin: '6px 0 0 32px' }}>
+                                    {form.displayedToClients ? 'This item is visible to clients' : 'This item is hidden from clients'}
+                                </p>
                             </div>
 
                             <div style={{ marginTop: 8 }} className="col">

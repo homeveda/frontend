@@ -4,12 +4,13 @@ import axios from "axios";
 import CatelogCard from "../../../../component/catelogCard";
 import ConfirmationDialogueBox from "../../../../component/confirmationDialogueBox";
 import LoadingSpinner from "../../../../component/loadingSpinner";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CatelogSearchPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
-
+  const router = useRouter();
   const categories = ["Builder","Economy","Standard","VedaX"];
   const types = ["All","Normal","Premium"];
   const workTypes = [
@@ -99,8 +100,22 @@ export default function CatelogSearchPage() {
           <h2 className="text-2xl font-semibold" style={{ color: '#111111', letterSpacing: '-0.02em' }}>Catalog Search</h2>
           <p className="text-sm mt-1" style={{ color: '#8f8f8f' }}>Browse and manage catalog items</p>
         </div>
-        <div>
-          <button onClick={fetchItems} className="text-white px-4 py-2 rounded-[10px] font-semibold transition" style={{ backgroundColor: '#e07b63' }} onMouseEnter={(e) => e.target.style.backgroundColor = '#d56a52'} onMouseLeave={(e) => e.target.style.backgroundColor = '#e07b63'}>Refresh</button>
+        <div className="flex gap-3 px-5">
+          <button
+              onClick={() => {
+                router.push(`/admin/catelog/additem`);
+              }}
+              className="cursor-pointer bg-[#e07b63] text-white px-4 py-2 rounded hover:bg-[#f7f4f1] hover:text-[#e07b63] hover:border-[#e07b63] border rounded-lg border-transparent transition-colors"
+            >
+              Add New Catelogue Item
+            </button>
+            <button
+            onClick={() => router.back()}
+            className="text-xl font-semibold cursor-pointer "
+            style={{ color: "#e07b63" }}
+          >
+            ← Back
+          </button>
         </div>
       </div>
 

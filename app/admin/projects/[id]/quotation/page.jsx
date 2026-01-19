@@ -209,6 +209,7 @@ export default function QuotationPage() {
                               <tr>
                                 <th style={{ width: 80 }}>S.No.</th>
                                 <th>Design and Finish</th>
+                                <th style={{ width: 100 }}>Quantity</th>
                                 <th style={{ width: 160 }}>Work Type</th>
                               </tr>
                             </thead>
@@ -230,6 +231,9 @@ export default function QuotationPage() {
                                           <td>{serial++}</td>
                                           <td style={{ fontWeight: 600 }}>
                                             {it.name}
+                                          </td>
+                                          <td style={{ textAlign: "center" }}>
+                                            {it.quantity || 0}
                                           </td>
                                           <td>{it.workType || "-"}</td>
                                         </tr>
@@ -273,6 +277,19 @@ export default function QuotationPage() {
                                   >
                                     ₹
                                     {quotation.totals?.freightInstallationHandling?.toLocaleString(
+                                      "en-IN"
+                                    ) || 0}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <td style={{ padding: 6, fontWeight: 700 }}>
+                                    Discount
+                                  </td>
+                                  <td
+                                    style={{ padding: 6, textAlign: "right" }}
+                                  >
+                                    ₹
+                                    {quotation.totals?.discount?.toLocaleString(
                                       "en-IN"
                                     ) || 0}
                                   </td>

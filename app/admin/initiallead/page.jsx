@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import LeadCard from "../../../../component/leadCard";
-import LoadingSpinner from "../../../../component/loadingSpinner";
-import ConfirmationDialogueBox from "../../../../component/confirmationDialogueBox";
+import LeadCard from "../../../component/leadCard";
+import LoadingSpinner from "../../../component/loadingSpinner";
+import ConfirmationDialogueBox from "../../../component/confirmationDialogueBox";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function LeadsDisplayPage() {

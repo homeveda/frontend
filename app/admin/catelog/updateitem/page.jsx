@@ -27,6 +27,7 @@ export default function UpdateItemPage() {
     price: "",
     type: "Normal",
     workType: "Carcass",
+    displayedToClients: true,
   });
   const [imageFile, setImageFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
@@ -55,6 +56,7 @@ export default function UpdateItemPage() {
           price: data.price || "",
           type: data.type || "Normal",
           workType: data.workType || "Wood Work",
+          displayedToClients: data.displayedToClients !== undefined ? data.displayedToClients : true,
         });
         if (data.imageLink) setPreviewImage(data.imageLink);
         if (data.video) setPreviewVideo(data.video);
@@ -113,6 +115,7 @@ export default function UpdateItemPage() {
       formDataToSend.append("price", formData.price);
       formDataToSend.append("type", formData.type);
       formDataToSend.append("workType", formData.workType);
+      formDataToSend.append("displayedToClients", formData.displayedToClients);
 
       if (imageFile) formDataToSend.append("image", imageFile);
       if (videoFile && formData.type === "Premium") formDataToSend.append("video", videoFile);
@@ -126,7 +129,7 @@ export default function UpdateItemPage() {
       setPopupMessage("Catalog item updated successfully!");
       setPopupColor("green");
       setShowPopup(true);
-      setTimeout(() => router.push("/admin/catelog/search"), 2000);
+      setTimeout(() => router.push("/admin/catelog/display"), 2000);
     } catch (err) {
       setPopupMessage(err?.response?.data?.message || "Failed to update item");
       setPopupColor("red");
@@ -232,18 +235,38 @@ export default function UpdateItemPage() {
               </div>
             </div>
 
-            <div className="mb-4">
-              <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
-                style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", resize: "vertical" }}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  rows={3}
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", resize: "vertical" }}
+                />
+              </div>
+            </div>
+
+            <div className="mb-4 p-3 rounded-[10px]" style={{ backgroundColor: "#f9f7f5", border: "1px solid #e9e6e3" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <input
+                  type="checkbox"
+                  id="displayToggle"
+                  checked={formData.displayedToClients}
+                  onChange={(e) => setFormData({ ...formData, displayedToClients: e.target.checked })}
+                  style={{ width: 20, height: 20, cursor: "pointer",accentColor: 'var(--primary)' }}
+                />
+                <label htmlFor="displayToggle" style={{ cursor: "pointer", margin: 0, fontSize: 14, fontWeight: 600 }}>
+                  Display to Clients
+                </label>
+              </div>
+              <p style={{ fontSize: 12, color: "#8f8f8f", margin: "6px 0 0 32px" }}>
+                {formData.displayedToClients ? "This item is visible to clients" : "This item is hidden from clients"}
+              </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

@@ -171,6 +171,17 @@ export default function ProjectCard({ project }) {
             onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
             onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
             onClick={() =>
+              router.push(`/admin/projects/${p.id || p._id}/inspection`)
+            }
+          >
+            Inspection
+          </button>
+          <button
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
+            style={{ backgroundColor: "#e07b63" }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            onClick={() =>
               router.push(`/admin/projects/${p.id || p._id}/designs`)
             }
           >

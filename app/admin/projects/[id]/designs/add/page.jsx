@@ -265,7 +265,7 @@ const AddDesignPage = () => {
                     className="text-sm font-medium mb-1 block"
                     style={{ color: "var(--muted)" }}
                   >
-                    Image File (png, jpeg, jpg)
+                    Customer Layout File (png, jpeg, jpg)
                   </label>
                   <input
                     id="image-file-input"
@@ -290,7 +290,7 @@ const AddDesignPage = () => {
                     className="text-sm font-medium mb-1 block"
                     style={{ color: "var(--muted)" }}
                   >
-                    Design File (png, jpeg, jpg)
+                    Proposed Layout File (png, jpeg, jpg)
                   </label>
                   <input
                     id="design-file-input"
@@ -366,7 +366,7 @@ const AddDesignPage = () => {
                             className="text-xs mb-2"
                             style={{ color: "var(--muted)" }}
                           >
-                            Image: {item.imageFile.name}
+                            Customer Layout: {item.imageFile.name}
                           </p>
                           <img
                             src={item.imagePreview}
@@ -381,7 +381,7 @@ const AddDesignPage = () => {
                             className="text-xs mb-2"
                             style={{ color: "var(--muted)" }}
                           >
-                            Design: {item.designFile.name}
+                            Proposed Layout: {item.designFile.name}
                           </p>
                           <img
                             src={item.designPreview}

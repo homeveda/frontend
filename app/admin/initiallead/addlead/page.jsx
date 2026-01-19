@@ -14,6 +14,9 @@ export default function AddLeadPage() {
     address: "",
     contactNumber: "",
     architectStatus: "Account Not Created",
+    architectName: "",
+    architectContact: "",
+    architectCity: "",
     leadStatus: "New",
   });
   const [loading, setLoading] = useState(false);
@@ -52,6 +55,9 @@ export default function AddLeadPage() {
         address: form.address.trim(),
         contactNumber: form.contactNumber.trim(),
         architectStatus: form.architectStatus,
+        architectName: form.architectName.trim(),
+        architectContact: form.architectContact.trim(),
+        architectCity: form.architectCity.trim(),
         leadStatus: form.leadStatus,
       };
       const res = await axios.post(`${backendUrl}/initiallead`, payload,{
@@ -62,8 +68,8 @@ export default function AddLeadPage() {
       setPopupMessage("Lead created successfully");
       setPopupColor("green");
       setShowPopup(true);
-      setForm({ name: "", address: "", contactNumber: "", architectStatus: "Account Not Created", leadStatus: "New" });
-      setTimeout(() => router.push("/admin/initiallead/display"), 1200);
+      setForm({ name: "", address: "", contactNumber: "", architectStatus: "Account Not Created", architectName: "", architectContact: "", architectCity: "", leadStatus: "New" });
+      setTimeout(() => router.push("/admin/initiallead"), 1200);
     } catch (error) {
       setPopupMessage(error?.response?.data?.message || "Failed to create lead");
       setPopupColor("red");
@@ -122,6 +128,23 @@ export default function AddLeadPage() {
                   <option>Closed</option>
                   <option>Follow Up</option>
                 </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Architect Name</label>
+                <input name="architectName" value={form.architectName} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }} />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Architect Contact</label>
+                <input name="architectContact" value={form.architectContact} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }} />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Architect City</label>
+                <input name="architectCity" value={form.architectCity} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }} />
               </div>
             </div>
 

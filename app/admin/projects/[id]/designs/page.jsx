@@ -115,7 +115,7 @@ export default function DesignPage() {
                           }}
                         />
                         <div className="absolute top-2 left-2 bg-[#e07b63] text-white px-2 py-1 rounded text-xs font-semibold">
-                          Design
+                          Proposed Layout 
                         </div>
                       </div>
                     )}
@@ -133,7 +133,7 @@ export default function DesignPage() {
                           }}
                         />
                         <div className="absolute top-2 left-2 bg-[#f7f4f1] text-[#e07b63] border-[#e07b63] border px-2 py-1 rounded text-xs font-semibold">
-                          Image
+                          Customer Layout
                         </div>
                       </div>
                     )}
@@ -152,7 +152,7 @@ export default function DesignPage() {
                             rel="noopener noreferrer"
                             className="flex-1 bg-[#e07b63] text-white  text-center py-2 rounded hover:bg-[#d56a52] transition-colors text-sm"
                           >
-                            View Design
+                            View Proposed Layout 
                           </a>
                         )}
                         {item.imageLink && (
@@ -162,7 +162,7 @@ export default function DesignPage() {
                             rel="noopener noreferrer"
                             className="flex-1 bg-[#f7f4f1] border-[#e07b63] border text-[#e07b63] hover:text-[#f7f4f1] text-center py-2 rounded hover:bg-[#e07b63] transition-colors text-sm"
                           >
-                            View Image
+                            View Customer Layout
                           </a>
                         )}
                       </div>

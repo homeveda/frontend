@@ -37,15 +37,15 @@ export default function UserProjectsPage(){
         }, [email, backendUrl]);
 
         return (
-            <div className="p-6" style={{ backgroundColor: '#f7f4f1', minHeight: '100vh', fontFamily: "'Space Grotesk', sans-serif" }}>
+            <div className="p-4 sm:p-6" style={{ backgroundColor: '#f7f4f1', minHeight: '100vh', fontFamily: "'Space Grotesk', sans-serif" }}>
                 <div className="max-w-4xl mx-auto">
-                    <div className="flex items-center justify-between mb-6">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                         <div>
-                            <h2 className="text-2xl font-semibold" style={{ color: '#111111' }}>User Projects</h2>
-                            <p className="text-xl mt-1" >Email id - <span className="text-[#8f8f8f]">{email}</span></p>
+                            <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: '#111111' }}>User Projects</h2>
+                            <p className="text-base sm:text-xl mt-1 break-all">Email id - <span className="text-[#8f8f8f]">{email}</span></p>
                         </div>
-                        <div className="flex gap-3">
-                            <button onClick={() => router.push(`/admin/projects/add?userEmail=${encodeURIComponent(email)}`)} className="text-white px-4 py-2 rounded-[10px] font-semibold transition" style={{ backgroundColor: '#e07b63' }} onMouseEnter={(e) => (e.target.style.backgroundColor = '#d56a52')} onMouseLeave={(e) => (e.target.style.backgroundColor = '#e07b63')}>Create New Project</button>
+                        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+                            <button onClick={() => router.push(`/admin/projects/add?userEmail=${encodeURIComponent(email)}`)} className="text-white px-3 sm:px-4 py-2 rounded-[10px] font-semibold transition text-sm sm:text-base whitespace-nowrap flex-1 sm:flex-none" style={{ backgroundColor: '#e07b63' }} onMouseEnter={(e) => (e.target.style.backgroundColor = '#d56a52')} onMouseLeave={(e) => (e.target.style.backgroundColor = '#e07b63')}>Create New Project</button>
                         </div>
                     </div>
 

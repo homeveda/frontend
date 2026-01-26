@@ -38,7 +38,9 @@ export default function DisplayAllUsers(){
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const filtered = users.filter(u => (u.name || '').toLowerCase().includes(query.trim().toLowerCase()));
+  const filtered = users
+    .filter(u => !u.isAdmin)
+    .filter(u => (u.name || '').toLowerCase().includes(query.trim().toLowerCase()));
 
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>

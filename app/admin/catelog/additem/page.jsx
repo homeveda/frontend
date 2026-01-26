@@ -117,7 +117,7 @@ export default function AddItemPage() {
             if (resp.status === 201) {
                 setMessage({ type: "success", text: "Catalog item created." });
                 // reset
-                setForm({ name: "", description: "", category: "Builder", workType: "Wood Work", price: "", type: "Normal" });
+                setForm({ name: "", description: "", category: "Builder", workType: "Carcass", price: "", type: "Normal" });
                 setImagePreview(null);
                 setVideoPreview(null);
                 if (imageInputRef.current) imageInputRef.current.value = "";

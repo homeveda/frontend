@@ -268,6 +268,19 @@ export default function QuotationPage() {
                                     ) || 0}
                                   </td>
                                 </tr>
+                                 <tr>
+                                  <td style={{ padding: 6, fontWeight: 700 }}>
+                                    Discount
+                                  </td>
+                                  <td
+                                    style={{ padding: 6, textAlign: "right" }}
+                                  >
+                                    ₹
+                                    {quotation.totals?.discount?.toLocaleString(
+                                      "en-IN"
+                                    ) || 0}
+                                  </td>
+                                </tr>
                                 <tr>
                                   <td style={{ padding: 6, fontWeight: 700 }}>
                                     Freight, Installation & Handling
@@ -281,19 +294,7 @@ export default function QuotationPage() {
                                     ) || 0}
                                   </td>
                                 </tr>
-                                <tr>
-                                  <td style={{ padding: 6, fontWeight: 700 }}>
-                                    Discount
-                                  </td>
-                                  <td
-                                    style={{ padding: 6, textAlign: "right" }}
-                                  >
-                                    ₹
-                                    {quotation.totals?.discount?.toLocaleString(
-                                      "en-IN"
-                                    ) || 0}
-                                  </td>
-                                </tr>
+                               
                                 <tr>
                                   <td style={{ padding: 6, fontWeight: 700 }}>
                                     Total before Tax

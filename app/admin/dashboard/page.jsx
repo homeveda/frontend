@@ -9,7 +9,7 @@ export default function AdminDashboardPage() {
             key: "initialLead",
             title: "Initial Leads",
             desc: "View and manage incoming leads.",
-            href: "/admin/initiallead/display",
+            href: "/admin/initiallead/",
             bg: "#fef2f0",
         },
         {

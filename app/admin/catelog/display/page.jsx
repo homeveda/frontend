@@ -94,24 +94,24 @@ export default function CatelogSearchPage() {
   const filtered = items.filter((it) => (query ? it.name.toLowerCase().includes(query.toLowerCase()) : true));
 
   return (
-    <div className="p-6" style={{ backgroundColor: '#f7f4f1', minHeight: '100vh', fontFamily: "'Space Grotesk', sans-serif" }}>
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 sm:p-6" style={{ backgroundColor: '#f7f4f1', minHeight: '100vh', fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-semibold" style={{ color: '#111111', letterSpacing: '-0.02em' }}>Catalog Search</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: '#111111', letterSpacing: '-0.02em' }}>Catalog Search</h2>
           <p className="text-sm mt-1" style={{ color: '#8f8f8f' }}>Browse and manage catalog items</p>
         </div>
-        <div className="flex gap-3 px-5">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <button
               onClick={() => {
                 router.push(`/admin/catelog/additem`);
               }}
-              className="cursor-pointer bg-[#e07b63] text-white px-4 py-2 rounded hover:bg-[#f7f4f1] hover:text-[#e07b63] hover:border-[#e07b63] border rounded-lg border-transparent transition-colors"
+              className="cursor-pointer bg-[#e07b63] text-white px-4 py-2 rounded hover:bg-[#f7f4f1] hover:text-[#e07b63] hover:border-[#e07b63] border rounded-lg border-transparent transition-colors text-sm sm:text-base whitespace-nowrap"
             >
               Add New Catelogue Item
             </button>
             <button
             onClick={() => router.back()}
-            className="text-xl font-semibold cursor-pointer "
+            className="text-lg sm:text-xl font-semibold cursor-pointer whitespace-nowrap"
             style={{ color: "#e07b63" }}
           >
             ← Back

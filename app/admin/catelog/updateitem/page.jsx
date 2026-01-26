@@ -55,7 +55,7 @@ export default function UpdateItemPage() {
           category: data.category || "Economy",
           price: data.price || "",
           type: data.type || "Normal",
-          workType: data.workType || "Wood Work",
+          workType: data.workType || "Carcass",
           displayedToClients: data.displayedToClients !== undefined ? data.displayedToClients : true,
         });
         if (data.imageLink) setPreviewImage(data.imageLink);
@@ -141,7 +141,7 @@ export default function UpdateItemPage() {
 
   if (loading) {
     return (
-      <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
         <LoadingSpinner />
       </div>
     );
@@ -149,7 +149,7 @@ export default function UpdateItemPage() {
 
   if (!item) {
     return (
-      <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
+      <div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
         <div style={{ color: "#e07b63" }}>Item not found</div>
       </div>
     );
@@ -170,7 +170,7 @@ export default function UpdateItemPage() {
   ];
 
   return (
-    <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
+    <div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
       {showPopup && (
         <Popup
           message={popupMessage}
@@ -182,15 +182,15 @@ export default function UpdateItemPage() {
       )}
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl mx-auto">
-        <div className="mb-6">
+        <div className="mb-4 sm:mb-6">
           <button
             onClick={() => router.back()}
-            className="text-sm font-semibold mb-4"
+            className="text-sm font-semibold mb-3 sm:mb-4"
             style={{ color: "#e07b63" }}
           >
             ← Back
           </button>
-          <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
+          <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
             Update Catalog Item
           </h2>
           <p className="text-sm mt-1" style={{ color: "#8f8f8f" }}>
@@ -203,7 +203,7 @@ export default function UpdateItemPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.1 }}
-            className="rounded-[14px] p-6 mb-6"
+            className="rounded-[14px] p-4 sm:p-6 mb-4 sm:mb-6"
             style={{ backgroundColor: "#ffffff", boxShadow: "0 10px 30px rgba(16,16,16,0.08)" }}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">

@@ -34,6 +34,7 @@ export default function UpdateProjectPage() {
     const [projectHead, setProjectHead] = useState("");
     const [architectName, setArchitectName] = useState("");
     const [category, setCategory] = useState("Economy");
+    const [status, setStatus] = useState("LEAD");
     const [kind, setKind] = useState("kitchen");
     const [email,setEmail]=useState("");
 
@@ -75,6 +76,25 @@ export default function UpdateProjectPage() {
 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const STATUS_OPTIONS = [
+        "LEAD",
+        "DESIGN",
+        "QUOTATION",
+        "10% TOKEN",
+        "FINAL MEASUREMENT",
+        "FINAL DRAWINGS",
+        "50% PAYMENT",
+        "FACTORY ORDER",
+        "SITE READY CHECK",
+        "FACTORY FULL PAYMENT",
+        "DISPATCH",
+        "90% CLIENT PAYMENT",
+        "INSTALLATION",
+        "QUALITY CHECK",
+        "HANDOVER",
+        "10% FINAL PAYMENT",
+        "AFTER SALES",
+    ];
 
     useEffect(() => {
         if (!id || !backendUrl) return;
@@ -87,6 +107,7 @@ export default function UpdateProjectPage() {
                 setProjectHead(p.projectHead || "");
                 setArchitectName(p.architectName || "");
                 setCategory(p.category || "Economy");
+                setStatus(p.status || "LEAD");
                 setEmail(p.userEmail || "");
                 if (p.kitchen) {
                     setKind("kitchen");
@@ -146,6 +167,7 @@ export default function UpdateProjectPage() {
             form.append("projectHead", projectHead);
             if (architectName) form.append("architectName", architectName);
             if (category) form.append("category", category);
+            if (status) form.append("status", status);
 
             if (kind === "kitchen") {
                 const appliancesArr = Array.isArray(kitchen.appliances)
@@ -243,6 +265,15 @@ export default function UpdateProjectPage() {
                             <option>Economy</option>
                             <option>Standard</option>
                             <option>VedaX</option>
+                        </select>
+
+                        <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                            Status
+                        </label>
+                        <select value={status} onChange={(e) => setStatus(e.target.value)} className="px-3 py-2 rounded-[10px]" style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}>
+                            {STATUS_OPTIONS.map((opt) => (
+                                <option key={opt} value={opt}>{opt}</option>
+                            ))}
                         </select>
 
                         <div className="mt-4">

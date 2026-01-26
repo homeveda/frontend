@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ConfirmationDialogueBox from "./confirmationDialogueBox";
 import Popup from "./popup";
+import ProjectTimeline from "./projectTimeline";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 export default function ProjectCard({ project }) {
@@ -81,6 +82,7 @@ export default function ProjectCard({ project }) {
                 </p>
               )}
 
+              {/* Project Timeline */}
               {p.kitchen && (
                 <div className=" mt-3">
                   <div>
@@ -96,6 +98,10 @@ export default function ProjectCard({ project }) {
                     Theme:{" "}
                     <span className="text-[#8f8f8f]">{p.kitchen.theme}</span>
                   </div>
+
+                  
+                {p.status && <ProjectTimeline status={p.status} />}
+
                   {Array.isArray(p.kitchen.layoutPlan) &&
                     p.kitchen.layoutPlan.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-2">
@@ -129,14 +135,16 @@ export default function ProjectCard({ project }) {
                       {(p.wardrobe.type || []).join(", ")}
                     </span>
                   </div>
+                   {p.status && <ProjectTimeline status={p.status} />}
                   {Array.isArray(p.wardrobe.measureents) &&
                     p.wardrobe.measureents.length > 0 && (
                       <div className="mt-3 grid grid-cols-3 gap-2">
                         {p.wardrobe.measureents.map((src) => (
                           <div
                             key={src}
-                            className="w-full h-20 rounded-[8px] overflow-hidden flex items-center justify-center"
+                            className="w-full h-20 rounded-[8px] overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
                             style={{ backgroundColor: "#f5f5f5" }}
+                            onClick={() => window.open(src, "_blank")}
                           >
                             <img
                               src={src}
@@ -186,6 +194,17 @@ export default function ProjectCard({ project }) {
             }
           >
             Designs
+          </button>
+          <button
+            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
+            style={{ backgroundColor: "#e07b63" }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            onClick={() =>
+              router.push(`/admin/projects/${p.id || p._id}/materials`)
+            }
+          >
+            Materials
           </button>
           <button
             className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"

@@ -28,7 +28,7 @@ export default function LeadCard({ lead, onDelete }) {
             <p className="text-xs mt-1" style={{ color: '#8f8f8f' }}>{lead.address}</p>
             <div className="text-xs mt-2" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.contactNumber}</span></div>
             
-            {(lead.architectName || lead.architectContact || lead.architectCity) && (
+            {(lead.architectName || lead.architectContact || lead.architectAddress) && (
               <div className="mt-3 pt-3" style={{ borderTop: '1px solid #e9e6e3' }}>
                 <p className="text-xs font-semibold" style={{ color: '#111111' }}>Architect Details</p>
                 {lead.architectName && (
@@ -37,8 +37,8 @@ export default function LeadCard({ lead, onDelete }) {
                 {lead.architectContact && (
                   <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectContact}</span></div>
                 )}
-                {lead.architectCity && (
-                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>City: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectCity}</span></div>
+                {lead.architectAddress && (
+                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Address: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectAddress}</span></div>
                 )}
               </div>
             )}
@@ -55,7 +55,31 @@ export default function LeadCard({ lead, onDelete }) {
             }}>
               {lead.architectStatus}
             </span>
-            <span style={{
+              {(lead.Requirements && lead.Requirements.length > 0) && (
+                <div className="mb-2">
+                  <p className="text-xs font-semibold" style={{ color: '#111111' }}>Requirements</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {lead.Requirements.map((req, idx) => (
+                      <span key={idx} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(224,123,99,0.1)', color: '#e07b63', fontWeight: 500 }}>
+                        {req}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {(lead.category && lead.category.length > 0) && (
+                <div>
+                  <p className="text-xs font-semibold" style={{ color: '#111111' }}>Category</p>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {lead.category.map((cat, idx) => (
+                      <span key={idx} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(22,150,209,0.1)', color: '#1696d1', fontWeight: 500 }}>
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <span style={{
               fontSize: 12,
               padding: '4px 8px',
               borderRadius: 8,

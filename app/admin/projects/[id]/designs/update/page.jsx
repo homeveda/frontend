@@ -289,7 +289,16 @@ export default function AddDesignPage() {
           <Popup message={popupMessage} color={popupColor} onClose={() => setShowPopup(false)} />
         )}
         <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between pb-4 mb-6">
           <h1 className="text-4xl font-bold mb-8" style={{ color: "var(--accent)" }}>Update Designs for Project</h1>
+          <button
+                onClick={() => router.back()}
+                className="text-xl font-semibold cursor-pointer"
+                style={{ color: "#e07b63" }}
+              >
+                ← Back
+              </button>
+          </div>
 
           <div className="mb-8 p-6 md:p-8 rounded-xl shadow-lg" style={{ backgroundColor: "var(--card)" }}>
             <h2 className="text-2xl font-semibold mb-6" style={{ color: "var(--accent)" }}>Add a New Design Item</h2>

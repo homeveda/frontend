@@ -223,12 +223,21 @@ const AddDesignPage = () => {
           />
         )}
         <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between pb-4 mb-6">
           <h1
             className="text-4xl font-bold mb-8"
             style={{ color: "var(--accent)" }}
           >
             Add Designs for Project
           </h1>
+          <button
+                onClick={() => router.back()}
+                className="text-xl font-semibold cursor-pointer"
+                style={{ color: "#e07b63" }}
+              >
+                ← Back
+              </button>
+          </div>
 
           <div
             className="mb-8 p-6 md:p-8 rounded-xl shadow-lg"

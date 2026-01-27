@@ -253,10 +253,21 @@ export default function AddMaterialPage() {
         )}
 
         <div className="mb-6">
+          <div className="flex items-center justify-between pb-4">
+          <div>
           <h1 className="text-2xl sm:text-3xl font-bold mb-2">Add Material</h1>
           <p className="text-gray-600">
             Project Category: <span className="font-semibold">{projectCategory}</span>
           </p>
+          </div>
+          <button
+                onClick={() => router.back()}
+                className="text-xl font-semibold cursor-pointer"
+                style={{ color: "#e07b63" }}
+              >
+                ← Back
+              </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

@@ -177,7 +177,14 @@ export default function MaterialsPage() {
         }
       `}</style>
 
-      <div className="p-4 sm:p-6">
+      <div
+        className="p-6"
+        style={{
+          backgroundColor: "#f7f4f1",
+          minHeight: "100vh",
+          fontFamily: "'Space Grotesk', sans-serif",
+        }}
+      >
         {showPopup && (
           <Popup
             message={popupMessage}
@@ -192,14 +199,15 @@ export default function MaterialsPage() {
             </h1>
             <p className="text-gray-600">Manage materials for this project</p>
           </div>
-          <div className="flex gap-3 w-full sm:w-auto">
+          <div className="flex gap-3 text-xl w-full sm:w-auto">
             <button
-              className="btn-primary flex-1 sm:flex-none"
-              onClick={() =>
-                router.push(`/admin/projects/${projectId}/materials/add`)
-              }
+              onClick={() => {
+                 router.push(`/admin/projects/${projectId}/materials/add`)
+
+              }}
+              className=" bg-[#e07b63] text-white px-4 py-2 rounded hover:bg-[#f7f4f1] hover:text-[#e07b63] hover:border-[#e07b63] border rounded-lg border-transparent transition-colors"
             >
-              + Add Material
+              Add New Materials
             </button>
             <button
               onClick={() =>

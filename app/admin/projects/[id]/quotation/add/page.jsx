@@ -5,7 +5,6 @@ import { useParams } from "next/navigation";
 import LoadingSpinner from "../../../../../../component/loadingSpinner";
 import Popup from "../../../../../../component/popup";
 import axios from "axios";
-import { number } from "framer-motion";
 
 export default function QuotationPage() {
   const params = useParams();
@@ -29,22 +28,19 @@ export default function QuotationPage() {
 
   // Work type groups and optional subtypes
   const workGroups = {
-    "Wood Work": ["Carcuass", "Shutters", "Visibles", "Base And Back"],
+    "Wood Work": ["Carcass", "Shutters", "Visibles", "Base And Back"],
     Hardware: ["Main Hardware", "Other Hardware"],
     Countertop: [],
     Appliances: [],
     Miscellaneous: [],
   };
-
+  const catelogWorkTypes = ["Carcass","Shutters","Visibles","Base And Back","Main Hardware","Other Hardware","Miscellaneous","Countertop","Appliances"];
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedWorkGroup, setSelectedWorkGroup] = useState("");
   const [selectedWorkSubtype, setSelectedWorkSubtype] = useState("");
 
   const [catalog, setCatalog] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
-  const [selectedItemName, setSelectedItemName] = useState("");
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [quantity, setQuantity] = useState(1);
 
   const [stagedItems, setStagedItems] = useState([]);
 
@@ -77,6 +73,10 @@ export default function QuotationPage() {
 
     const fetchByWorkType = async (workType) => {
       try {
+        console.log("Fetching catalog for category:", selectedCategory);
+        console.log("Fetching by workType:", workType);
+        if(catelogWorkTypes.includes(workType)===false) return [];
+        console.log("Fetching by workType:", workType);
         const res = await axios.get(
           `${backendUrl}/catelog/category/${encodeURIComponent(
             selectedCategory
@@ -148,41 +148,86 @@ export default function QuotationPage() {
     fetchCatalog();
   }, [selectedCategory, selectedWorkGroup, selectedWorkSubtype]);
 
+  // Auto-stage items when a subtype is chosen OR when a work group has no subtypes
+  // Each staged item defaults to quantity 1. Previously staged items persist when switching filters.
   useEffect(() => {
-    if (!selectedItemName) return setSelectedItem(null);
-    const found = filteredItems.find((i) => i.name === selectedItemName);
-    setSelectedItem(found || null);
-    if (found) setQuantity(1);
-  }, [selectedItemName, filteredItems]);
+    const hasSubtypes =
+      selectedWorkGroup &&
+      workGroups[selectedWorkGroup] &&
+      workGroups[selectedWorkGroup].length > 0;
 
-  const handleStage = () => {
-    if (!selectedItem) return triggerPopup("Select an item to add.", "red");
-    if (!quantity || Number(quantity) <= 0)
-      return triggerPopup("Quantity must be at least 1", "red");
+    // Stage when a subtype is selected, or when a work group without subtypes is selected
+    const shouldStageByGroupWithoutSubtypes =
+      selectedWorkGroup && !hasSubtypes && !selectedWorkSubtype;
 
-    const newItem = {
-      id: Date.now(),
-      name: selectedItem.name,
-      price: selectedItem.price,
-      quantity: Number(quantity),
-      totalPrice: Number(quantity) * Number(selectedItem.price || 0),
-      imageLink: selectedItem.imageLink,
-      workType: selectedItem.workType,
-    };
-    setStagedItems([...stagedItems, newItem]);
-    setSelectedItemName("");
-    setSelectedItem(null);
-    setQuantity(1);
-  };
+    if (!selectedWorkSubtype && !shouldStageByGroupWithoutSubtypes) {
+      return;
+    }
+
+    const staged = filteredItems.map((item, idx) => ({
+      id: item._id || `${item.name}-${idx}`,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      totalPrice: Number(item.price || 0),
+      imageLink: item.imageLink,
+      workType: item.workType,
+    }));
+
+    // Merge newly staged items with existing ones, avoid duplicates by name
+    setStagedItems((prev) => {
+      const merged = new Map();
+      prev.forEach((it) => merged.set(it.name, it));
+      staged.forEach((it) => {
+        if (!merged.has(it.name)) {
+          merged.set(it.name, it);
+        }
+      });
+      return Array.from(merged.values());
+    });
+  }, [selectedWorkSubtype, selectedWorkGroup, filteredItems]);
 
   const handleRemoveStaged = (id) => {
     setStagedItems(stagedItems.filter((it) => it.id !== id));
+  };
+
+  // Allow editing quantity for staged items and keep totals in sync
+  const handleQuantityChange = (id, value) => {
+    // Allow empty string while user edits; clamp to min 1 when a number is provided
+    if (value === "") {
+      setStagedItems((prev) =>
+        prev.map((it) =>
+          it.id === id
+            ? {
+                ...it,
+                quantity: "",
+                totalPrice: 0,
+              }
+            : it
+        )
+      );
+      return;
+    }
+
+    const qty = Math.max(1, Number(value) || 0);
+    setStagedItems((prev) =>
+      prev.map((it) =>
+        it.id === id
+          ? {
+              ...it,
+              quantity: qty,
+              totalPrice: qty * Number(it.price || 0),
+            }
+          : it
+      )
+    );
   };
 
   const [discount, setDiscount] = useState(0);
   const [freightInstallationHandling, setFreightInstallationHandling] =
     useState(0);
   const [taxPercent, setTaxPercent] = useState(18);
+  const [includeTax, setIncludeTax] = useState(true);
   const handleSubmit = async () => {
     if (stagedItems.length === 0)
       return triggerPopup("Add at least one item", "red");
@@ -196,7 +241,9 @@ export default function QuotationPage() {
         grossAmount -
         Number(discount || 0) +
         Number(freightInstallationHandling || 0);
-      const taxAmount = (Number(taxPercent || 0) / 100) * totalBeforeTax;
+      const taxAmount = includeTax
+        ? (Number(taxPercent || 0) / 100) * totalBeforeTax
+        : 0;
       const grandTotal =
         grossAmount -
         Number(discount || 0) +
@@ -252,6 +299,9 @@ export default function QuotationPage() {
         .card-header{font-size:16px;font-weight:600;margin-bottom:8px}
         .staged-item{background:#fafafa;padding:12px;border-radius:8px}
         .muted{color:#888;font-size:13px}
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+        .no-spinner{-moz-appearance:textfield}
       `}</style>
       <div style={{ padding: 20 }}>
         {showPopup && (
@@ -261,8 +311,16 @@ export default function QuotationPage() {
             onClose={() => setShowPopup(false)}
           />
         )}
-
+        <div className="flex items-center justify-between pb-4 mb-6 ">
         <h1 style={{ fontSize: 28, marginBottom: 12 }}>Create Quotation</h1>
+          <button
+                onClick={() => router.back()}
+                className="text-xl font-semibold cursor-pointer"
+                style={{ color: "#e07b63" }}
+              >
+                ← Back
+              </button>
+        </div>
 
         <div style={{ display: "flex", gap: 20 }}>
           <div className="card" style={{ flex: 1 }}>
@@ -330,76 +388,9 @@ export default function QuotationPage() {
                   <LoadingSpinner />
                 </div>
               ) : (
-                <>
-                  <select
-                    className="input-styled w-full"
-                    value={selectedItemName}
-                    onChange={(e) => setSelectedItemName(e.target.value)}
-                  >
-                    <option value="">Select item</option>
-                    {filteredItems.map((it) => (
-                      <option key={it._id || it.name} value={it.name}>
-                        {it.name} — ₹{it.price} ({it.type || it.workType || "—"}
-                        )
-                      </option>
-                    ))}
-                  </select>
-
-                  {selectedItem && (
-                    <div style={{ marginTop: 10 }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: 12,
-                          alignItems: "center",
-                        }}
-                      >
-                        <img
-                          src={selectedItem.imageLink}
-                          alt={selectedItem.name}
-                          style={{
-                            width: 120,
-                            height: 80,
-                            objectFit: "cover",
-                            borderRadius: 6,
-                          }}
-                        />
-                        <div>
-                          <div style={{ fontWeight: 600 }}>
-                            {selectedItem.name}
-                          </div>
-                          <div style={{ color: "#888" }}>
-                            {selectedItem.description}
-                          </div>
-                          <div style={{ marginTop: 6 }}>
-                            <strong>₹{selectedItem.price}</strong>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div
-                        style={{
-                          marginTop: 10,
-                          display: "flex",
-                          gap: 8,
-                          alignItems: "center",
-                        }}
-                      >
-                        <input
-                          type="number"
-                          min={1}
-                          className="input-styled"
-                          style={{ width: 120 }}
-                          value={quantity}
-                          onChange={(e) => setQuantity(e.target.value)}
-                        />
-                        <button className="btn-primary" onClick={handleStage}>
-                          Add
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </>
+                <div style={{ color: "#666", fontSize: 13 }}>
+                  Select a subtype (or a work group without subtypes) to auto-stage all matching items with quantity 1.
+                </div>
               )}
             </div>
           </div>
@@ -440,8 +431,19 @@ export default function QuotationPage() {
                         <div style={{ fontSize: 13, color: "#666" }}>
                           {it.workType}
                         </div>
-                        <div style={{ marginTop: 6 }}>
-                          Qty: {it.quantity} × ₹{it.price} ={" "}
+                        <div style={{ marginTop: 6, display: "flex", gap: 8, alignItems: "center" }}>
+                          <span>Qty:</span>
+                          <input
+                            type="number"
+                            min={1}
+                            className="input-styled"
+                            style={{ width: 90 }}
+                            value={it.quantity}
+                            onChange={(e) => handleQuantityChange(it.id, e.target.value)}
+                            onFocus={() => handleQuantityChange(it.id, "")}
+                            onBlur={(e) => handleQuantityChange(it.id, e.target.value || "1")}
+                          />
+                          <span>× ₹{it.price} =</span>
                           <strong>₹{it.totalPrice}</strong>
                         </div>
                       </div>
@@ -473,7 +475,7 @@ export default function QuotationPage() {
                 </label>
                 <input
                   type="number"
-                  className="input-styled"
+                  className="input-styled no-spinner"
                   value={discount === 0 ? "" : discount}
                   onFocus={() => discount === 0 && setDiscount("")}
                   onBlur={(e) =>
@@ -496,7 +498,7 @@ export default function QuotationPage() {
                 <input
                   type="number"
               
-                  className="input-styled"
+                  className="input-styled no-spinner"
                   value={
                     freightInstallationHandling === 0
                       ? ""
@@ -519,8 +521,8 @@ export default function QuotationPage() {
                 />
               </div>
 
-              <div style={{ display: "flex", gap: 8 }}>
-                <label style={{ width: 160, alignSelf: "center" }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <label style={{ width: 160 }}>
                   Tax (%)
                 </label>
                 <input
@@ -538,7 +540,16 @@ export default function QuotationPage() {
                       e.target.value === "" ? "" : Number(e.target.value)
                     )
                   }
+                  disabled={!includeTax}
                 />
+                <label style={{ display: "flex", gap: 6, alignItems: "center", fontSize: 13 }}>
+                  <input
+                    type="checkbox"
+                    checked={includeTax}
+                    onChange={(e) => setIncludeTax(e.target.checked)}
+                  />
+                  Apply tax
+                </label>
               </div>
 
               {/* live summary H2s */}
@@ -552,13 +563,15 @@ export default function QuotationPage() {
                 <h1 className="text-xl">
                   Tax: ₹
                   {(
-                    (stagedItems.reduce(
-                      (s, it) => s + (Number(it.totalPrice) || 0),
-                      0
-                    ) -
-                      Number(discount || 0) +
-                      Number(freightInstallationHandling || 0)) *
-                      (Number(taxPercent || 0) / 100) || 0
+                    includeTax
+                      ? (stagedItems.reduce(
+                          (s, it) => s + (Number(it.totalPrice) || 0),
+                          0
+                        ) -
+                          Number(discount || 0) +
+                          Number(freightInstallationHandling || 0)) *
+                        (Number(taxPercent || 0) / 100)
+                      : 0
                   ).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
@@ -570,13 +583,15 @@ export default function QuotationPage() {
                     ) -
                       Number(discount || 0) +
                       Number(freightInstallationHandling || 0) +
-                      (stagedItems.reduce(
-                        (s, it) => s + (Number(it.totalPrice) || 0),
-                        0
-                      ) -
-                        Number(discount || 0) +
-                        Number(freightInstallationHandling || 0)) *
-                        (Number(taxPercent || 0) / 100) || 0
+                      (includeTax
+                        ? (stagedItems.reduce(
+                            (s, it) => s + (Number(it.totalPrice) || 0),
+                            0
+                          ) -
+                            Number(discount || 0) +
+                            Number(freightInstallationHandling || 0)) *
+                          (Number(taxPercent || 0) / 100)
+                        : 0) || 0
                   ).toLocaleString("en-IN")}
                 </h1>
               </div>

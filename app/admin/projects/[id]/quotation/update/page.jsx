@@ -29,13 +29,23 @@ export default function UpdateQuotationPage() {
 
   // Work type groups and optional subtypes
   const workGroups = {
-    "Wood Work": ["Carcuass", "Shutters", "Visibles", "Base And Back"],
+    "Wood Work": ["Carcass", "Shutters", "Visibles", "Base And Back"],
     Hardware: ["Main Hardware", "Other Hardware"],
     Countertop: [],
     Appliances: [],
     Miscellaneous: [],
   };
-
+  const catelogWorkTypes = [
+    "Carcass",
+    "Shutters",
+    "Visibles",
+    "Base And Back",
+    "Main Hardware",
+    "Other Hardware",
+    "Miscellaneous",
+    "Countertop",
+    "Appliances",
+  ];
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedWorkGroup, setSelectedWorkGroup] = useState("");
   const [selectedWorkSubtype, setSelectedWorkSubtype] = useState("");
@@ -56,11 +66,14 @@ export default function UpdateQuotationPage() {
         setIsLoading(true);
 
         // Fetch project details
-        const projectRes = await axios.get(`${backendUrl}/project/${projectId}`, {
-          headers: {
-            Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
+        const projectRes = await axios.get(
+          `${backendUrl}/project/${projectId}`,
+          {
+            headers: {
+              Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
+            },
           },
-        });
+        );
         const cat = projectRes.data?.details?.category || "";
         setProjectCategory(cat);
         setSelectedCategory(cat);
@@ -72,7 +85,7 @@ export default function UpdateQuotationPage() {
             headers: {
               Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
             },
-          }
+          },
         );
         console.log("Fetched quotation:", quotationRes.data.quotations[0]);
         if (quotationRes.data) {
@@ -96,9 +109,11 @@ export default function UpdateQuotationPage() {
           if (quotation.totals) {
             setDiscount(quotation.totals.discount || 0);
             setFreightInstallationHandling(
-              quotation.totals.freightInstallationHandling || 0
+              quotation.totals.freightInstallationHandling || 0,
             );
             setTaxPercent(quotation.totals.taxPercent || 18);
+            // Check if tax was applied in the saved quotation
+            setIncludeTax(quotation.totals.taxAmount > 0);
           }
         }
       } catch (err) {
@@ -113,20 +128,22 @@ export default function UpdateQuotationPage() {
 
   // Fetch catalog when category or workType selection changes
   useEffect(() => {
-    if (!selectedCategory) return;
+    if (!selectedCategory) {
+      return;
+    }
     const adminToken = localStorage.getItem("adminToken");
-
     const fetchByWorkType = async (workType) => {
       try {
+        if (catelogWorkTypes.includes(selectedWorkGroup) === false) return [];
         const res = await axios.get(
           `${backendUrl}/catelog/category/${encodeURIComponent(
-            selectedCategory
+            selectedCategory,
           )}/workType/${encodeURIComponent(workType)}`,
           {
             headers: {
               Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
             },
-          }
+          },
         );
         return res.data || [];
       } catch (err) {
@@ -157,20 +174,20 @@ export default function UpdateQuotationPage() {
 
         const resp = await axios.get(
           `${backendUrl}/catelog/category/${encodeURIComponent(
-            selectedCategory
+            selectedCategory,
           )}`,
           {
             headers: {
               Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
             },
-          }
+          },
         );
         const list = resp.data || [];
         let filtered = list;
         if (selectedWorkGroup) {
           const sub = selectedWorkSubtype || selectedWorkGroup;
           filtered = list.filter((it) =>
-            (it.workType || "").toLowerCase().includes(sub.toLowerCase())
+            (it.workType || "").toLowerCase().includes(sub.toLowerCase()),
           );
         }
         setCatalog(list);
@@ -200,7 +217,7 @@ export default function UpdateQuotationPage() {
 
     // Check if item already exists in staged items
     const existingItemIndex = stagedItems.findIndex(
-      (it) => it.name === selectedItem.name
+      (it) => it.name === selectedItem.name,
     );
 
     if (existingItemIndex !== -1) {
@@ -254,6 +271,7 @@ export default function UpdateQuotationPage() {
   const [freightInstallationHandling, setFreightInstallationHandling] =
     useState(0);
   const [taxPercent, setTaxPercent] = useState(18);
+  const [includeTax, setIncludeTax] = useState(true);
   // Derived amounts to show realtime calculations
   const [grossAmount, setGrossAmount] = useState(0);
   const [taxAmount, setTaxAmount] = useState(0);
@@ -264,16 +282,22 @@ export default function UpdateQuotationPage() {
   useEffect(() => {
     const gross = stagedItems.reduce(
       (s, it) => s + (Number(it.totalPrice) || 0),
-      0
+      0,
     );
     setGrossAmount(gross);
     const beforeTax =
       gross - Number(discount || 0) + Number(freightInstallationHandling || 0);
     setTotalBeforeTaxState(beforeTax);
-    const tax = (Number(taxPercent || 0) / 100) * beforeTax;
+    const tax = includeTax ? (Number(taxPercent || 0) / 100) * beforeTax : 0;
     setTaxAmount(tax);
     setGrandTotalState(beforeTax + tax);
-  }, [stagedItems, discount, freightInstallationHandling, taxPercent]);
+  }, [
+    stagedItems,
+    discount,
+    freightInstallationHandling,
+    taxPercent,
+    includeTax,
+  ]);
 
   const handleSubmit = async () => {
     if (stagedItems.length === 0)
@@ -313,18 +337,18 @@ export default function UpdateQuotationPage() {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },
-        }
+        },
       );
       triggerPopup("Quotation updated successfully", "green");
       setTimeout(
         () => router.push(`/admin/projects/${projectId}/quotation`),
-        1200
+        1200,
       );
     } catch (err) {
       console.error(err);
       triggerPopup(
         err?.response?.data?.message || "Failed to update quotation",
-        "red"
+        "red",
       );
     } finally {
       setIsLoading(false);
@@ -340,6 +364,9 @@ export default function UpdateQuotationPage() {
         .card-header{font-size:16px;font-weight:600;margin-bottom:8px}
         .staged-item{background:#fafafa;padding:12px;border-radius:8px}
         .muted{color:#888;font-size:13px}
+        .no-spinner::-webkit-outer-spin-button,
+        .no-spinner::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+        .no-spinner{-moz-appearance:textfield}
       `}</style>
       <div style={{ padding: 20 }}>
         {showPopup && (
@@ -349,8 +376,16 @@ export default function UpdateQuotationPage() {
             onClose={() => setShowPopup(false)}
           />
         )}
-
-        <h1 style={{ fontSize: 28, marginBottom: 12 }}>Update Quotation</h1>
+        <div className="flex items-center justify-between pb-4 mb-6 ">
+          <h1 style={{ fontSize: 28, marginBottom: 12 }}>Update Quotation</h1>
+          <button
+            onClick={() => router.back()}
+            className="text-xl font-semibold cursor-pointer"
+            style={{ color: "#e07b63" }}
+          >
+            ← Back
+          </button>
+        </div>
 
         <div style={{ display: "flex", gap: 20 }}>
           <div className="card" style={{ flex: 1 }}>
@@ -442,7 +477,6 @@ export default function UpdateQuotationPage() {
                           alignItems: "center",
                         }}
                       >
-                       
                         <div>
                           <div style={{ fontWeight: 600 }}>
                             {selectedItem.name}
@@ -502,28 +536,49 @@ export default function UpdateQuotationPage() {
                     }}
                   >
                     <div
-                      style={{ display: "flex", gap: 12, alignItems: "center", flex: 1 }}
+                      style={{
+                        display: "flex",
+                        gap: 12,
+                        alignItems: "center",
+                        flex: 1,
+                      }}
                     >
-                      
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: 600 }}>{it.name}</div>
                         <div style={{ fontSize: 13, color: "#666" }}>
                           {it.workType}
                         </div>
-                        <div style={{ marginTop: 6, display: "flex", gap: 12, alignItems: "center" }}>
+                        <div
+                          style={{
+                            marginTop: 6,
+                            display: "flex",
+                            gap: 12,
+                            alignItems: "center",
+                          }}
+                        >
                           <div>
-                            <label style={{ fontSize: 12, color: "#666" }}>Qty:</label>
+                            <label style={{ fontSize: 12, color: "#666" }}>
+                              Qty:
+                            </label>
                             <input
                               type="number"
                               min={1}
                               className="input-styled"
-                              style={{ width: 60, padding: "6px", marginLeft: 4 }}
+                              style={{
+                                width: 60,
+                                padding: "6px",
+                                marginLeft: 4,
+                              }}
                               value={it.quantity}
-                              onChange={(e) => handleUpdateQuantity(it.id, e.target.value)}
+                              onChange={(e) =>
+                                handleUpdateQuantity(it.id, e.target.value)
+                              }
                             />
                           </div>
                           <div>
-                            <div style={{ fontSize: 12, color: "#666" }}>Price: ₹{it.price}</div>
+                            <div style={{ fontSize: 12, color: "#666" }}>
+                              Price: ₹{it.price}
+                            </div>
                             <div style={{ fontWeight: 600, marginTop: 2 }}>
                               Total: ₹{it.totalPrice}
                             </div>
@@ -559,17 +614,17 @@ export default function UpdateQuotationPage() {
                 </label>
                 <input
                   type="number"
-                  className="input-styled"
+                  className="input-styled no-spinner"
                   value={discount === 0 ? "" : discount}
                   onFocus={() => discount === 0 && setDiscount("")}
                   onBlur={(e) =>
                     setDiscount(
-                      e.target.value === "" ? 0 : Number(e.target.value)
+                      e.target.value === "" ? 0 : Number(e.target.value),
                     )
                   }
                   onChange={(e) =>
                     setDiscount(
-                      e.target.value === "" ? "" : Number(e.target.value)
+                      e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
                 />
@@ -581,7 +636,7 @@ export default function UpdateQuotationPage() {
                 </label>
                 <input
                   type="number"
-                  className="input-styled"
+                  className="input-styled no-spinner"
                   value={
                     freightInstallationHandling === 0
                       ? ""
@@ -593,21 +648,19 @@ export default function UpdateQuotationPage() {
                   }
                   onBlur={(e) =>
                     setFreightInstallationHandling(
-                      e.target.value === "" ? 0 : Number(e.target.value)
+                      e.target.value === "" ? 0 : Number(e.target.value),
                     )
                   }
                   onChange={(e) =>
                     setFreightInstallationHandling(
-                      e.target.value === "" ? "" : Number(e.target.value)
+                      e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
                 />
               </div>
 
-              <div style={{ display: "flex", gap: 8 }}>
-                <label style={{ width: 160, alignSelf: "center" }}>
-                  Tax (%)
-                </label>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                <label style={{ width: 160 }}>Tax (%)</label>
                 <input
                   type="number"
                   className="input-styled"
@@ -615,15 +668,31 @@ export default function UpdateQuotationPage() {
                   onFocus={() => taxPercent === 0 && setTaxPercent("")}
                   onBlur={(e) =>
                     setTaxPercent(
-                      e.target.value === "" ? 0 : Number(e.target.value)
+                      e.target.value === "" ? 0 : Number(e.target.value),
                     )
                   }
                   onChange={(e) =>
                     setTaxPercent(
-                      e.target.value === "" ? "" : Number(e.target.value)
+                      e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
+                  disabled={!includeTax}
                 />
+                <label
+                  style={{
+                    display: "flex",
+                    gap: 6,
+                    alignItems: "center",
+                    fontSize: 13,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    checked={includeTax}
+                    onChange={(e) => setIncludeTax(e.target.checked)}
+                  />
+                  Apply tax
+                </label>
               </div>
 
               {/* live summary H2s */}

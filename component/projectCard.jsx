@@ -195,6 +195,7 @@ export default function ProjectCard({ project }) {
             </div>
           </div>
         </div>
+      </div>
 
       <div className="project-card-footer" style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',padding:'12px 16px',borderTop:'1px solid #e9e6e3'}}>
           <button
@@ -248,7 +249,7 @@ export default function ProjectCard({ project }) {
         {showPopup && (
           <Popup message={popupMessage} color={popupColor} onClose={() => setShowPopup(false)} />
         )}
-      </div>
     </motion.article>
+    </>
   );
 }

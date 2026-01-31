@@ -401,7 +401,7 @@ function UpdateItemContent() {
 
 export default function UpdateItemPage() {
   return (
-    <Suspense fallback={<LoadingSpinner />}>
+    <Suspense fallback={<div><LoadingSpinner /></div>}>
       <UpdateItemContent />
     </Suspense>
   );

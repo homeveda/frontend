@@ -23,6 +23,13 @@ export default function UpdateQuotationPage() {
     setShowPopup(true);
   };
 
+  // Validate backend URL on mount
+  useEffect(() => {
+    if (!backendUrl) {
+      triggerPopup("Backend URL not configured", "red");
+    }
+  }, []);
+
   const [projectCategory, setProjectCategory] = useState("");
   const [quotationId, setQuotationId] = useState("");
   const categories = ["Builder", "Economy", "Standard", "VedaX"];
@@ -128,9 +135,7 @@ export default function UpdateQuotationPage() {
 
   // Fetch catalog when category or workType selection changes
   useEffect(() => {
-    if (!selectedCategory) {
-      return;
-    }
+    if (!selectedCategory) return;
     const adminToken = localStorage.getItem("adminToken");
     const fetchByWorkType = async (workType) => {
       try {
@@ -156,7 +161,7 @@ export default function UpdateQuotationPage() {
       try {
         if (selectedWorkSubtype) {
           const r = await fetchByWorkType(selectedWorkSubtype);
-          if (r && Array.isArray(r)) {
+          if (r && Array.isArray(r) && r.length > 0) {
             setCatalog(r);
             setFilteredItems(r);
             return;
@@ -165,7 +170,7 @@ export default function UpdateQuotationPage() {
 
         if (selectedWorkGroup) {
           const r = await fetchByWorkType(selectedWorkGroup);
-          if (r && Array.isArray(r)) {
+          if (r && Array.isArray(r) && r.length > 0) {
             setCatalog(r);
             setFilteredItems(r);
             return;
@@ -183,18 +188,35 @@ export default function UpdateQuotationPage() {
           },
         );
         const list = resp.data || [];
+        
+        if (!list || list.length === 0) {
+          triggerPopup("No catalog items found for this category", "red");
+          setCatalog([]);
+          setFilteredItems([]);
+          return;
+        }
+        
         let filtered = list;
         if (selectedWorkGroup) {
           const sub = selectedWorkSubtype || selectedWorkGroup;
           filtered = list.filter((it) =>
             (it.workType || "").toLowerCase().includes(sub.toLowerCase()),
           );
+          
+          if (filtered.length === 0) {
+            triggerPopup("No catalog items found for the selected work type", "red");
+            setCatalog([]);
+            setFilteredItems([]);
+            return;
+          }
         }
         setCatalog(list);
         setFilteredItems(filtered);
       } catch (err) {
         console.error(err);
-        triggerPopup("Failed to fetch catalog", "red");
+        triggerPopup(err?.response?.data?.message || "Failed to fetch catalog", "red");
+        setCatalog([]);
+        setFilteredItems([]);
       } finally {
         setIsLoading(false);
       }
@@ -212,8 +234,8 @@ export default function UpdateQuotationPage() {
 
   const handleStage = () => {
     if (!selectedItem) return triggerPopup("Select an item to add.", "red");
-    if (!quantity || Number(quantity) <= 0)
-      return triggerPopup("Quantity must be at least 1", "red");
+    if (!quantity || Number(quantity) < 0.1)
+      return triggerPopup("Quantity must be at least 0.1", "red");
 
     // Check if item already exists in staged items
     const existingItemIndex = stagedItems.findIndex(
@@ -252,7 +274,7 @@ export default function UpdateQuotationPage() {
 
   const handleUpdateQuantity = (id, newQuantity) => {
     const numQty = Number(newQuantity);
-    if (numQty <= 0) return;
+    if (numQty < 0.1) return;
 
     const updatedItems = stagedItems.map((it) => {
       if (it.id === id) {
@@ -500,7 +522,8 @@ export default function UpdateQuotationPage() {
                       >
                         <input
                           type="number"
-                          min={1}
+                          min="0.1"
+                          step="0.1"
                           className="input-styled"
                           style={{ width: 120 }}
                           value={quantity}
@@ -562,7 +585,8 @@ export default function UpdateQuotationPage() {
                             </label>
                             <input
                               type="number"
-                              min={1}
+                              min="0.1"
+                              step="0.1"
                               className="input-styled"
                               style={{
                                 width: 60,

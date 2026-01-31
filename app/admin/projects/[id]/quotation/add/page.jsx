@@ -99,7 +99,7 @@ export default function QuotationPage() {
         // If a subtype is selected, try fetching by that exact workType first
         if (selectedWorkSubtype) {
           const r = await fetchByWorkType(selectedWorkSubtype);
-          if (r && Array.isArray(r)) {
+          if (r && Array.isArray(r) && r.length > 0) {
             setCatalog(r);
             setFilteredItems(r);
             return;
@@ -109,7 +109,7 @@ export default function QuotationPage() {
         // If a work group is selected, try fetching by it
         if (selectedWorkGroup) {
           const r = await fetchByWorkType(selectedWorkGroup);
-          if (r && Array.isArray(r)) {
+          if (r && Array.isArray(r) && r.length > 0) {
             setCatalog(r);
             setFilteredItems(r);
             return;
@@ -128,18 +128,35 @@ export default function QuotationPage() {
           }
         );
         const list = resp.data || [];
+        
+        if (!list || list.length === 0) {
+          triggerPopup("No catalog items found for this category", "red");
+          setCatalog([]);
+          setFilteredItems([]);
+          return;
+        }
+        
         let filtered = list;
         if (selectedWorkGroup) {
           const sub = selectedWorkSubtype || selectedWorkGroup;
           filtered = list.filter((it) =>
             (it.workType || "").toLowerCase().includes(sub.toLowerCase())
           );
+          
+          if (filtered.length === 0) {
+            triggerPopup("No catalog items found for the selected work type", "red");
+            setCatalog([]);
+            setFilteredItems([]);
+            return;
+          }
         }
         setCatalog(list);
         setFilteredItems(filtered);
       } catch (err) {
         console.error(err);
-        triggerPopup("Failed to fetch catalog", "red");
+        triggerPopup(err?.response?.data?.message || "Failed to fetch catalog", "red");
+        setCatalog([]);
+        setFilteredItems([]);
       } finally {
         setIsLoading(false);
       }
@@ -193,7 +210,7 @@ export default function QuotationPage() {
 
   // Allow editing quantity for staged items and keep totals in sync
   const handleQuantityChange = (id, value) => {
-    // Allow empty string while user edits; clamp to min 1 when a number is provided
+    // Allow empty string while user edits; clamp to min 0.1 when a number is provided
     if (value === "") {
       setStagedItems((prev) =>
         prev.map((it) =>
@@ -209,7 +226,7 @@ export default function QuotationPage() {
       return;
     }
 
-    const qty = Math.max(1, Number(value) || 0);
+    const qty = Math.max(0.1, Number(value) || 0);
     setStagedItems((prev) =>
       prev.map((it) =>
         it.id === id
@@ -311,16 +328,8 @@ export default function QuotationPage() {
             onClose={() => setShowPopup(false)}
           />
         )}
-        <div className="flex items-center justify-between pb-4 mb-6 ">
+
         <h1 style={{ fontSize: 28, marginBottom: 12 }}>Create Quotation</h1>
-          <button
-                onClick={() => router.back()}
-                className="text-xl font-semibold cursor-pointer"
-                style={{ color: "#e07b63" }}
-              >
-                ← Back
-              </button>
-        </div>
 
         <div style={{ display: "flex", gap: 20 }}>
           <div className="card" style={{ flex: 1 }}>
@@ -435,13 +444,14 @@ export default function QuotationPage() {
                           <span>Qty:</span>
                           <input
                             type="number"
-                            min={1}
+                            min="0.1"
+                            step="0.1"
                             className="input-styled"
                             style={{ width: 90 }}
                             value={it.quantity}
                             onChange={(e) => handleQuantityChange(it.id, e.target.value)}
                             onFocus={() => handleQuantityChange(it.id, "")}
-                            onBlur={(e) => handleQuantityChange(it.id, e.target.value || "1")}
+                            onBlur={(e) => handleQuantityChange(it.id, e.target.value || "0.1")}
                           />
                           <span>× ₹{it.price} =</span>
                           <strong>₹{it.totalPrice}</strong>

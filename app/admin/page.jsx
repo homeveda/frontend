@@ -50,12 +50,7 @@ export default function AdminLoginPage() {
     }
     setLoading(true);
     // Mock request delay
-    await new Promise((resolve) => {
-      setTimeout(resolve, 800);
-    });
-
-    setLoading(false);
-    router.push("/admin/dashboard");
+    
 
     if (isSignUp) {
       handleSignup();
@@ -76,6 +71,12 @@ export default function AdminLoginPage() {
         setPopupMessage("Admin login successful!");
         setPopupColor("green");
         setShowPopup(true);
+        await new Promise((resolve) => {
+          setTimeout(resolve, 800);
+        });
+
+        setLoading(false);
+        router.push("/admin/dashboard");
       } else {
         setPopupMessage("Login failed. Please check your credentials.");
         setPopupColor("red");
@@ -103,6 +104,12 @@ export default function AdminLoginPage() {
         setPopupMessage("Signup successful!");
         setPopupColor("green");
         setShowPopup(true);
+        await new Promise((resolve) => {
+          setTimeout(resolve, 800);
+        });
+
+        setLoading(false);
+        router.push("/admin/dashboard");
       } else {
         setPopupMessage("Signup failed. Please check your details.");
         setPopupColor("red");

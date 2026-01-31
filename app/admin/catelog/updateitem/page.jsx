@@ -1,12 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
 import { motion } from "framer-motion";
 import Popup from "../../../../component/popup";
 import LoadingSpinner from "../../../../component/loadingSpinner";
 
-export default function UpdateItemPage() {
+function UpdateItemContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -396,5 +396,13 @@ export default function UpdateItemPage() {
         </form>
       </motion.div>
     </div>
+  );
+}
+
+export default function UpdateItemPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <UpdateItemContent />
+    </Suspense>
   );
 }

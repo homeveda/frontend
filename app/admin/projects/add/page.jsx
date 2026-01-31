@@ -1,11 +1,11 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import LoadingSpinner from "../../../../component/loadingSpinner";
 import Popup from "../../../../component/popup";
 
-export default function NewProjectPage() {
+function NewProjectContent() {
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
@@ -718,5 +718,13 @@ export default function NewProjectPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function NewProjectPage() {
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <NewProjectContent />
+    </Suspense>
   );
 }

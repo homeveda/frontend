@@ -1,11 +1,11 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import axios from "axios";
 import LoadingSpinner from "../../../component/loadingSpinner";
 import ProjectCard from "../../../component/projectCard";
 import { useRouter,useSearchParams } from "next/navigation";
 
-export default function UserProjectsPage(){
+function UserProjectsContent(){
         const [email, setEmail] = useState("");
         const [projects, setProjects] = useState([]);
         const [loading, setLoading] = useState(false);
@@ -70,5 +70,13 @@ export default function UserProjectsPage(){
                     )}
                 </div>
             </div>
+        );
+}
+
+export default function UserProjectsPage(){
+        return (
+                <Suspense fallback={<LoadingSpinner />}>
+                        <UserProjectsContent />
+                </Suspense>
         );
 }

@@ -245,6 +245,25 @@ export default function UserLoginPage() {
 					input{font-size:14px;padding:8px}
 					label{font-size:10px}
 					.tab{padding:5px 8px;font-size:11px}
+				}
+			`}</style>
+
+      <motion.div
+        className="card"
+        initial="hidden"
+        animate="enter"
+        exit="exit"
+        variants={cardVariants}
+      >
+        <div className="brand">
+          <h1>User portal</h1>
+
+          <motion.div
+            className="art"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 120 }}
+          >
+            <Image
               src={logo}
               alt="Homeveda Logo"
               style={{ objectFit: "cover" }}

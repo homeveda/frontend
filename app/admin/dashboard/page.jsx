@@ -87,7 +87,6 @@ export default function AdminDashboardPage() {
                 `}</style>
 
                 <div className="max-w-7xl mx-auto">
-        <div>
                 <div className="dash-header">
                     <div>
                         <h1>Admin Dashboard</h1>

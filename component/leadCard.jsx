@@ -119,21 +119,12 @@ export default function LeadCard({ lead, onDelete }) {
         <button
           onClick={(e) => { e.stopPropagation(); onDelete && onDelete(lead); }}
           className="lead-card-delete-btn"
-        >
-          Delete
-        </button>
-      </div>
-    </motion.article>
-    </>
-  );
-}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#d56a52'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#e07b63'}
           aria-label={`Delete lead ${lead.name}`}
         >
           Delete
         </button>
       </div>
     </motion.article>
+    </>
   );
 }

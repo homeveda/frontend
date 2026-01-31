@@ -44,37 +44,74 @@ export default function DisplayAllUsers(){
 
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
-      <div className="flex items-center justify-between mb-6">
+      <style>{`
+        .users-header{display:flex;items-align:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+        .users-header > div:first-child{flex:1;min-width:200px}
+        .users-header h2{font-size:24px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin:0}
+        .users-header p{font-size:14px;color:#8f8f8f;margin:8px 0 0 0}
+        .users-refresh-btn{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
+        .users-refresh-btn:hover{background:#d56a52}
+        .users-search-panel{padding:16px;border-radius:14px;background:#ffffff;box-shadow:0 10px 30px rgba(16,16,16,0.08);margin-bottom:24px}
+        .users-search-group{display:flex;flex-direction:column}
+        .users-search-group label{font-size:13px;font-weight:600;color:#8f8f8f;margin-bottom:8px}
+        .users-search-group input{padding:10px 12px;border-radius:10px;border:1px solid #e9e6e3;background:#fafafa;font-size:13px;outline:none;font-family:inherit}
+        .users-search-group input:focus{border-color:#e07b63;background:rgba(224,123,99,0.02)}
+        .users-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+
+        @media (max-width:1024px){
+          .users-header{margin-bottom:20px}
+          .users-header h2{font-size:20px}
+          .users-refresh-btn{padding:6px 12px;font-size:13px}
+          .users-grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+        }
+
+        @media (max-width:768px){
+          .p-6{padding:12px !important}
+          .users-header{flex-direction:column;margin-bottom:16px;gap:8px}
+          .users-header > div:first-child{width:100%}
+          .users-refresh-btn{width:100%;padding:8px 12px;font-size:12px}
+          .users-search-panel{padding:12px;margin-bottom:16px}
+          .users-search-group label{font-size:12px;margin-bottom:6px}
+          .users-search-group input{padding:8px 10px;font-size:12px}
+          .users-grid{grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+          .users-header h2{font-size:18px}
+          .users-header p{font-size:12px;margin-top:4px}
+        }
+
+        @media (max-width:480px){
+          .p-6{padding:8px !important}
+          .users-header{gap:8px;margin-bottom:12px}
+          .users-header h2{font-size:16px}
+          .users-header p{font-size:11px}
+          .users-refresh-btn{width:100%;padding:6px 10px;font-size:11px;border-radius:8px}
+          .users-search-panel{padding:8px;margin-bottom:12px;border-radius:10px}
+          .users-search-group label{font-size:11px;margin-bottom:4px}
+          .users-search-group input{padding:6px 8px;font-size:11px;border-radius:6px}
+          .users-grid{grid-template-columns:1fr;gap:6px}
+        }
+      `}</style>
+      <div className="users-header">
         <div>
-          <h2 className="text-3xl font-bold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
-            Users
-          </h2>
-          <p className="text-xl mt-1" style={{ color: "#8f8f8f" }}>
-            Click on user card to see and user projects
-          </p>
+          <h2>Users</h2>
+          <p>Click on user card to see and user projects</p>
         </div>
         <button
           onClick={fetchUsers}
-          className="text-white px-4 py-2 rounded-[10px] font-semibold transition"
-          style={{ backgroundColor: "#e07b63" }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+          className="users-refresh-btn"
         >
           Refresh
         </button>
       </div>
 
-      <div className="p-4 rounded-[14px] mb-6" style={{ backgroundColor: "#ffffff", boxShadow: "0 10px 30px rgba(16,16,16,0.08)" }}>
-        <div>
-          <label className="text-sm font-medium" style={{ color: "#8f8f8f" }}>
+      <div className="users-search-panel">
+        <div className="users-search-group">
+          <label>
             Search User
           </label>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search by name..."
-            className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
-            style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
             aria-label="Search users by name"
           />
         </div>
@@ -83,7 +120,7 @@ export default function DisplayAllUsers(){
       {loading && <LoadingSpinner />}
       {error && <div className="text-sm" style={{ color: "#e07b63" }}>{error}</div>}
 
-      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <motion.div layout className="users-grid">
         <AnimatePresence>
           {filtered.map(user => (
             <motion.div key={user._id || user.id} layout>

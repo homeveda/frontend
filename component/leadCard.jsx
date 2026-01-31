@@ -7,97 +7,126 @@ export default function LeadCard({ lead, onDelete }) {
   const router = useRouter();
 
   const openDetails = () => {
-    // navigate to a lead details page if you have one
     const id = encodeURIComponent(lead.id || lead._id || lead.id);
     router.push(`/admin/initiallead/updatelead?id=${id}`);
   };
 
   return (
+    <>
+    <style>{`
+      .lead-card{background:#ffffff;border-radius:10px;box-shadow:0 10px 30px rgba(16,16,16,0.08);border:1px solid #e9e6e3;overflow:hidden;display:flex;flex-direction:column;font-family:"Space Grotesk",sans-serif}
+      .lead-card-content{cursor:pointer;padding:16px}
+      .lead-card-content:hover{background:rgba(224,123,99,0.02)}
+      .lead-card-title{font-size:14px;font-weight:600;color:#111111;margin:0}
+      .lead-card-address{font-size:12px;color:#8f8f8f;margin:8px 0 0 0}
+      .lead-card-contact{font-size:12px;color:#8f8f8f;margin:8px 0 0 0}
+      .lead-card-contact span{color:#111111;font-weight:600}
+      .lead-card-architect{border-top:1px solid #e9e6e3;margin-top:12px;padding-top:12px}
+      .lead-card-architect-label{font-size:11px;font-weight:600;color:#111111;margin:0}
+      .lead-card-info{font-size:11px;color:#8f8f8f;margin:4px 0 0 0}
+      .lead-card-info span{color:#111111;font-weight:600}
+      .lead-card-badges{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:flex-end}
+      .lead-card-badge{font-size:11px;padding:4px 8px;border-radius:8px;font-weight:600;white-space:nowrap}
+      .lead-card-badge.status-created{background:rgba(32,197,94,0.08);color:#20c55e}
+      .lead-card-badge.status-pending{background:rgba(224,123,99,0.06);color:#e07b63}
+      .lead-card-badge.hot{background:rgba(224,123,99,0.12);color:#e07b63}
+      .lead-card-badge.closed{background:rgba(100,100,100,0.08);color:#666666}
+      .lead-card-badge.followup{background:rgba(255,165,0,0.08);color:#ff8c00}
+      .lead-card-badge.new{background:rgba(100,150,200,0.08);color:#1696d1}
+      .lead-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+      .lead-card-tag{font-size:10px;padding:3px 6px;border-radius:6px;font-weight:500;white-space:nowrap}
+      .lead-card-tag.req{background:rgba(224,123,99,0.1);color:#e07b63}
+      .lead-card-tag.cat{background:rgba(22,150,209,0.1);color:#1696d1}
+      .lead-card-footer{display:flex;gap:12px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #e9e6e3}
+      .lead-card-delete-btn{color:white;font-size:12px;padding:6px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;background:#e07b63;transition:all 0.2s;flex:1}
+      .lead-card-delete-btn:hover{background:#d56a52}
+
+      @media (max-width:768px){
+        .lead-card-content{padding:12px}
+        .lead-card-title{font-size:13px}
+        .lead-card-address{font-size:11px}
+        .lead-card-footer{padding:10px 12px;gap:8px}
+        .lead-card-delete-btn{padding:5px 10px;font-size:11px;flex:1}
+      }
+
+      @media (max-width:480px){
+        .lead-card-content{padding:10px}
+        .lead-card-title{font-size:12px}
+        .lead-card-address{font-size:10px}
+        .lead-card-contact{font-size:10px}
+        .lead-card-badge{font-size:10px;padding:3px 6px}
+        .lead-card-tag{font-size:9px;padding:2px 4px}
+        .lead-card-footer{padding:8px 10px;gap:6px}
+        .lead-card-delete-btn{padding:5px 8px;font-size:10px}
+      }
+    `}</style>
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
       whileHover={{ scale: 1.02 }}
-      className="overflow-hidden flex flex-col"
-      style={{ backgroundColor: '#ffffff', borderRadius: '10px', boxShadow: '0 10px 30px rgba(16,16,16,0.08)', border: '1px solid #e9e6e3' }}
+      className="lead-card"
     >
-      <div onClick={openDetails} className="cursor-pointer p-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-sm font-semibold" style={{ color: '#111111' }}>{lead.name}</h3>
-            <p className="text-xs mt-1" style={{ color: '#8f8f8f' }}>{lead.address}</p>
-            <div className="text-xs mt-2" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.contactNumber}</span></div>
-            
-            {(lead.architectName || lead.architectContact || lead.architectAddress) && (
-              <div className="mt-3 pt-3" style={{ borderTop: '1px solid #e9e6e3' }}>
-                <p className="text-xs font-semibold" style={{ color: '#111111' }}>Architect Details</p>
-                {lead.architectName && (
-                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Name: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectName}</span></div>
-                )}
-                {lead.architectContact && (
-                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Contact: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectContact}</span></div>
-                )}
-                {lead.architectAddress && (
-                  <div className="text-xs mt-1" style={{ color: '#8f8f8f' }}>Address: <span style={{ color: '#111111', fontWeight:600 }}>{lead.architectAddress}</span></div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="flex flex-col items-end gap-2">
-            <span style={{
-              fontSize: 12,
-              padding: '4px 8px',
-              borderRadius: 8,
-              backgroundColor: lead.architectStatus === 'Account Created' ? 'rgba(32, 197, 94,0.08)' : 'rgba(224,123,99,0.06)',
-              color: lead.architectStatus === 'Account Created' ? '#20c55e' : '#e07b63',
-              fontWeight: 600
-            }}>
+      <div className="lead-card-content" onClick={openDetails}>
+        <div>
+          <h3 className="lead-card-title">{lead.name}</h3>
+          <p className="lead-card-address">{lead.address}</p>
+          <div className="lead-card-contact">Contact: <span>{lead.contactNumber}</span></div>
+          
+          {(lead.architectName || lead.architectContact || lead.architectAddress) && (
+            <div className="lead-card-architect">
+              <p className="lead-card-architect-label">Architect Details</p>
+              {lead.architectName && (
+                <div className="lead-card-info">Name: <span>{lead.architectName}</span></div>
+              )}
+              {lead.architectContact && (
+                <div className="lead-card-info">Contact: <span>{lead.architectContact}</span></div>
+              )}
+              {lead.architectAddress && (
+                <div className="lead-card-info">Address: <span>{lead.architectAddress}</span></div>
+              )}
+            </div>
+          )}
+          
+          <div className="lead-card-badges">
+            <span className={`lead-card-badge ${lead.architectStatus === 'Account Created' ? 'status-created' : 'status-pending'}`}>
               {lead.architectStatus}
             </span>
-              {(lead.Requirements && lead.Requirements.length > 0) && (
-                <div className="mb-2">
-                  <p className="text-xs font-semibold" style={{ color: '#111111' }}>Requirements</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {lead.Requirements.map((req, idx) => (
-                      <span key={idx} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(224,123,99,0.1)', color: '#e07b63', fontWeight: 500 }}>
-                        {req}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {(lead.category && lead.category.length > 0) && (
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: '#111111' }}>Category</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {lead.category.map((cat, idx) => (
-                      <span key={idx} className="text-xs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(22,150,209,0.1)', color: '#1696d1', fontWeight: 500 }}>
-                        {cat}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <span style={{
-              fontSize: 12,
-              padding: '4px 8px',
-              borderRadius: 8,
-              backgroundColor: lead.leadStatus === 'Hot' ? 'rgba(224,123,99,0.12)' : lead.leadStatus === 'Closed' ? 'rgba(100,100,100,0.08)' : lead.leadStatus === 'Follow Up' ? 'rgba(255,165,0,0.08)' : 'rgba(100,150,200,0.08)',
-              color: lead.leadStatus === 'Hot' ? '#e07b63' : lead.leadStatus === 'Closed' ? '#666666' : lead.leadStatus === 'Follow Up' ? '#ff8c00' : '#1696d1',
-              fontWeight: 600
-            }}>
+            <span className={`lead-card-badge ${lead.leadStatus === 'Hot' ? 'hot' : lead.leadStatus === 'Closed' ? 'closed' : lead.leadStatus === 'Follow Up' ? 'followup' : 'new'}`}>
               {lead.leadStatus}
             </span>
           </div>
+
+          {(lead.Requirements && lead.Requirements.length > 0) && (
+            <div className="lead-card-tags">
+              {lead.Requirements.map((req, idx) => (
+                <span key={idx} className="lead-card-tag req">{req}</span>
+              ))}
+            </div>
+          )}
+          
+          {(lead.category && lead.category.length > 0) && (
+            <div className="lead-card-tags">
+              {lead.category.map((cat, idx) => (
+                <span key={idx} className="lead-card-tag cat">{cat}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="flex gap-3 justify-end p-3" style={{ borderTop: '1px solid #e9e6e3' }}>
+      <div className="lead-card-footer">
         <button
           onClick={(e) => { e.stopPropagation(); onDelete && onDelete(lead); }}
-          className="text-white text-sm px-3 py-1 rounded-[10px] transition font-semibold"
-          style={{ backgroundColor: '#e07b63' }}
+          className="lead-card-delete-btn"
+        >
+          Delete
+        </button>
+      </div>
+    </motion.article>
+    </>
+  );
+}
           onMouseEnter={(e) => e.target.style.backgroundColor = '#d56a52'}
           onMouseLeave={(e) => e.target.style.backgroundColor = '#e07b63'}
           aria-label={`Delete lead ${lead.name}`}

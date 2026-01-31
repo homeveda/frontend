@@ -44,59 +44,97 @@ export default function ProjectCard({ project }) {
       setIsDeleting(false);
     }
   };
+  
   return (
+    <>
+    <style>{`
+      .project-card{background:#ffffff;border-radius:10px;box-shadow:0 10px 30px rgba(16,16,16,0.08);border:1px solid #e9e6e3;overflow:hidden;display:flex;flex-direction:column}
+      .project-card-content{padding:16px;font-family:"Space Grotesk",sans-serif}
+      .project-card-title{font-size:18px;font-weight:600;color:#111111;margin:0}
+      .project-card-subtitle{font-size:14px;margin-top:8px;color:#111111}
+      .project-card-subtitle span{color:#8f8f8f}
+      .project-card-info{font-size:13px;margin-top:8px;color:#111111}
+      .project-card-info span{color:#e07b63}
+      .project-card-section{margin-top:12px;color:#8f8f8f}
+      .project-card-section strong{color:#111111}
+      .project-card-section div{font-size:12px;margin-top:4px}
+      .project-card-images{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+      .project-card-image{width:100%;height:80px;border-radius:6px;background:#f5f5f5;overflow:hidden;display:flex;align-items:center;justify-content:center}
+      .project-card-image img{object-contain;max-height:100%;max-width:100%}
+      .project-card-footer{display:flex;gap:8px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #e9e6e3}
+      .project-card-btn{padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:12px;transition:all 0.2s;flex:1}
+      .project-card-btn-edit{background:#e07b63;color:white}
+      .project-card-btn-edit:hover{background:#d56a52}
+      .project-card-btn-delete{background:#dc2626;color:white}
+      .project-card-btn-delete:hover{background:#b91c1c}
+
+      @media (max-width:768px){
+        .project-card-content{padding:12px}
+        .project-card-title{font-size:16px}
+        .project-card-subtitle{font-size:13px;margin-top:6px}
+        .project-card-info{font-size:12px;margin-top:6px}
+        .project-card-section{margin-top:10px}
+        .project-card-section div{font-size:11px;margin-top:3px}
+        .project-card-images{grid-template-columns:repeat(3,1fr);gap:6px;margin-top:6px}
+        .project-card-image{height:70px}
+        .project-card-footer{padding:10px 12px;gap:6px}
+        .project-card-btn{padding:5px 10px;font-size:11px}
+      }
+
+      @media (max-width:480px){
+        .project-card-content{padding:10px}
+        .project-card-title{font-size:14px}
+        .project-card-subtitle{font-size:12px;margin-top:4px}
+        .project-card-info{font-size:11px;margin-top:4px}
+        .project-card-section{margin-top:8px}
+        .project-card-section div{font-size:10px;margin-top:2px}
+        .project-card-images{grid-template-columns:repeat(2,1fr);gap:4px;margin-top:4px}
+        .project-card-image{height:60px}
+        .project-card-footer{padding:8px 10px;gap:4px}
+        .project-card-btn{padding:4px 8px;font-size:10px}
+      }
+    `}</style>
     <motion.article
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
-      className="overflow-hidden bg-white flex flex-col hover:shadow-lg transition-shadow duration-300 cursor-default"
-      style={{
-        borderRadius: "10px",
-        boxShadow: "0 10px 30px rgba(16,16,16,0.08)",
-        border: "1px solid #e9e6e3",
-      }}
+      className="project-card"
     >
-      <div
-        className="p-4 "
-        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-      >
+      <div className="project-card-content">
         <div>
-          <div className="flex items-start justify-between gap-3">
+          <div>
             <div>
-              <h3
-                className="text-2xl font-semibold"
-                style={{ color: "#111111" }}
-              >
+              <h3 className="project-card-title">
                 Projects Head - {p.projectHead}{" "}
               </h3>
               {p.architectName && (
-                <p className="text-xl mt-1 text-[#111111]">
+                <p className="project-card-subtitle">
                   Architect Name -{" "}
-                  <span className="text-[#8f8f8f]"> {p.architectName}</span>
+                  <span> {p.architectName}</span>
                 </p>
               )}
               {p.category && (
-                <p className=" mt-1 text-[#111111]">
+                <p className="project-card-info">
                   Category -{" "}
-                  <span className="text-[#e07b63]"> {p.category}</span>
+                  <span> {p.category}</span>
                 </p>
               )}
 
               {/* Project Timeline */}
               {p.kitchen && (
-                <div className=" mt-3">
+                <div className="project-card-section">
                   <div>
-                    <strong style={{ color: "#111111" }}>Kitchen:</strong>
+                    <strong>Kitchen:</strong>
                   </div>
                   <div>
                     Type:{" "}
-                    <span className="text-[#8f8f8f]">
+                    <span>
                       {p.kitchen.kitchenType}
                     </span>
                   </div>
                   <div>
                     Theme:{" "}
-                    <span className="text-[#8f8f8f]">{p.kitchen.theme}</span>
+                    <span>{p.kitchen.theme}</span>
                   </div>
 
                   
@@ -104,17 +142,15 @@ export default function ProjectCard({ project }) {
 
                   {Array.isArray(p.kitchen.layoutPlan) &&
                     p.kitchen.layoutPlan.length > 0 && (
-                      <div className="mt-3 grid grid-cols-3 gap-2">
+                      <div className="project-card-images">
                         {p.kitchen.layoutPlan.map((src) => (
                           <div
                             key={src||Math.random()}
-                            className="w-full h-20 rounded-[8px] overflow-hidden flex items-center justify-center"
-                            style={{ backgroundColor: "#f5f5f5" }}
+                            className="project-card-image"
                           >
                             <img
                               src={src||null}
                               alt="layout"
-                              className="object-contain max-h-full max-w-full"
                             />
                           </div>
                         ))}
@@ -124,13 +160,13 @@ export default function ProjectCard({ project }) {
               )}
 
               {p.wardrobe && (
-                <div className=" mt-3" style={{ color: "#8f8f8f" }}>
+                <div className="project-card-section">
                   <div>
-                    <strong style={{ color: "#111111" }}>Wardrobe:</strong>
+                    <strong>Wardrobe:</strong>
                   </div>
-                  <div className="text-[#111111]">
+                  <div>
                     Types:{" "}
-                    <span className="text-[#8f8f8f]">
+                    <span>
                       {" "}
                       {(p.wardrobe.type || []).join(", ")}
                     </span>
@@ -138,12 +174,11 @@ export default function ProjectCard({ project }) {
                    {p.status && <ProjectTimeline status={p.status} />}
                   {Array.isArray(p.wardrobe.measureents) &&
                     p.wardrobe.measureents.length > 0 && (
-                      <div className="mt-3 grid grid-cols-3 gap-2">
+                      <div className="project-card-images">
                         {p.wardrobe.measureents.map((src) => (
                           <div
                             key={src}
-                            className="w-full h-20 rounded-[8px] overflow-hidden flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
-                            style={{ backgroundColor: "#f5f5f5" }}
+                            className="project-card-image"
                             onClick={() => window.open(src, "_blank")}
                           >
                             <img
@@ -161,12 +196,9 @@ export default function ProjectCard({ project }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 content-between ">
+      <div className="project-card-footer" style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'8px',padding:'12px 16px',borderTop:'1px solid #e9e6e3'}}>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="project-card-btn project-card-btn-edit"
             onClick={() =>
               router.push(`/admin/projects/${p.id || p._id}/quotation`)
             }
@@ -174,10 +206,7 @@ export default function ProjectCard({ project }) {
             Quotation
           </button>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="project-card-btn project-card-btn-edit"
             onClick={() =>
               router.push(`/admin/projects/${p.id || p._id}/inspection`)
             }
@@ -185,10 +214,7 @@ export default function ProjectCard({ project }) {
             Inspection
           </button>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="project-card-btn project-card-btn-edit"
             onClick={() =>
               router.push(`/admin/projects/${p.id || p._id}/designs`)
             }
@@ -196,10 +222,7 @@ export default function ProjectCard({ project }) {
             Designs
           </button>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="project-card-btn project-card-btn-edit"
             onClick={() =>
               router.push(`/admin/projects/${p.id || p._id}/materials`)
             }
@@ -207,10 +230,7 @@ export default function ProjectCard({ project }) {
             Materials
           </button>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="project-card-btn project-card-btn-edit"
             onClick={() => {
               router.push(`/admin/projects/${p.id || p._id}/update`)  
             }}
@@ -218,7 +238,7 @@ export default function ProjectCard({ project }) {
             Update Project
           </button>
           <button
-            className="mt-4 cursor-pointer text-white px-4 py-2 rounded-[10px] font-semibold transition bg-red-500 hover:bg-red-800"
+            className="project-card-btn project-card-btn-delete"
             onClick={() => setConfirmOpen(true)}
           >
             Delete Project

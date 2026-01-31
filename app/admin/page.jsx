@@ -159,7 +159,7 @@ export default function AdminLoginPage() {
 					align-items:center;
 					justify-content:center;
 					background: radial-gradient(circle at 10% 10%, rgba(224,123,99,0.06), transparent 10%), var(--bg);
-					padding:28px;
+					padding:16px;
 				}
 				.card{
 					width:100%;
@@ -180,6 +180,7 @@ export default function AdminLoginPage() {
 					margin:0 0 8px 0;
 					color:var(--accent);
 					letter-spacing:-0.02em;
+					font-size:2.5rem;
 				}
 				.brand p{color:var(--muted);margin:0 0 18px 0}
 				.art{
@@ -198,6 +199,7 @@ export default function AdminLoginPage() {
 					display:flex;
 					gap:8px;
 					margin-bottom:10px;
+					flex-wrap:wrap;
 				}
 				.tab{
 					padding:8px 14px;
@@ -205,18 +207,101 @@ export default function AdminLoginPage() {
 					cursor:pointer;
 					color:var(--muted);
 					font-weight:600;
+					font-size:14px;
+					white-space:nowrap;
 				}
 				.tab.active{ color:var(--card); background:var(--primary); box-shadow:0 6px 18px rgba(224,123,99,0.12) }
 				form{display:flex;flex-direction:column;gap:12px}
 				label{font-size:13px;color:var(--muted);}
-				input{padding:12px 14px;border-radius:10px;border:1px solid #e9e6e3;background:transparent;outline:none}
-				.row{display:flex;gap:10px}
-				.submit{background:var(--primary);color:white;padding:12px;border-radius:10px;border:none;cursor:pointer;font-weight:600}
+				input{padding:12px 14px;border-radius:10px;border:1px solid #e9e6e3;background:transparent;outline:none;font-size:16px;width:100%}
+				input:focus{border-color:var(--primary);background:rgba(224,123,99,0.02)}
+				.row{display:flex;gap:10px;flex-wrap:wrap}
+				.submit{background:var(--primary);color:white;padding:12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s ease}
+				.submit:hover{background:#d66b52}
 				.submit[disabled]{opacity:0.6;cursor:default}
-				.muted{font-size:13px;color:var(--muted)}
-				@media (max-width:880px){
-					.card{grid-template-columns:1fr;}
-					.art{height:180px}
+				.muted{font-size:13px;color:var(--muted);line-height:1.4}
+				
+				@media (max-width:1024px){
+					.card{
+						grid-template-columns:1fr;
+						padding:20px;
+						gap:20px;
+					}
+					.art{height:200px}
+					.brand{padding:16px}
+					.brand h1{font-size:2rem}
+				}
+				
+				@media (max-width:768px){
+					.admin-auth-root{
+						padding:12px;
+					}
+					.card{
+						padding:16px;
+						gap:16px;
+						border-radius:12px;
+					}
+					.brand{padding:12px}
+					.brand h1{
+						font-size:1.75rem;
+						margin-bottom:12px;
+					}
+					.art{height:160px;font-size:36px;margin:12px 0}
+					.muted{font-size:12px}
+					label{font-size:12px}
+					input{padding:10px 12px;font-size:16px}
+					.tab{padding:6px 12px;font-size:13px}
+					form{gap:10px}
+					.submit{padding:10px 12px;font-size:13px}
+				}
+				
+				@media (max-width:480px){
+					.admin-auth-root{
+						padding:8px;
+						min-height:100vh;
+					}
+					.card{
+						grid-template-columns:1fr;
+						padding:12px;
+						gap:12px;
+						max-width:100%;
+					}
+					.brand{padding:8px}
+					.brand h1{
+						font-size:1.5rem;
+						margin-bottom:8px;
+					}
+					.art{
+						height:140px;
+						font-size:32px;
+						margin:8px 0;
+						border-radius:8px;
+					}
+					.controls{gap:6px;margin-bottom:8px}
+					.tab{padding:6px 10px;font-size:12px;border-radius:6px}
+					label{font-size:11px;margin-bottom:4px}
+					input{padding:10px;font-size:16px;border-radius:8px}
+					form{gap:8px}
+					.muted{font-size:11px;line-height:1.3}
+					.submit{padding:10px;font-size:12px;border-radius:8px}
+					.submit:disabled{opacity:0.5}
+					
+					.flex{display:flex}
+					.flex-col{flex-direction:column}
+					.gap-3{gap:12px}
+					.gap-4{gap:16px;width:100%}
+					.gap-4 input{width:100%}
+					.gap-4 label{width:100%;display:block}
+					.items-center{align-items:center}
+				}
+				
+				@media (max-width:360px){
+					.card{padding:8px}
+					.brand h1{font-size:1.25rem}
+					.art{height:120px;font-size:28px}
+					input{font-size:14px;padding:8px}
+					label{font-size:10px}
+					.tab{padding:5px 8px;font-size:11px}
 				}
 			`}</style>
 
@@ -283,7 +368,7 @@ export default function AdminLoginPage() {
               aria-label={isSignUp ? "Sign up form" : "Login form"}
             >
               {isSignUp && (
-                <div className="flex gap-4 items-center">
+                <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
                   <label htmlFor="name">Full name</label>
                   <input
                     id="name"
@@ -295,7 +380,7 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
                 <label htmlFor="email">Email</label>
                 <input
                   id="email"
@@ -307,7 +392,7 @@ export default function AdminLoginPage() {
                 />
               </div>
 
-              <div className="flex gap-4 items-center">
+              <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
                 <label htmlFor="password">Password</label>
                 <input
                   id="password"
@@ -322,7 +407,7 @@ export default function AdminLoginPage() {
               </div>
               {isSignUp && (
                 <div className="flex flex-col gap-3">
-                  <div className="flex gap-4 items-center">
+                  <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
                     <label htmlFor="confirmPassword">Confirm Password</label>
                     <input
                       id="confirmPassword"
@@ -335,7 +420,7 @@ export default function AdminLoginPage() {
                       placeholder="••••••••"
                     />
                   </div>
-                  <div className="flex gap-4 items-center">
+                  <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
                     <label htmlFor="phone">Phone Number</label>
                     <input
                       id="phone"
@@ -350,16 +435,18 @@ export default function AdminLoginPage() {
                   </div>
                 </div>
               )}
-              <div className="flex flex-col ">
+              <div className="flex flex-col " style={{width:'100%'}}>
                 <div
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     marginTop: 6,
+                    gap: '12px',
+                    flexWrap: 'wrap'
                   }}
                 >
-                  <div className="muted">
+                  <div className="muted" style={{minWidth:'150px'}}>
                     {isSignUp
                       ? "Create a new admin account"
                       : "Welcome back — please sign in"}
@@ -370,6 +457,7 @@ export default function AdminLoginPage() {
                     className="submit"
                     type="submit"
                     disabled={loading}
+                    style={{flex:'1',minWidth:'120px'}}
                   >
                     {loading
                       ? "Please wait..."
@@ -383,6 +471,7 @@ export default function AdminLoginPage() {
                     <button
                       className="text-sm text-blue-500 underline cursor-pointer"
                       onClick={() => router.push("/forgetpassword")}
+                      style={{background:'none',border:'none',padding:0,marginTop:'8px'}}
                     >
                       forget password
                     </button>

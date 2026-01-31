@@ -86,7 +86,60 @@ export default function LeadsDisplayPage() {
 
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
-      <div className="flex items-center justify-between mb-6">
+      <style>{`
+        .leads-header{display:flex;items-align:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+        .leads-header > div:first-child{flex:1;min-width:200px}
+        .leads-header h2{font-size:24px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin:0}
+        .leads-header p{font-size:14px;color:#8f8f8f;margin:8px 0 0 0}
+        .leads-header-actions{display:flex;gap:12px;flex-wrap:wrap}
+        .leads-button{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
+        .leads-button:hover{background:#d56a52}
+        .leads-filters{padding:16px;border-radius:14px;background:#ffffff;box-shadow:0 10px 30px rgba(16,16,16,0.08);margin-bottom:24px}
+        .filters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .filter-group{display:flex;flex-direction:column}
+        .filter-group label{font-size:12px;font-weight:600;color:#8f8f8f;margin-bottom:8px}
+        .filter-group select,.filter-group input{padding:10px 12px;border-radius:10px;border:1px solid #e9e6e3;background:#fafafa;font-size:13px;outline:none;font-family:inherit}
+        .filter-group select:focus,.filter-group input:focus{border-color:#e07b63;background:rgba(224,123,99,0.02)}
+        .leads-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+
+        @media (max-width:1024px){
+          .leads-header{margin-bottom:20px}
+          .leads-header h2{font-size:20px}
+          .leads-button{padding:6px 12px;font-size:13px}
+          .filters-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+          .leads-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+        }
+
+        @media (max-width:768px){
+          .p-6{padding:12px !important}
+          .leads-header{flex-direction:column;margin-bottom:16px}
+          .leads-header > div:first-child{width:100%}
+          .leads-header-actions{width:100%}
+          .leads-button{flex:1;padding:8px 12px;font-size:12px}
+          .leads-filters{padding:12px;margin-bottom:16px}
+          .filters-grid{grid-template-columns:1fr;gap:8px}
+          .filter-group label{font-size:11px}
+          .filter-group select,.filter-group input{padding:8px 10px;font-size:12px}
+          .leads-grid{grid-template-columns:1fr;gap:8px}
+          .leads-header h2{font-size:18px}
+          .leads-header p{font-size:12px}
+        }
+
+        @media (max-width:480px){
+          .p-6{padding:8px !important}
+          .leads-header{gap:8px;margin-bottom:12px}
+          .leads-header h2{font-size:16px}
+          .leads-header p{font-size:11px;margin-top:4px}
+          .leads-header-actions{width:100%;gap:6px}
+          .leads-button{padding:6px 10px;font-size:11px;border-radius:8px;flex:1}
+          .leads-filters{padding:8px;margin-bottom:12px;border-radius:10px}
+          .filters-grid{grid-template-columns:1fr;gap:6px}
+          .filter-group label{font-size:10px;margin-bottom:4px}
+          .filter-group select,.filter-group input{padding:6px 8px;font-size:11px;border-radius:6px}
+          .leads-grid{gap:6px}
+        }
+      `}</style>
+      <div className="leads-header">
         <div>
           <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
             All Leads
@@ -95,39 +148,31 @@ export default function LeadsDisplayPage() {
             Manage and view all leads
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="leads-header-actions">
           <button
             onClick={() => router.push("/admin/initiallead/addlead")}
-            className="text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="leads-button"
           >
             + Add Lead
           </button>
           <button
             onClick={fetchLeads}
-            className="text-white px-4 py-2 rounded-[10px] font-semibold transition"
-            style={{ backgroundColor: "#e07b63" }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "#d56a52")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "#e07b63")}
+            className="leads-button"
           >
             Refresh
           </button>
         </div>
       </div>
 
-      <div className="p-4 rounded-[14px] mb-6" style={{ backgroundColor: "#ffffff", boxShadow: "0 10px 30px rgba(16,16,16,0.08)" }}>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div>
-            <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+      <div className="leads-filters">
+        <div className="filters-grid">
+          <div className="filter-group">
+            <label>
               Lead Status
             </label>
             <select
               value={leadStatus}
               onChange={(e) => setLeadStatus(e.target.value)}
-              className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
             >
               {leadStatusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -137,15 +182,13 @@ export default function LeadsDisplayPage() {
             </select>
           </div>
 
-          <div>
-            <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+          <div className="filter-group">
+            <label>
               Architect Status
             </label>
             <select
               value={architectStatus}
               onChange={(e) => setArchitectStatus(e.target.value)}
-              className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
             >
               {architectStatusOptions.map((status) => (
                 <option key={status} value={status}>
@@ -155,16 +198,14 @@ export default function LeadsDisplayPage() {
             </select>
           </div>
 
-          <div className="md:col-span-2">
-            <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+          <div className="filter-group">
+            <label>
               Search by Name
             </label>
             <input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by name..."
-              className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
-              style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
             />
           </div>
         </div>
@@ -173,7 +214,7 @@ export default function LeadsDisplayPage() {
       {loading && <LoadingSpinner />}
       {error && <div className="text-sm" style={{ color: "#e07b63" }}>{error}</div>}
 
-      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <motion.div layout className="leads-grid">
         <AnimatePresence>
           {filtered.map((lead) => (
             <motion.div key={lead.id} layout>

@@ -72,18 +72,6 @@ export default function AddItemPage() {
             setMessage({ type: "error", text: "Please fill name, category, price and type." });
             return false;
         }
-        const imageFile = imageInputRef.current?.files?.[0];
-        const videoFile = videoInputRef.current?.files?.[0];
-        if (form.type === "Normal" && !imageFile) {
-            setMessage({ type: "error", text: "Normal items require an image." });
-            return false;
-        }
-        if (form.type === "Premium") {
-            if (!imageFile || !videoFile) {
-                setMessage({ type: "error", text: "Premium items require both image and video." });
-                return false;
-            }
-        }
         return true;
     };
 
@@ -183,7 +171,7 @@ export default function AddItemPage() {
 
                     <motion.div className="art" whileHover={{ scale: 1.02 }} transition={{ type: "spring", stiffness: 120 }}>CATALOG</motion.div>
 
-                    <div style={{ marginTop: 18 }} className="muted">Choose item type and upload media. Premium items require a video.</div>
+                    <div style={{ marginTop: 18 }} className="muted">Choose item type and upload media (optional).</div>
 
                     <div className="theme-swatch">
                         <div className="swatch" style={{ background: 'var(--primary)' }} />
@@ -301,7 +289,7 @@ export default function AddItemPage() {
                             </div>
 
                             <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-                                <div className="muted">{form.type === 'Premium' ? 'Premium requires image + video' : 'Normal requires image'}</div>
+                                <div className="muted">Media is optional</div>
                                 <motion.button whileTap={{ scale: 0.98 }} whileHover={{ y: -2 }} type="submit" className="submit" disabled={loading}>{loading ? 'Uploading...' : 'Add Item'}</motion.button>
                             </div>
                         </form>

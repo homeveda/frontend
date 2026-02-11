@@ -25,6 +25,7 @@ export default function CatelogCard({ item, onDelete }) {
       .catelog-card-price{font-weight:600;color:#e07b63;font-size:13px}
       .catelog-card-type{font-size:11px;padding:3px 6px;border-radius:6px;color:#8f8f8f;background:rgba(224,123,99,0.1)}
       .catelog-card-worktype{font-size:11px;color:#8f8f8f}
+      .catelog-card-department{font-size:11px;padding:3px 6px;border-radius:6px;color:#63b8e0;background:rgba(99,184,224,0.1)}
       .catelog-card-footer{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px;border-top:1px solid #e9e6e3}
       .catelog-card-delete-btn{color:white;font-size:11px;padding:6px 12px;border-radius:8px;border:none;cursor:pointer;font-weight:600;background:#e07b63;transition:all 0.2s;flex:1}
       .catelog-card-delete-btn:hover{background:#d56a52}
@@ -75,6 +76,7 @@ export default function CatelogCard({ item, onDelete }) {
           <div className="catelog-card-type">{item.type}</div>
         </div>
         <div className="catelog-card-worktype">{item.workType}</div>
+        {item.department && <div className="catelog-card-department">{item.department}</div>}
       </div>
 
       <div className="catelog-card-footer">

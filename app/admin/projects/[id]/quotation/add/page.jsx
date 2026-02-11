@@ -26,18 +26,20 @@ export default function QuotationPage() {
   const [projectCategory, setProjectCategory] = useState("");
   const categories = ["Builder", "Economy", "Standard", "VedaX"];
 
-  // Work type groups and optional subtypes
-  const workGroups = {
-    "Wood Work": ["Carcass", "Shutters", "Visibles", "Base And Back"],
-    Hardware: ["Main Hardware", "Other Hardware"],
-    Countertop: [],
-    Appliances: [],
-    Miscellaneous: [],
+  // Department -> WorkType mapping (matches backend catelogModel)
+  const DEPARTMENT_WORKTYPE_MAP = {
+    Kitchen: ["Carcass", "Shutters", "Visibles", "Base And Back", "Basic Hardware", "Additional Hardware", "Other Hardware", "Countertop", "Appliances"],
+    Wardrobe: ["Carcass", "Shutters", "Base And Back", "Visibles", "Basic Hardware", "Additional Hardware", "Other Hardware"],
+    Glass: ["Sliding Partitions", "Shower Cubicles", "Mirrors", "Railing"],
+    Facade: ["Elevation", "Double Height Lobby", "Highlighter Wall", "Washrooms", "Countertop"],
   };
-  const catelogWorkTypes = ["Carcass","Shutters","Visibles","Base And Back","Main Hardware","Other Hardware","Miscellaneous","Countertop","Appliances"];
+  const departments = Object.keys(DEPARTMENT_WORKTYPE_MAP);
+
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [selectedWorkGroup, setSelectedWorkGroup] = useState("");
-  const [selectedWorkSubtype, setSelectedWorkSubtype] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
+  const [selectedWorkType, setSelectedWorkType] = useState("");
+
+  const currentWorkTypes = selectedDepartment ? DEPARTMENT_WORKTYPE_MAP[selectedDepartment] || [] : [];
 
   const [catalog, setCatalog] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
@@ -66,92 +68,34 @@ export default function QuotationPage() {
     fetchProject();
   }, [projectId]);
 
-  // Fetch catalog when category or workType selection changes
+  // Fetch catalog when category, department, or workType selection changes
   useEffect(() => {
     if (!selectedCategory) return;
     const adminToken = localStorage.getItem("adminToken");
 
-    const fetchByWorkType = async (workType) => {
-      try {
-        console.log("Fetching catalog for category:", selectedCategory);
-        console.log("Fetching by workType:", workType);
-        if(catelogWorkTypes.includes(workType)===false) return [];
-        console.log("Fetching by workType:", workType);
-        const res = await axios.get(
-          `${backendUrl}/catelog/category/${encodeURIComponent(
-            selectedCategory
-          )}/workType/${encodeURIComponent(workType)}`,
-          {
-            headers: {
-              Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
-            },
-          }
-        );
-        return res.data || [];
-      } catch (err) {
-        return null; // signal fallback
-      }
-    };
-
     const fetchCatalog = async () => {
       setIsLoading(true);
       try {
-        // If a subtype is selected, try fetching by that exact workType first
-        if (selectedWorkSubtype) {
-          const r = await fetchByWorkType(selectedWorkSubtype);
-          if (r && Array.isArray(r) && r.length > 0) {
-            setCatalog(r);
-            setFilteredItems(r);
-            return;
-          }
+        let url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}`;
+        if (selectedWorkType) {
+          url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}/workType/${encodeURIComponent(selectedWorkType)}`;
         }
 
-        // If a work group is selected, try fetching by it
-        if (selectedWorkGroup) {
-          const r = await fetchByWorkType(selectedWorkGroup);
-          if (r && Array.isArray(r) && r.length > 0) {
-            setCatalog(r);
-            setFilteredItems(r);
-            return;
-          }
+        const res = await axios.get(url, {
+          headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
+        });
+        let list = Array.isArray(res.data) ? res.data : [];
+
+        // Client-side filter by department if selected
+        if (selectedDepartment) {
+          list = list.filter((it) => it.department === selectedDepartment);
         }
 
-        // Fallback: fetch all by category and filter client-side
-        const resp = await axios.get(
-          `${backendUrl}/catelog/category/${encodeURIComponent(
-            selectedCategory
-          )}`,
-          {
-            headers: {
-              Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
-            },
-          }
-        );
-        const list = resp.data || [];
-        
-        if (!list || list.length === 0) {
-          triggerPopup("No catalog items found for this category", "red");
-          setCatalog([]);
-          setFilteredItems([]);
-          return;
-        }
-        
-        let filtered = list;
-        if (selectedWorkGroup) {
-          const sub = selectedWorkSubtype || selectedWorkGroup;
-          filtered = list.filter((it) =>
-            (it.workType || "").toLowerCase().includes(sub.toLowerCase())
-          );
-          
-          if (filtered.length === 0) {
-            triggerPopup("No catalog items found for the selected work type", "red");
-            setCatalog([]);
-            setFilteredItems([]);
-            return;
-          }
+        if (list.length === 0) {
+          triggerPopup("No catalog items found for the selected filters", "red");
         }
         setCatalog(list);
-        setFilteredItems(filtered);
+        setFilteredItems(list);
       } catch (err) {
         console.error(err);
         triggerPopup(err?.response?.data?.message || "Failed to fetch catalog", "red");
@@ -163,23 +107,11 @@ export default function QuotationPage() {
     };
 
     fetchCatalog();
-  }, [selectedCategory, selectedWorkGroup, selectedWorkSubtype]);
+  }, [selectedCategory, selectedDepartment, selectedWorkType]);
 
-  // Auto-stage items when a subtype is chosen OR when a work group has no subtypes
-  // Each staged item defaults to quantity 1. Previously staged items persist when switching filters.
+  // Auto-stage all filtered items when workType is selected
   useEffect(() => {
-    const hasSubtypes =
-      selectedWorkGroup &&
-      workGroups[selectedWorkGroup] &&
-      workGroups[selectedWorkGroup].length > 0;
-
-    // Stage when a subtype is selected, or when a work group without subtypes is selected
-    const shouldStageByGroupWithoutSubtypes =
-      selectedWorkGroup && !hasSubtypes && !selectedWorkSubtype;
-
-    if (!selectedWorkSubtype && !shouldStageByGroupWithoutSubtypes) {
-      return;
-    }
+    if (!selectedWorkType || filteredItems.length === 0) return;
 
     const staged = filteredItems.map((item, idx) => ({
       id: item._id || `${item.name}-${idx}`,
@@ -188,6 +120,7 @@ export default function QuotationPage() {
       quantity: 1,
       totalPrice: Number(item.price || 0),
       imageLink: item.imageLink,
+      department: item.department,
       workType: item.workType,
     }));
 
@@ -202,7 +135,7 @@ export default function QuotationPage() {
       });
       return Array.from(merged.values());
     });
-  }, [selectedWorkSubtype, selectedWorkGroup, filteredItems]);
+  }, [selectedWorkType, filteredItems]);
 
   const handleRemoveStaged = (id) => {
     setStagedItems(stagedItems.filter((it) => it.id !== id));
@@ -275,6 +208,7 @@ export default function QuotationPage() {
           quantity: it.quantity,
           price: it.price,
           totalPrice: it.totalPrice,
+          department: it.department,
           workType: it.workType,
         })),
         totals: {
@@ -352,43 +286,41 @@ export default function QuotationPage() {
             </div>
 
             <div style={{ marginBottom: 8 }}>
-              <label style={{ fontSize: 12 }}>Work Group</label>
+              <label style={{ fontSize: 12 }}>Department</label>
               <select
                 className="input-styled w-full"
-                value={selectedWorkGroup}
+                value={selectedDepartment}
                 onChange={(e) => {
-                  setSelectedWorkGroup(e.target.value);
-                  setSelectedWorkSubtype("");
+                  setSelectedDepartment(e.target.value);
+                  setSelectedWorkType("");
                 }}
               >
-                <option value="">All</option>
-                {Object.keys(workGroups).map((g) => (
-                  <option key={g} value={g}>
-                    {g}
+                <option value="">All Departments</option>
+                {departments.map((d) => (
+                  <option key={d} value={d}>
+                    {d}
                   </option>
                 ))}
               </select>
             </div>
 
-            {selectedWorkGroup &&
-              workGroups[selectedWorkGroup] &&
-              workGroups[selectedWorkGroup].length > 0 && (
-                <div style={{ marginBottom: 8 }}>
-                  <label style={{ fontSize: 12 }}>Subtype</label>
-                  <select
-                    className="input-styled w-full"
-                    value={selectedWorkSubtype}
-                    onChange={(e) => setSelectedWorkSubtype(e.target.value)}
-                  >
-                    <option value="">All</option>
-                    {workGroups[selectedWorkGroup].map((s) => (
-                      <option key={s} value={s}>
-                        {s}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            {selectedDepartment && (
+              <div style={{ marginBottom: 8 }}>
+                <label style={{ fontSize: 12 }}>Work Type</label>
+                <select
+                  className="input-styled w-full"
+                  value={selectedWorkType}
+                  onChange={(e) => setSelectedWorkType(e.target.value)}
+                >
+                  <option value="">All Work Types</option>
+                  {currentWorkTypes.map((wt) => (
+                    <option key={wt} value={wt}>
+                      {wt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
 
             <div style={{ marginTop: 12 }}>
               <label style={{ fontSize: 12 }}>Items</label>
@@ -398,7 +330,7 @@ export default function QuotationPage() {
                 </div>
               ) : (
                 <div style={{ color: "#666", fontSize: 13 }}>
-                  Select a subtype (or a work group without subtypes) to auto-stage all matching items with quantity 1.
+                  Select a department and work type to auto-stage all matching items with quantity 1.
                 </div>
               )}
             </div>

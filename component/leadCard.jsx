@@ -25,14 +25,6 @@ export default function LeadCard({ lead, onDelete }) {
       .lead-card-architect-label{font-size:11px;font-weight:600;color:#111111;margin:0}
       .lead-card-info{font-size:11px;color:#8f8f8f;margin:4px 0 0 0}
       .lead-card-info span{color:#111111;font-weight:600}
-      .lead-card-badges{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap;align-items:flex-end}
-      .lead-card-badge{font-size:11px;padding:4px 8px;border-radius:8px;font-weight:600;white-space:nowrap}
-      .lead-card-badge.status-created{background:rgba(32,197,94,0.08);color:#20c55e}
-      .lead-card-badge.status-pending{background:rgba(224,123,99,0.06);color:#e07b63}
-      .lead-card-badge.hot{background:rgba(224,123,99,0.12);color:#e07b63}
-      .lead-card-badge.closed{background:rgba(100,100,100,0.08);color:#666666}
-      .lead-card-badge.followup{background:rgba(255,165,0,0.08);color:#ff8c00}
-      .lead-card-badge.new{background:rgba(100,150,200,0.08);color:#1696d1}
       .lead-card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
       .lead-card-tag{font-size:10px;padding:3px 6px;border-radius:6px;font-weight:500;white-space:nowrap}
       .lead-card-tag.req{background:rgba(224,123,99,0.1);color:#e07b63}
@@ -54,7 +46,7 @@ export default function LeadCard({ lead, onDelete }) {
         .lead-card-title{font-size:12px}
         .lead-card-address{font-size:10px}
         .lead-card-contact{font-size:10px}
-        .lead-card-badge{font-size:10px;padding:3px 6px}
+
         .lead-card-tag{font-size:9px;padding:2px 4px}
         .lead-card-footer{padding:8px 10px;gap:6px}
         .lead-card-delete-btn{padding:5px 8px;font-size:10px}
@@ -88,15 +80,6 @@ export default function LeadCard({ lead, onDelete }) {
             </div>
           )}
           
-          <div className="lead-card-badges">
-            <span className={`lead-card-badge ${lead.architectStatus === 'Account Created' ? 'status-created' : 'status-pending'}`}>
-              {lead.architectStatus}
-            </span>
-            <span className={`lead-card-badge ${lead.leadStatus === 'Hot' ? 'hot' : lead.leadStatus === 'Closed' ? 'closed' : lead.leadStatus === 'Follow Up' ? 'followup' : 'new'}`}>
-              {lead.leadStatus}
-            </span>
-          </div>
-
           {(lead.Requirements && lead.Requirements.length > 0) && (
             <div className="lead-card-tags">
               {lead.Requirements.map((req, idx) => (

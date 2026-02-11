@@ -23,11 +23,9 @@ function UpdateLeadContent() {
     name: "",
     address: "",
     contactNumber: "",
-    architectStatus: "Account Not Created",
     architectName: "",
     architectContact: "",
     architectAddress: "",
-    leadStatus: "New",
     Requirements: [],
     category: [],
   });
@@ -76,11 +74,9 @@ function UpdateLeadContent() {
           name: data.name || "",
           address: data.address || "",
           contactNumber: data.contactNumber || "",
-          architectStatus: data.architectStatus || "Account Not Created",
           architectName: data.architectName || "",
           architectContact: data.architectContact || "",
           architectAddress: data.architectAddress || "",
-          leadStatus: data.leadStatus || "New",
           Requirements: data.Requirements || [],
           category: data.category || [],
         });
@@ -154,11 +150,9 @@ function UpdateLeadContent() {
         name: form.name.trim(),
         address: form.address.trim(),
         contactNumber: form.contactNumber.trim(),
-        architectStatus: form.architectStatus,
         architectName: form.architectName.trim(),
         architectContact: form.architectContact.trim(),
         architectAddress: form.architectAddress.trim(),
-        leadStatus: form.leadStatus,
         Requirements: form.Requirements || [],
         category: form.category || [],
       };
@@ -181,8 +175,6 @@ function UpdateLeadContent() {
 
   if (loading) return (<div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}><LoadingSpinner /></div>);
   if (!lead) return (<div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}><div style={{ color: '#e07b63' }}>Lead not found</div></div>);
-
-  const architectOptions = ["Account Created", "Account Not Created"];
 
   return (
     <div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: '#f7f4f1', fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -212,20 +204,6 @@ function UpdateLeadContent() {
             <div className="mb-4">
               <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Address</label>
               <textarea name="address" value={form.address} onChange={handleChange} rows={3} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa', resize: 'vertical' }} />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <div>
-                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Status</label>
-                <select name="architectStatus" value={form.architectStatus} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
-                  {architectOptions.map(opt => <option key={opt} value={opt}>{opt}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Lead Status</label>
-                <input name="leadStatus" value={form.leadStatus} onChange={handleChange} placeholder="e.g. New, Hot, Follow Up" className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }} />
-              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

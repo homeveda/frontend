@@ -12,11 +12,6 @@ export default function LeadsDisplayPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
-  const leadStatusOptions = ["All", "New", "Hot", "Closed", "Follow Up"];
-  const architectStatusOptions = ["All", "Account Created", "Account Not Created"];
-
-  const [leadStatus, setLeadStatus] = useState("All");
-  const [architectStatus, setArchitectStatus] = useState("All");
   const [query, setQuery] = useState("");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -76,12 +71,10 @@ export default function LeadsDisplayPage() {
     setLeadToDelete(null);
   };
 
-  // Filter leads by status and search
+  // Filter leads by search only
   const filtered = leads.filter((lead) => {
-    const matchLeadStatus = leadStatus === "All" || lead.leadStatus === leadStatus;
-    const matchArchStatus = architectStatus === "All" || lead.architectStatus === architectStatus;
     const matchQuery = query === "" || lead.name.toLowerCase().includes(query.toLowerCase());
-    return matchLeadStatus && matchArchStatus && matchQuery;
+    return matchQuery;
   });
 
   return (
@@ -95,7 +88,7 @@ export default function LeadsDisplayPage() {
         .leads-button{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
         .leads-button:hover{background:#d56a52}
         .leads-filters{padding:16px;border-radius:14px;background:#ffffff;box-shadow:0 10px 30px rgba(16,16,16,0.08);margin-bottom:24px}
-        .filters-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+        .filters-grid{display:grid;grid-template-columns:1fr;gap:16px}
         .filter-group{display:flex;flex-direction:column}
         .filter-group label{font-size:12px;font-weight:600;color:#8f8f8f;margin-bottom:8px}
         .filter-group select,.filter-group input{padding:10px 12px;border-radius:10px;border:1px solid #e9e6e3;background:#fafafa;font-size:13px;outline:none;font-family:inherit}
@@ -106,7 +99,7 @@ export default function LeadsDisplayPage() {
           .leads-header{margin-bottom:20px}
           .leads-header h2{font-size:20px}
           .leads-button{padding:6px 12px;font-size:13px}
-          .filters-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+          .filters-grid{grid-template-columns:1fr;gap:12px}
           .leads-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
         }
 
@@ -166,38 +159,6 @@ export default function LeadsDisplayPage() {
 
       <div className="leads-filters">
         <div className="filters-grid">
-          <div className="filter-group">
-            <label>
-              Lead Status
-            </label>
-            <select
-              value={leadStatus}
-              onChange={(e) => setLeadStatus(e.target.value)}
-            >
-              {leadStatusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="filter-group">
-            <label>
-              Architect Status
-            </label>
-            <select
-              value={architectStatus}
-              onChange={(e) => setArchitectStatus(e.target.value)}
-            >
-              {architectStatusOptions.map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-
           <div className="filter-group">
             <label>
               Search by Name

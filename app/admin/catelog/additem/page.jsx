@@ -3,26 +3,43 @@ import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import { Upload, Camera } from "lucide-react";
+import Popup from "../../../../component/popup";
+import { useRouter } from "next/navigation";
 
 export default function AddItemPage() {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
+    const router = useRouter();
+
+    const [showPopup, setShowPopup] = useState(false);
+    const [popupMessage, setPopupMessage] = useState("");
+    const [popupColor, setPopupColor] = useState("green");
+
+    const DEPARTMENT_WORKTYPE_MAP = {
+        Kitchen: ["Carcass", "Shutters", "Visibles", "Base And Back", "Basic Hardware", "Additional Hardware", "Other Hardware", "Countertop", "Appliances"],
+        Wardrobe: ["Carcass", "Shutters", "Base And Back", "Visibles", "Basic Hardware", "Additional Hardware", "Other Hardware"],
+        Glass: ["Sliding Partitions", "Shower Cubicles", "Mirrors", "Railing"],
+        Facade: ["Elevation", "Double Height Lobby", "Highlighter Wall", "Washrooms", "Countertop"],
+    };
+    const departments = Object.keys(DEPARTMENT_WORKTYPE_MAP);
 
     const [form, setForm] = useState({
         name: "",
         description: "",
         category: "Builder",
+        department: "Kitchen",
         workType: "Carcass",
         price: "",
         type: "Normal",
         displayedToClients: true,
     });
 
+    const currentWorkTypes = DEPARTMENT_WORKTYPE_MAP[form.department] || [];
+
     const imageInputRef = useRef(null);
     const videoInputRef = useRef(null);
     const [imagePreview, setImagePreview] = useState(null);
     const [videoPreview, setVideoPreview] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState(null);
 
     const handleImageChange = (e) => {
         const file = e.target.files?.[0];
@@ -55,21 +72,12 @@ export default function AddItemPage() {
     };
 
     const categories = ["Builder", "Economy", "Standard", "VedaX"];
-    const workTypes = [
-        "Carcass",
-        "Shutters",
-        "Visibles",
-        "Base And Back",
-        "Main Hardware",
-        "Other Hardware",
-        "Miscellaneous",
-        "Countertop",
-        "Appliances",
-    ];
 
     const validate = () => {
-        if (!form.name || !form.category || !form.price || !form.type) {
-            setMessage({ type: "error", text: "Please fill name, category, price and type." });
+        if (!form.name || !form.category || !form.price || !form.type || !form.department || !form.workType) {
+            setPopupMessage("Please fill name, department, workType, category, price and type.");
+            setPopupColor("red");
+            setShowPopup(true);
             return false;
         }
         return true;
@@ -77,7 +85,7 @@ export default function AddItemPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setMessage(null);
+        setShowPopup(false);
         if (!validate()) return;
         setLoading(true);
         try {
@@ -88,7 +96,8 @@ export default function AddItemPage() {
             fd.append("name", form.name);
             fd.append("description", form.description || "");
             fd.append("category", form.category);
-            fd.append("workType", form.workType || "");
+            fd.append("department", form.department);
+            fd.append("workType", form.workType);
             fd.append("price", form.price);
             fd.append("type", form.type);
             fd.append("displayedToClients", form.displayedToClients);
@@ -103,19 +112,27 @@ export default function AddItemPage() {
             });
 
             if (resp.status === 201) {
-                setMessage({ type: "success", text: "Catalog item created." });
+                setPopupMessage("Catalog item created successfully!");
+                setPopupColor("green");
+                setShowPopup(true);
                 // reset
-                setForm({ name: "", description: "", category: "Builder", workType: "Carcass", price: "", type: "Normal" });
+                setForm({ name: "", description: "", category: "Builder", department: "Kitchen", workType: "Carcass", price: "", type: "Normal", displayedToClients: true });
                 setImagePreview(null);
                 setVideoPreview(null);
                 if (imageInputRef.current) imageInputRef.current.value = "";
                 if (videoInputRef.current) videoInputRef.current.value = "";
+                // redirect to display page after 2 seconds
+                setTimeout(() => router.push("/admin/catelog/display"), 2000);
             } else {
-                setMessage({ type: "error", text: resp.data?.message || "Failed to create item." });
+                setPopupMessage(resp.data?.message || "Failed to create item.");
+                setPopupColor("red");
+                setShowPopup(true);
             }
         } catch (err) {
             console.error(err);
-            setMessage({ type: "error", text: err.response?.data?.message || "Server error." });
+            setPopupMessage(err.response?.data?.message || "Server error.");
+            setPopupColor("red");
+            setShowPopup(true);
         } finally {
             setLoading(false);
         }
@@ -123,6 +140,15 @@ export default function AddItemPage() {
 
     return (
         <div className="admin-auth-root">
+            {showPopup && (
+                <Popup
+                    message={popupMessage}
+                    color={popupColor}
+                    onClose={() => setShowPopup(false)}
+                    autoClose={true}
+                    duration={4000}
+                />
+            )}
             <style>{`
                 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
                 :root{
@@ -183,10 +209,6 @@ export default function AddItemPage() {
 
                 <motion.div style={{ padding: 6 }} initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { delay: 0.05 } }}>
                     <motion.div initial={{ x: 10, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ duration: 0.35 }}>
-                        {message && (
-                            <div style={{ marginBottom: 12, padding: 10, borderRadius: 8, background: message.type === 'error' ? '#fff2f2' : '#f0fff4', border: message.type === 'error' ? '1px solid #ffd6d6' : '1px solid #d8f6de', color: message.type === 'error' ? '#9b1c1c' : '#0a6b2b' }}>{message.text}</div>
-                        )}
-
                         <form onSubmit={handleSubmit}>
                             <div className="row">
                                 <div style={{ flex: 1 }} className="col">
@@ -209,10 +231,23 @@ export default function AddItemPage() {
                                         {categories.map((c) => <option key={c} value={c}>{c}</option>)}
                                     </select>
                                 </div>
-                                <div style={{ width: 200 }} className="col">
+                                <div style={{ flex: 1 }} className="col">
+                                    <label htmlFor="department">Department</label>
+                                    <select id="department" value={form.department} onChange={(e) => {
+                                        const dept = e.target.value;
+                                        const firstWork = DEPARTMENT_WORKTYPE_MAP[dept]?.[0] || "";
+                                        setForm({ ...form, department: dept, workType: firstWork });
+                                    }}>
+                                        {departments.map((d) => <option key={d} value={d}>{d}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="row">
+                                <div style={{ flex: 1 }} className="col">
                                     <label htmlFor="workType">Work Type</label>
                                     <select id="workType" value={form.workType} onChange={(e) => setForm({ ...form, workType: e.target.value })}>
-                                        {workTypes.map((w) => <option key={w} value={w}>{w}</option>)}
+                                        {currentWorkTypes.map((w) => <option key={w} value={w}>{w}</option>)}
                                     </select>
                                 </div>
                             </div>

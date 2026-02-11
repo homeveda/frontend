@@ -16,30 +16,16 @@ export default function QuotationPage() {
   const [toDeleteId, setToDeleteId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
-  const groupWorkTypes = (items = []) => {
-    const groups = {
-      "Wood Work": ["Carcass", "Shutters", "Visibles", "Base And Back"],
-      Hardware: ["Main Hardware", "Other Hardware"],
-      Countertop: ["Countertop"],
-      Appliances: ["Appliances"],
-    };
-
+  const groupByDepartmentAndWorkType = (items = []) => {
     const result = {};
-    Object.keys(groups).forEach((g) => (result[g] = []));
-
     (items || []).forEach((it) => {
-      if (!it || !it.workType) return;
-      for (const [groupName, types] of Object.entries(groups)) {
-        if (types.includes(it.workType)) {
-          result[groupName].push(it);
-          return;
-        }
-      }
-      // If workType didn't match any known group, put it under its own heading
-      if (!result[it.workType]) result[it.workType] = [];
-      result[it.workType].push(it);
+      if (!it) return;
+      const dept = it.department || "Other";
+      const wt = it.workType || "Uncategorized";
+      if (!result[dept]) result[dept] = {};
+      if (!result[dept][wt]) result[dept][wt] = [];
+      result[dept][wt].push(it);
     });
-
     return result;
   };
 
@@ -214,30 +200,34 @@ export default function QuotationPage() {
                               </tr>
                             </thead>
                             {(() => {
-                              const grouped = groupWorkTypes(
+                              const grouped = groupByDepartmentAndWorkType(
                                 quotation.items || []
                               );
                               let serial = 1;
                               return Object.entries(grouped).map(
-                                ([groupName, items]) => {
-                                  if (!items || items.length === 0) return null;
+                                ([deptName, workTypes]) => {
                                   return (
-                                    <tbody key={groupName}>
+                                    <tbody key={deptName}>
                                       <tr className="group-row">
-                                        <td colSpan={4}>{groupName}</td>
+                                        <td colSpan={4} style={{ fontWeight: 700, fontSize: 15 }}>{deptName}</td>
                                       </tr>
-                                      {items.map((it) => (
-                                        <tr key={`${groupName}-${serial}`}>
-                                          <td>{serial++}</td>
-                                          <td style={{ fontWeight: 600 }}>
-                                            {it.name}
-                                          </td>
-                                          <td style={{ textAlign: "center" }}>
-                                            {it.quantity || 0}
-                                          </td>
-                                          <td>{it.workType || "-"}</td>
-                                        </tr>
-                                      ))}
+                                      {Object.entries(workTypes).map(
+                                        ([workType, items]) => {
+                                          if (!items || items.length === 0) return null;
+                                          return items.map((it) => (
+                                            <tr key={`${deptName}-${workType}-${serial}`}>
+                                              <td>{serial++}</td>
+                                              <td style={{ fontWeight: 600 }}>
+                                                {it.name}
+                                              </td>
+                                              <td style={{ textAlign: "center" }}>
+                                                {it.quantity || 0}
+                                              </td>
+                                              <td>{it.workType || "-"}</td>
+                                            </tr>
+                                          ));
+                                        }
+                                      )}
                                     </tbody>
                                   );
                                 }

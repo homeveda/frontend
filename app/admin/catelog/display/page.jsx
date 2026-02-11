@@ -13,26 +13,24 @@ export default function CatelogSearchPage() {
   const router = useRouter();
   const categories = ["Builder","Economy","Standard","VedaX"];
   const types = ["All","Normal","Premium"];
-  const workTypes = [
-    "All",
-    "Carcass",
-    "Shutters",
-    "Visibles",
-    "Base And Back",
-    "Main Hardware",
-    "Other Hardware",
-    "Miscellaneous",
-    "Countertop",
-    "Appliances",
-  ];
+  const DEPARTMENT_WORKTYPE_MAP = {
+    Kitchen: ["Carcass", "Shutters", "Visibles", "Base And Back", "Basic Hardware", "Additional Hardware", "Other Hardware", "Countertop", "Appliances"],
+    Wardrobe: ["Carcass", "Shutters", "Base And Back", "Visibles", "Basic Hardware", "Additional Hardware", "Other Hardware"],
+    Glass: ["Sliding Partitions", "Shower Cubicles", "Mirrors", "Railing"],
+    Facade: ["Elevation", "Double Height Lobby", "Highlighter Wall", "Washrooms", "Countertop"],
+  };
+  const departments = ["All", ...Object.keys(DEPARTMENT_WORKTYPE_MAP)];
 
   const [category, setCategory] = useState("Economy");
   const [type, setType] = useState("All");
+  const [department, setDepartment] = useState("All");
   const [workType, setWorkType] = useState("All");
   const [query, setQuery] = useState("");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const currentWorkTypes = department !== "All" ? ["All", ...DEPARTMENT_WORKTYPE_MAP[department]] : ["All"];
 
   const fetchItems = async () => {
     if (!backendUrl) return setError('Backend URL not configured');
@@ -48,7 +46,14 @@ export default function CatelogSearchPage() {
       }
 
       const res = await axios.get(url, { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } });
-      setItems(Array.isArray(res.data) ? res.data : []);
+      let data = Array.isArray(res.data) ? res.data : [];
+
+      // Client-side filter by department if selected
+      if (department && department !== 'All') {
+        data = data.filter((item) => item.department === department);
+      }
+
+      setItems(data);
     } catch (err) {
       setError(err?.response?.data?.message || err.message || 'Failed to load');
       setItems([]);
@@ -60,7 +65,7 @@ export default function CatelogSearchPage() {
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [category, type, workType]);
+  }, [category, type, workType, department]);
 
   // state for confirmation dialog
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -120,10 +125,10 @@ export default function CatelogSearchPage() {
       </div>
 
       <div className="p-4 rounded-[14px] mb-6" style={{ backgroundColor: '#ffffff', boxShadow: '0 10px 30px rgba(16,16,16,0.08)' }}>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div>
             <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Category</label>
-            <select value={category} onChange={(e)=>{setCategory(e.target.value); setType('All'); setWorkType('All');}} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
+            <select value={category} onChange={(e)=>{setCategory(e.target.value); setType('All'); setDepartment('All'); setWorkType('All');}} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
               {categories.map(c=> <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
@@ -136,9 +141,16 @@ export default function CatelogSearchPage() {
           </div>
 
           <div>
+            <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Department</label>
+            <select value={department} onChange={(e)=>{setDepartment(e.target.value); setWorkType('All');}} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
+              {departments.map(d=> <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+
+          <div>
             <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Work Type</label>
             <select value={workType} onChange={(e)=>{setWorkType(e.target.value); setType('All');}} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}>
-              {workTypes.map(w=> <option key={w} value={w}>{w}</option>)}
+              {currentWorkTypes.map(w=> <option key={w} value={w}>{w}</option>)}
             </select>
           </div>
 

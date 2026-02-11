@@ -20,15 +20,26 @@ function UpdateItemContent() {
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
 
+  const DEPARTMENT_WORKTYPE_MAP = {
+    Kitchen: ["Carcass", "Shutters", "Visibles", "Base And Back", "Basic Hardware", "Additional Hardware", "Other Hardware", "Countertop", "Appliances"],
+    Wardrobe: ["Carcass", "Shutters", "Base And Back", "Visibles", "Basic Hardware", "Additional Hardware", "Other Hardware"],
+    Glass: ["Sliding Partitions", "Shower Cubicles", "Mirrors", "Railing"],
+    Facade: ["Elevation", "Double Height Lobby", "Highlighter Wall", "Washrooms", "Countertop"],
+  };
+  const departmentsList = Object.keys(DEPARTMENT_WORKTYPE_MAP);
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
     category: "Economy",
+    department: "Kitchen",
     price: "",
     type: "Normal",
     workType: "Carcass",
     displayedToClients: true,
   });
+
+  const currentWorkTypes = DEPARTMENT_WORKTYPE_MAP[formData.department] || [];
   const [imageFile, setImageFile] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
@@ -53,6 +64,7 @@ function UpdateItemContent() {
           name: data.name || "",
           description: data.description || "",
           category: data.category || "Economy",
+          department: data.department || "Kitchen",
           price: data.price || "",
           type: data.type || "Normal",
           workType: data.workType || "Carcass",
@@ -112,6 +124,7 @@ function UpdateItemContent() {
       formDataToSend.append("name", formData.name);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("category", formData.category);
+      formDataToSend.append("department", formData.department);
       formDataToSend.append("price", formData.price);
       formDataToSend.append("type", formData.type);
       formDataToSend.append("workType", formData.workType);
@@ -157,17 +170,6 @@ function UpdateItemContent() {
 
   const categories = ["Builder", "Economy", "Standard", "VedaX"];
   const types = ["Normal", "Premium"];
-  const workTypes = [
-    "Carcass",
-    "Shutters",
-    "Visibles",
-    "Base And Back",
-    "Main Hardware",
-    "Other Hardware",
-    "Miscellaneous",
-    "Countertop",
-    "Appliances",
-  ];
 
   return (
     <div className="p-4 sm:p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -269,7 +271,7 @@ function UpdateItemContent() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
                   Category
@@ -306,6 +308,31 @@ function UpdateItemContent() {
                   ))}
                 </select>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                  Department
+                </label>
+                <select
+                  name="department"
+                  value={formData.department}
+                  onChange={(e) => {
+                    const dept = e.target.value;
+                    const firstWork = DEPARTMENT_WORKTYPE_MAP[dept]?.[0] || "";
+                    setFormData((prev) => ({ ...prev, department: dept, workType: firstWork }));
+                  }}
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                >
+                  {departmentsList.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
                   Work Type
@@ -317,7 +344,7 @@ function UpdateItemContent() {
                   className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none"
                   style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
                 >
-                  {workTypes.map((wt) => (
+                  {currentWorkTypes.map((wt) => (
                     <option key={wt} value={wt}>
                       {wt}
                     </option>

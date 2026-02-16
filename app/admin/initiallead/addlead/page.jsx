@@ -10,7 +10,7 @@ export default function AddLeadPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const REQUIREMENTS_OPTIONS = ["Glass Work", "Kitchen", "Wardrobe", "Facade","Aristo"];
-  const CATEGORY_OPTIONS = ["Builder", "Economy", "Standard", "VedaX"];
+  const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
 
   const [form, setForm] = useState({
     name: "",

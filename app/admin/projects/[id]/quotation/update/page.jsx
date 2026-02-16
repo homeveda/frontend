@@ -14,6 +14,9 @@ export default function UpdateQuotationPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const [isLoading, setIsLoading] = useState(true);
+  const [catalogError, setCatalogError] = useState(false);
+  const [catalogErrorMessage, setCatalogErrorMessage] = useState("");
+  const [catalogLoading, setCatalogLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
@@ -56,6 +59,79 @@ export default function UpdateQuotationPage() {
   const [quantity, setQuantity] = useState(1);
 
   const [stagedItems, setStagedItems] = useState([]);
+
+  // Retry function for catalog loading
+  const retryCatalogFetch = () => {
+    if (!selectedCategory) {
+      triggerPopup("Please select a category first", "red");
+      return;
+    }
+    // Trigger the useEffect by toggling a dependency
+    setCatalogError(false);
+    setCatalogErrorMessage("");
+    const adminToken = localStorage.getItem("adminToken");
+    
+    const fetchCatalog = async () => {
+      setCatalogLoading(true);
+      setCatalogError(false);
+      setCatalogErrorMessage("");
+      try {
+        if (!backendUrl) {
+          throw new Error("Backend URL not configured");
+        }
+
+        let url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}`;
+        if (selectedWorkType) {
+          url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}/workType/${encodeURIComponent(selectedWorkType)}`;
+        }
+
+        const res = await axios.get(url, {
+          headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
+        });
+        
+        if (!res.data) {
+          throw new Error("No data received from catalog API");
+        }
+        
+        let list = Array.isArray(res.data) ? res.data : [];
+
+        // Client-side filter by department if selected
+        if (selectedDepartment) {
+          list = list.filter((it) => it.department === selectedDepartment);
+        }
+
+        if (list.length === 0) {
+          setCatalogError(true);
+          setCatalogErrorMessage("No catalog items found for the selected category and filters. Please contact admin to add items to the catalog.");
+          triggerPopup("No catalog items available for selection", "red");
+        } else {
+          setCatalogError(false);
+          setCatalogErrorMessage("");
+          triggerPopup("Catalog loaded successfully!", "green");
+        }
+        
+        setCatalog(list);
+        setFilteredItems(list);
+      } catch (err) {
+        console.error("Catalog fetch error:", err);
+        const errorMsg = err?.response?.status === 404 
+          ? "Catalog not found for this category"
+          : err?.response?.status === 500
+          ? "Server error while fetching catalog"
+          : err?.response?.data?.message || "Failed to fetch catalog items";
+        
+        setCatalogError(true);
+        setCatalogErrorMessage(errorMsg);
+        triggerPopup(errorMsg, "red");
+        setCatalog([]);
+        setFilteredItems([]);
+      } finally {
+        setCatalogLoading(false);
+      }
+    };
+    
+    fetchCatalog();
+  };
 
   // Fetch existing quotation and project details
   useEffect(() => {
@@ -132,8 +208,14 @@ export default function UpdateQuotationPage() {
     const adminToken = localStorage.getItem("adminToken");
 
     const fetchCatalog = async () => {
-      setIsLoading(true);
+      setCatalogLoading(true);
+      setCatalogError(false);
+      setCatalogErrorMessage("");
       try {
+        if (!backendUrl) {
+          throw new Error("Backend URL not configured");
+        }
+
         let url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}`;
         if (selectedWorkType) {
           url = `${backendUrl}/catelog/category/${encodeURIComponent(selectedCategory)}/workType/${encodeURIComponent(selectedWorkType)}`;
@@ -142,6 +224,11 @@ export default function UpdateQuotationPage() {
         const res = await axios.get(url, {
           headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
         });
+        
+        if (!res.data) {
+          throw new Error("No data received from catalog API");
+        }
+        
         let list = Array.isArray(res.data) ? res.data : [];
 
         // Client-side filter by department if selected
@@ -150,17 +237,31 @@ export default function UpdateQuotationPage() {
         }
 
         if (list.length === 0) {
-          triggerPopup("No catalog items found for the selected filters", "red");
+          setCatalogError(true);
+          setCatalogErrorMessage("No catalog items found for the selected category and filters. Please contact admin to add items to the catalog.");
+          triggerPopup("No catalog items available for selection", "red");
+        } else {
+          setCatalogError(false);
+          setCatalogErrorMessage("");
         }
+        
         setCatalog(list);
         setFilteredItems(list);
       } catch (err) {
-        console.error(err);
-        triggerPopup(err?.response?.data?.message || "Failed to fetch catalog", "red");
+        console.error("Catalog fetch error:", err);
+        const errorMsg = err?.response?.status === 404 
+          ? "Catalog not found for this category"
+          : err?.response?.status === 500
+          ? "Server error while fetching catalog"
+          : err?.response?.data?.message || "Failed to fetch catalog items";
+        
+        setCatalogError(true);
+        setCatalogErrorMessage(errorMsg);
+        triggerPopup(errorMsg, "red");
         setCatalog([]);
         setFilteredItems([]);
       } finally {
-        setIsLoading(false);
+        setCatalogLoading(false);
       }
     };
 
@@ -265,8 +366,15 @@ export default function UpdateQuotationPage() {
   ]);
 
   const handleSubmit = async () => {
-    if (stagedItems.length === 0)
+    if (catalogError) {
+      return triggerPopup("Cannot update quotation: Catalog items failed to load. Please retry loading catalog items.", "red");
+    }
+    if (catalog.length === 0 && stagedItems.length === 0) {
+      return triggerPopup("Cannot update quotation: No catalog items are available and no items are staged. Please contact admin.", "red");
+    }
+    if (stagedItems.length === 0) {
       return triggerPopup("Add at least one item", "red");
+    }
     try {
       setIsLoading(true);
       // Use derived state values that are kept in sync via useEffect
@@ -356,6 +464,53 @@ export default function UpdateQuotationPage() {
         <div style={{ display: "flex", gap: 20 }}>
           <div className="card" style={{ flex: 1 }}>
             <h2 className="card-header">Catalog & Filters</h2>
+
+            {/* Catalog Error Display */}
+            {catalogError && (
+              <div style={{ 
+                background: "#fee2e2", 
+                border: "1px solid #fecaca", 
+                borderRadius: "8px", 
+                padding: "12px", 
+                marginBottom: "16px" 
+              }}>
+                <div style={{ color: "#dc2626", fontWeight: "600", marginBottom: "8px" }}>
+                  ⚠️ Catalog Loading Error
+                </div>
+                <div style={{ color: "#dc2626", fontSize: "14px", marginBottom: "12px" }}>
+                  {catalogErrorMessage}
+                </div>
+                <button 
+                  onClick={retryCatalogFetch}
+                  disabled={catalogLoading}
+                  style={{
+                    background: "#dc2626",
+                    color: "white",
+                    padding: "8px 16px",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: catalogLoading ? "not-allowed" : "pointer",
+                    opacity: catalogLoading ? 0.6 : 1
+                  }}
+                >
+                  {catalogLoading ? "Retrying..." : "Retry"}
+                </button>
+              </div>
+            )}
+
+            {/* Catalog Loading Indicator */}
+            {catalogLoading && (
+              <div style={{ 
+                background: "#eff6ff", 
+                border: "1px solid #dbeafe", 
+                borderRadius: "8px", 
+                padding: "12px", 
+                marginBottom: "16px",
+                textAlign: "center" 
+              }}>
+                <div style={{ color: "#2563eb" }}>Loading catalog items...</div>
+              </div>
+            )}
 
             <div style={{ marginBottom: 8 }}>
               <label style={{ fontSize: 12 }}>Category</label>
@@ -697,7 +852,11 @@ export default function UpdateQuotationPage() {
               <button
                 className="btn-primary"
                 onClick={handleSubmit}
-                disabled={isLoading || stagedItems.length === 0}
+                disabled={isLoading || stagedItems.length === 0 || (catalogError && catalog.length === 0)}
+                style={{
+                  opacity: (catalogError && catalog.length === 0 && stagedItems.length === 0) ? 0.5 : 1,
+                  cursor: (catalogError && catalog.length === 0 && stagedItems.length === 0) ? 'not-allowed' : 'pointer'
+                }}
               >
                 {isLoading ? "Updating..." : "Update"}
               </button>

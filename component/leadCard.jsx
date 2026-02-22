@@ -29,6 +29,9 @@ export default function LeadCard({ lead, onDelete }) {
       .lead-card-tag{font-size:10px;padding:3px 6px;border-radius:6px;font-weight:500;white-space:nowrap}
       .lead-card-tag.req{background:rgba(224,123,99,0.1);color:#e07b63}
       .lead-card-tag.cat{background:rgba(22,150,209,0.1);color:#1696d1}
+      .lead-card-tag.role{background:rgba(99,102,241,0.08);color:#6366f1;border:1px solid rgba(99,102,241,0.15)}
+      .lead-card-visible{margin-top:10px;padding-top:10px;border-top:1px dashed #e9e6e3}
+      .lead-card-visible-label{font-size:10px;font-weight:600;color:#8f8f8f;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 5px 0}
       .lead-card-footer{display:flex;gap:12px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #e9e6e3}
       .lead-card-delete-btn{color:white;font-size:12px;padding:6px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;background:#e07b63;transition:all 0.2s;flex:1}
       .lead-card-delete-btn:hover{background:#d56a52}
@@ -95,6 +98,19 @@ export default function LeadCard({ lead, onDelete }) {
               ))}
             </div>
           )}
+
+          <div className="lead-card-visible">
+            <p className="lead-card-visible-label">Visible to</p>
+            <div className="lead-card-tags">
+              {lead.assignedRoles && lead.assignedRoles.length > 0 ? (
+                lead.assignedRoles.map((role, idx) => (
+                  <span key={idx} className="lead-card-tag role">{role}</span>
+                ))
+              ) : (
+                <span className="lead-card-tag role">designer · site supervisor</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

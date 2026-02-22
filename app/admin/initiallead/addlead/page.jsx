@@ -11,6 +11,14 @@ export default function AddLeadPage() {
 
   const REQUIREMENTS_OPTIONS = ["Glass Work", "Kitchen", "Wardrobe", "Facade","Aristo"];
   const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
+  const VISIBLE_TO_OPTIONS = [
+    "designer",
+    "site supervisor",
+    "kitchen sales executive",
+    "glass sales executive",
+    "wardrobes sales executive",
+    "facade sales executive",
+  ];
 
   const [form, setForm] = useState({
     name: "",
@@ -21,12 +29,15 @@ export default function AddLeadPage() {
     architectAddress: "",
     Requirements: [],
     category: [],
+    assignedRoles: [],
   });
 
   const [requirementsOpen, setRequirementsOpen] = useState(false);
   const [categoryOpen, setCategoryOpen] = useState(false);
+  const [visibleToOpen, setVisibleToOpen] = useState(false);
   const requirementsRef = useRef(null);
   const categoryRef = useRef(null);
+  const visibleToRef = useRef(null);
 
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -42,13 +53,16 @@ export default function AddLeadPage() {
       if (categoryRef.current && !categoryRef.current.contains(e.target)) {
         setCategoryOpen(false);
       }
+      if (visibleToRef.current && !visibleToRef.current.contains(e.target)) {
+        setVisibleToOpen(false);
+      }
     };
 
-    if (requirementsOpen || categoryOpen) {
+    if (requirementsOpen || categoryOpen || visibleToOpen) {
       document.addEventListener("mousedown", handleClickOutside);
       return () => document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, [requirementsOpen, categoryOpen]);
+  }, [requirementsOpen, categoryOpen, visibleToOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -73,6 +87,17 @@ export default function AddLeadPage() {
       return {
         ...prev,
         category: isSelected ? current.filter((x) => x !== cat) : [...current, cat],
+      };
+    });
+  };
+
+  const handleVisibleToToggle = (role) => {
+    setForm((prev) => {
+      const current = Array.isArray(prev.assignedRoles) ? prev.assignedRoles : [];
+      const isSelected = current.includes(role);
+      return {
+        ...prev,
+        assignedRoles: isSelected ? current.filter((x) => x !== role) : [...current, role],
       };
     });
   };
@@ -107,6 +132,7 @@ export default function AddLeadPage() {
         architectAddress: form.architectAddress.trim(),
         Requirements: form.Requirements || [],
         category: form.category || [],
+        visibleTo: form.assignedRoles || [],
       };
       const res = await axios.post(`${backendUrl}/initiallead`, payload, {
         headers: {
@@ -125,6 +151,7 @@ export default function AddLeadPage() {
         architectAddress: "",
         Requirements: [],
         category: [],
+        assignedRoles: [],
       });
       setTimeout(() => router.push("/admin/initiallead"), 1200);
     } catch (error) {
@@ -394,6 +421,49 @@ export default function AddLeadPage() {
                             />
                             <span className="text-sm">{opt}</span>
                           </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Visible To Admin Multi-select */}
+            <div className="mb-4">
+              <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Visible To Admin</label>
+              <p className="text-xs mt-1 mb-2" style={{ color: "#b0b0b0" }}>Leave empty to show to all admins</p>
+              <div className="w-full relative" ref={visibleToRef}>
+                <div
+                  onClick={(e) => { e.stopPropagation(); setVisibleToOpen(!visibleToOpen); }}
+                  className="w-full min-h-[44px] flex flex-wrap items-center gap-2 p-2 rounded-[10px]"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", cursor: "pointer" }}
+                >
+                  {form.assignedRoles && form.assignedRoles.length > 0 ? (
+                    form.assignedRoles.map((role, idx) => (
+                      <div key={role + idx} className="flex items-center gap-2 bg-white px-3 py-1 rounded-full text-sm" style={{ boxShadow: "0 1px 0 rgba(16,16,16,0.04)" }}>
+                        <span>{role}</span>
+                      </div>
+                    ))
+                  ) : (
+                    <span className="text-sm text-gray-500">All admins (no restriction)</span>
+                  )}
+                  <div className="ml-auto text-gray-400">▾</div>
+                </div>
+                {visibleToOpen && (
+                  <div className="absolute mt-1 bg-white rounded shadow-md z-50" style={{ maxHeight: 220, overflowY: "auto", width: "100%" }}>
+                    {VISIBLE_TO_OPTIONS.map((opt) => {
+                      const selected = (form.assignedRoles || []).includes(opt);
+                      return (
+                        <div
+                          key={opt}
+                          onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                          onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVisibleToToggle(opt); }}
+                          className="p-2 flex items-center gap-2 cursor-pointer transition-colors hover:opacity-90"
+                          style={{ backgroundColor: selected ? "#6366f1" : "white", color: selected ? "white" : "black" }}
+                        >
+                          <input type="checkbox" checked={selected} readOnly tabIndex={-1} className="accent-white pointer-events-none" />
+                          <span className="text-sm">{opt}</span>
                         </div>
                       );
                     })}

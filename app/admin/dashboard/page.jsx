@@ -1,8 +1,17 @@
 "use client";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AdminDashboardPage() {
     const router = useRouter();
+    const [adminRole, setAdminRole] = useState("");
+
+    useEffect(() => {
+        const role = localStorage.getItem("adminRole") || "";
+        setAdminRole(role);
+    }, []);
+
+    const isSuperAdmin = adminRole === "super admin";
 
     const cards = [
         {
@@ -26,6 +35,20 @@ export default function AdminDashboardPage() {
             href: "/admin/catelog/display",
             bg: "#f0fdf4",
         },
+        {
+            key: "architects",
+            title: "Architects",
+            desc: "View and update registered architects.",
+            href: "/admin/architects",
+            bg: "#fdf4ff",
+        },
+        ...(isSuperAdmin ? [{
+            key: "admins",
+            title: "Admins",
+            desc: "View all admins and update their assigned roles.",
+            href: "/admin/admins",
+            bg: "#f0f4ff",
+        }] : []),
     ];
 
     return (
@@ -91,6 +114,23 @@ export default function AdminDashboardPage() {
                     <div>
                         <h1>Admin Dashboard</h1>
                         <div className="dash-header-sub">Quick access to common admin areas</div>
+                        {adminRole && (
+                            <div style={{ marginTop: 8 }}>
+                                <span style={{
+                                    display: "inline-block",
+                                    padding: "3px 12px",
+                                    borderRadius: 20,
+                                    fontSize: 12,
+                                    fontWeight: 600,
+                                    background: "#fef2f0",
+                                    color: "#e07b63",
+                                    border: "1px solid rgba(224,123,99,0.25)",
+                                    textTransform: "capitalize",
+                                }}>
+                                    {adminRole}
+                                </span>
+                            </div>
+                        )}
                     </div>
                     <div>
                         <button onClick={() => router.back()} className="dash-back-btn">← Back</button>

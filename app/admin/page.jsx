@@ -12,12 +12,23 @@ export default function AdminLoginPage() {
   const router = useRouter();
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
+  const ADMIN_ROLES = [
+    'super admin',
+    'designer',
+    'site supervisor',
+    'kitchen sales executive',
+    'glass sales executive',
+    'wardrobes sales executive',
+    'facade sales executive',
+  ];
+
   const [form, setForm] = useState({
     email: "",
     password: "",
     name: "",
     phone: "",
     confirmPassword: "",
+    role: "",
   });
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
@@ -47,6 +58,11 @@ export default function AdminLoginPage() {
       setPopupColor("red");
       setShowPopup(true);
       return;
+    } else if (isSignUp && !form.role) {
+      setPopupMessage("Please select a role.");
+      setPopupColor("red");
+      setShowPopup(true);
+      return;
     }
     setLoading(true);
     // Mock request delay
@@ -67,6 +83,7 @@ export default function AdminLoginPage() {
       });
 
       localStorage.setItem("adminToken", response.data.token);
+      localStorage.setItem("adminRole", response.data.role);
       if (response.status === 200) {
         setPopupMessage("Admin login successful!");
         setPopupColor("green");
@@ -98,6 +115,7 @@ export default function AdminLoginPage() {
         email: form.email,
         password: form.password,
         phone: form.phone,
+        role: form.role,
       });
       console.log(response);
       if (response.status === 201) {
@@ -222,6 +240,8 @@ export default function AdminLoginPage() {
 				label{font-size:13px;color:var(--muted);}
 				input{padding:12px 14px;border-radius:10px;border:1px solid #e9e6e3;background:transparent;outline:none;font-size:16px;width:100%}
 				input:focus{border-color:var(--primary);background:rgba(224,123,99,0.02)}
+				select{padding:12px 14px;border-radius:10px;border:1px solid #e9e6e3;background:transparent;outline:none;font-size:14px;width:100%;font-family:inherit;color:#111;cursor:pointer}
+				select:focus{border-color:var(--primary);background:rgba(224,123,99,0.02)}
 				.row{display:flex;gap:10px;flex-wrap:wrap}
 				.submit{background:var(--primary);color:white;padding:12px;border-radius:10px;border:none;cursor:pointer;font-weight:600;font-size:14px;transition:all 0.2s ease}
 				.submit:hover{background:#d66b52}
@@ -439,6 +459,22 @@ export default function AdminLoginPage() {
                       }
                       placeholder="xxxxx-xxxxxx"
                     />
+                  </div>
+                  <div className="flex gap-4 items-center" style={{flexDirection:'column',alignItems:'flex-start',gap:'8px'}}>
+                    <label htmlFor="role">Role</label>
+                    <select
+                      id="role"
+                      name="role"
+                      value={form.role}
+                      onChange={(e) => setForm({ ...form, role: e.target.value })}
+                    >
+                      <option value="">Select a role...</option>
+                      {ADMIN_ROLES.map((r) => (
+                        <option key={r} value={r}>
+                          {r.charAt(0).toUpperCase() + r.slice(1)}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               )}

@@ -81,7 +81,7 @@ export default function CatelogSearchPage() {
   const performDelete = async () => {
     if (!itemToDelete) return;
     try {
-      await axios.delete(`${backendUrl}/catelog/${encodeURIComponent(itemToDelete.name)}`, { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } });
+      await axios.delete(`${backendUrl}/catelog/${encodeURIComponent(itemToDelete._id)}`, { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } });
       setItems((prev) => prev.filter((i) => i._id !== itemToDelete._id));
     } catch (err) {
       alert(err?.response?.data?.message || err.message || 'Delete failed');

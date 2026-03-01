@@ -11,7 +11,7 @@ function UpdateItemContent() {
   const router = useRouter();
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
-  const itemName = searchParams.get("name") ? decodeURIComponent(searchParams.get("name")) : null;
+  const itemId = searchParams.get("id") ? decodeURIComponent(searchParams.get("id")) : null;
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -47,7 +47,7 @@ function UpdateItemContent() {
 
   // Fetch item details
   useEffect(() => {
-    if (!itemName || !backendUrl) {
+    if (!itemId || !backendUrl) {
       setLoading(false);
       return;
     }
@@ -55,7 +55,7 @@ function UpdateItemContent() {
     const fetchItem = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(`${backendUrl}/catelog/${itemName}`, {
+        const response = await axios.get(`${backendUrl}/catelog/${itemId}`, {
           headers: { Authorization: `Bearer ${adminToken}` },
         });
         const data = response.data;
@@ -82,7 +82,7 @@ function UpdateItemContent() {
     };
 
     fetchItem();
-  }, [itemName, backendUrl, adminToken]);
+  }, [ backendUrl, adminToken]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -111,8 +111,8 @@ function UpdateItemContent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!itemName) {
-      setPopupMessage("Item name not found");
+    if (!itemId) {
+      setPopupMessage("Item id not found");
       setPopupColor("red");
       setShowPopup(true);
       return;
@@ -134,7 +134,7 @@ function UpdateItemContent() {
       if (videoFile && formData.type === "Premium") formDataToSend.append("video", videoFile);
 
       const response = await axios.patch(
-        `${backendUrl}/catelog/${encodeURIComponent(itemName)}`,
+        `${backendUrl}/catelog/${encodeURIComponent(itemId)}`,
         formDataToSend,
         { headers: { Authorization: `Bearer ${adminToken}`, "Content-Type": "multipart/form-data" } }
       );

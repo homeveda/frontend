@@ -7,8 +7,8 @@ export default function CatelogCard({ item, onDelete }) {
   const router = useRouter();
 
   const handleClick = () => {
-    const name = encodeURIComponent(item.name);
-    router.push(`/admin/catelog/updateitem?name=${name}`);
+    const id = encodeURIComponent(item._id);
+    router.push(`/admin/catelog/updateitem?id=${id}`);
   };
 
   return (

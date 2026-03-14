@@ -44,10 +44,14 @@ export default function QuotationPage() {
 
   const currentWorkTypes = selectedDepartment ? DEPARTMENT_WORKTYPE_MAP[selectedDepartment] || [] : [];
 
+  // Work types that should use auto-staging
+  const AUTO_STAGE_WORK_TYPES = ["Carcass", "Base And Back", "Basic Hardware", "Other Hardware"];
+
   const [catalog, setCatalog] = useState([]);
   const [filteredItems, setFilteredItems] = useState([]);
 
   const [stagedItems, setStagedItems] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   // Retry function for catalog loading
   const retryCatalogFetch = () => {
@@ -210,9 +214,10 @@ export default function QuotationPage() {
     fetchCatalog();
   }, [selectedCategory, selectedDepartment, selectedWorkType]);
 
-  // Auto-stage all filtered items when workType is selected
+  // Auto-stage all filtered items when workType is selected (only for specific work types)
   useEffect(() => {
-    if (!selectedWorkType || filteredItems.length === 0) return;
+    // Only auto-stage for specified work types
+    if (!AUTO_STAGE_WORK_TYPES.includes(selectedWorkType) || filteredItems.length === 0) return;
 
     const staged = filteredItems.map((item, idx) => ({
       id: item._id || `${item.name}-${idx}`,
@@ -240,6 +245,30 @@ export default function QuotationPage() {
 
   const handleRemoveStaged = (id) => {
     setStagedItems(stagedItems.filter((it) => it.id !== id));
+  };
+
+  // Add a single item to staged items (for manual selection)
+  const handleAddToStaged = (item) => {
+    const stagedItem = {
+      id: item._id || `${item.name}-${Date.now()}`,
+      name: item.name,
+      price: item.price,
+      quantity: 1,
+      totalPrice: Number(item.price || 0),
+      imageLink: item.imageLink,
+      department: item.department,
+      workType: item.workType,
+    };
+
+    setStagedItems((prev) => {
+      // Check if item already exists by name
+      const exists = prev.some((it) => it.name === item.name);
+      if (exists) {
+        triggerPopup("This item is already staged", "orange");
+        return prev;
+      }
+      return [...prev, stagedItem];
+    });
   };
 
   // Allow editing quantity for staged items and keep totals in sync
@@ -465,7 +494,10 @@ export default function QuotationPage() {
                 <select
                   className="input-styled w-full"
                   value={selectedWorkType}
-                  onChange={(e) => setSelectedWorkType(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedWorkType(e.target.value);
+                    setSearchTerm("");
+                  }}
                 >
                   <option value="">All Work Types</option>
                   {currentWorkTypes.map((wt) => (
@@ -483,9 +515,87 @@ export default function QuotationPage() {
                 <div style={{ padding: 8 }}>
                   <LoadingSpinner />
                 </div>
-              ) : (
+              ) : !selectedWorkType ? (
                 <div style={{ color: "#666", fontSize: 13 }}>
-                  Select a department and work type to auto-stage all matching items with quantity 1.
+                  Select a department and work type to view items.
+                </div>
+              ) : AUTO_STAGE_WORK_TYPES.includes(selectedWorkType) ? (
+                <div style={{ color: "#666", fontSize: 13 }}>
+                  All matching items auto-staged with quantity 1.
+                </div>
+              ) : (
+                <div>
+                  <input
+                    type="text"
+                    placeholder="Search items..."
+                    className="input-styled w-full"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    style={{ marginBottom: 10 }}
+                  />
+                  <div style={{ display: "grid", gap: 10, maxHeight: "400px", overflowY: "auto" }}>
+                    {filteredItems
+                      .filter((item) =>
+                        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                      )
+                      .length === 0 ? (
+                      <div style={{ color: "#888", fontSize: 13 }}>
+                        {filteredItems.length === 0
+                          ? "No items available"
+                          : "No items match your search"}
+                      </div>
+                    ) : (
+                      filteredItems
+                        .filter((item) =>
+                          item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                        )
+                        .map((item) => (
+                      <div
+                        key={item._id}
+                        style={{
+                          display: "flex",
+                          gap: 10,
+                          padding: "10px",
+                          background: "#f5f5f5",
+                          borderRadius: "6px",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <div style={{ display: "flex", gap: 10, alignItems: "center", flex: 1 }}>
+                          <img
+                            src={item.imageLink}
+                            alt={item.name}
+                            style={{
+                              width: 60,
+                              height: 45,
+                              objectFit: "cover",
+                              borderRadius: 4,
+                            }}
+                          />
+                          <div>
+                            <div style={{ fontWeight: 600, fontSize: 13 }}>{item.name}</div>
+                            <div style={{ fontSize: 12, color: "#666" }}>₹{item.price}</div>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => handleAddToStaged(item)}
+                          style={{
+                            background: "#e07b63",
+                            color: "#fff",
+                            padding: "6px 12px",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            border: "none",
+                            cursor: "pointer",
+                          }}
+                        >
+                          Add
+                        </button>
+                      </div>
+                        ))
+                    )}
+                  </div>
                 </div>
               )}
             </div>

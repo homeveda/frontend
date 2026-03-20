@@ -29,6 +29,9 @@ export default function AddLeadPage() {
     architectAddress: "",
     Requirements: [],
     category: [],
+    leadSource: "",
+    expectedTimeline: "",
+    notes: "",
     assignedRoles: [],
   });
 
@@ -132,6 +135,9 @@ export default function AddLeadPage() {
         architectAddress: form.architectAddress.trim(),
         Requirements: form.Requirements || [],
         category: form.category || [],
+        leadSource: form.leadSource.trim(),
+        expectedTimeline: form.expectedTimeline.trim(),
+        notes: form.notes.trim(),
         visibleTo: form.assignedRoles || [],
       };
       const res = await axios.post(`${backendUrl}/initiallead`, payload, {
@@ -151,6 +157,9 @@ export default function AddLeadPage() {
         architectAddress: "",
         Requirements: [],
         category: [],
+        leadSource: "",
+        expectedTimeline: "",
+        notes: "",
         assignedRoles: [],
       });
       setTimeout(() => router.push("/admin/initiallead"), 1200);
@@ -267,6 +276,51 @@ export default function AddLeadPage() {
                   style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", resize: "vertical" }}
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                  Lead Source
+                </label>
+                <input
+                  name="leadSource"
+                  value={form.leadSource}
+                  onChange={handleChange}
+                  placeholder="e.g. Website, Referral, Social Media, Cold Call"
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                  Expected Timeline
+                </label>
+                <input
+                  name="expectedTimeline"
+                  value={form.expectedTimeline}
+                  onChange={handleChange}
+                  placeholder="e.g. ASAP, 1 Month, 3 Months, 6 Months"
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
+                Notes
+              </label>
+              <textarea
+                name="notes"
+                value={form.notes}
+                onChange={handleChange}
+                placeholder="Add any additional notes about this lead..."
+                rows={3}
+                className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", resize: "vertical" }}
+              />
             </div>
 
             {/* Requirements Multi-select */}

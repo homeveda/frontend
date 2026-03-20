@@ -13,9 +13,12 @@ export default function LeadsDisplayPage() {
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
 
   const [query, setQuery] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
 
   const fetchLeads = async () => {
     if (!backendUrl) return setError("Backend URL not configured");
@@ -71,10 +74,11 @@ export default function LeadsDisplayPage() {
     setLeadToDelete(null);
   };
 
-  // Filter leads by search only
+  // Filter leads by search and category
   const filtered = leads.filter((lead) => {
     const matchQuery = query === "" || lead.name.toLowerCase().includes(query.toLowerCase());
-    return matchQuery;
+    const matchCategory = categoryFilter === "" || (Array.isArray(lead.category) && lead.category.includes(categoryFilter));
+    return matchQuery && matchCategory;
   });
 
   return (
@@ -88,7 +92,7 @@ export default function LeadsDisplayPage() {
         .leads-button{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
         .leads-button:hover{background:#d56a52}
         .leads-filters{padding:16px;border-radius:14px;background:#ffffff;box-shadow:0 10px 30px rgba(16,16,16,0.08);margin-bottom:24px}
-        .filters-grid{display:grid;grid-template-columns:1fr;gap:16px}
+        .filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
         .filter-group{display:flex;flex-direction:column}
         .filter-group label{font-size:12px;font-weight:600;color:#8f8f8f;margin-bottom:8px}
         .filter-group select,.filter-group input{padding:10px 12px;border-radius:10px;border:1px solid #e9e6e3;background:#fafafa;font-size:13px;outline:none;font-family:inherit}
@@ -99,7 +103,7 @@ export default function LeadsDisplayPage() {
           .leads-header{margin-bottom:20px}
           .leads-header h2{font-size:20px}
           .leads-button{padding:6px 12px;font-size:13px}
-          .filters-grid{grid-template-columns:1fr;gap:12px}
+          .filters-grid{grid-template-columns:1fr 1fr;gap:12px}
           .leads-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
         }
 
@@ -168,6 +172,22 @@ export default function LeadsDisplayPage() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by name..."
             />
+          </div>
+          <div className="filter-group">
+            <label>
+              Filter by Category
+            </label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+            >
+              <option value="">All Categories</option>
+              {CATEGORY_OPTIONS.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </div>

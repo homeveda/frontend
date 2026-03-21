@@ -14,11 +14,25 @@ export default function LeadsDisplayPage() {
 
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
+  const [requirementsFilter, setRequirementsFilter] = useState("");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
+  
+  // Extract all unique requirements from leads
+  const getUniqueRequirements = () => {
+    const requirementsSet = new Set();
+    leads.forEach((lead) => {
+      if (Array.isArray(lead.Requirements)) {
+        lead.Requirements.forEach((req) => {
+          requirementsSet.add(req);
+        });
+      }
+    });
+    return Array.from(requirementsSet).sort();
+  };
 
   const fetchLeads = async () => {
     if (!backendUrl) return setError("Backend URL not configured");
@@ -74,11 +88,12 @@ export default function LeadsDisplayPage() {
     setLeadToDelete(null);
   };
 
-  // Filter leads by search and category
+  // Filter leads by search, category, and requirements
   const filtered = leads.filter((lead) => {
     const matchQuery = query === "" || lead.name.toLowerCase().includes(query.toLowerCase());
     const matchCategory = categoryFilter === "" || (Array.isArray(lead.category) && lead.category.includes(categoryFilter));
-    return matchQuery && matchCategory;
+    const matchRequirements = requirementsFilter === "" || (Array.isArray(lead.Requirements) && lead.Requirements.includes(requirementsFilter));
+    return matchQuery && matchCategory && matchRequirements;
   });
 
   return (
@@ -185,6 +200,22 @@ export default function LeadsDisplayPage() {
               {CATEGORY_OPTIONS.map((cat) => (
                 <option key={cat} value={cat}>
                   {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>
+              Filter by Requirements
+            </label>
+            <select
+              value={requirementsFilter}
+              onChange={(e) => setRequirementsFilter(e.target.value)}
+            >
+              <option value="">All Requirements</option>
+              {getUniqueRequirements().map((req) => (
+                <option key={req} value={req}>
+                  {req}
                 </option>
               ))}
             </select>

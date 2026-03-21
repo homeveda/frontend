@@ -37,7 +37,8 @@ function UpdateLeadContent() {
     Requirements: [],
     category: [],
     leadSource: "",
-    expectedTimeline: "",
+    expectedTimelineStart: "",
+    expectedTimelineEnd: "",
     notes: "",
     assignedRoles: [],
   });
@@ -97,7 +98,8 @@ function UpdateLeadContent() {
           Requirements: data.Requirements || [],
           category: data.category || [],
           leadSource: data.leadSource || "",
-          expectedTimeline: data.expectedTimeline || "",
+          expectedTimelineStart: data.expectedTimelineStart || "",
+          expectedTimelineEnd: data.expectedTimelineEnd || "",
           notes: data.notes || "",
           assignedRoles: data.assignedRoles || [],
         });
@@ -156,6 +158,15 @@ function UpdateLeadContent() {
     if (!form.address.trim()) return "Address is required";
     if (!form.contactNumber.trim()) return "Contact number is required";
     if (!/^\+?[0-9\- ]{6,20}$/.test(form.contactNumber.trim())) return "Enter a valid contact number";
+    
+    // Validate expected timeline
+    if (form.expectedTimelineStart && form.expectedTimelineEnd) {
+      const startDate = new Date(form.expectedTimelineStart);
+      const endDate = new Date(form.expectedTimelineEnd);
+      if (startDate > endDate) {
+        return "Start date cannot be after end date";
+      }
+    }
     return null;
   };
 
@@ -188,7 +199,8 @@ function UpdateLeadContent() {
         Requirements: form.Requirements || [],
         category: form.category || [],
         leadSource: form.leadSource.trim(),
-        expectedTimeline: form.expectedTimeline.trim(),
+        expectedTimelineStart: form.expectedTimelineStart,
+        expectedTimelineEnd: form.expectedTimelineEnd,
         notes: form.notes.trim(),
         visibleTo: form.assignedRoles || [],
       };
@@ -278,14 +290,30 @@ function UpdateLeadContent() {
                 <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
                   Expected Timeline
                 </label>
-                <input
-                  name="expectedTimeline"
-                  value={form.expectedTimeline}
-                  onChange={handleChange}
-                  placeholder="e.g. ASAP, 1 Month, 3 Months, 6 Months"
-                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
-                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
-                />
+                <div style={{ display: "flex", gap: "8px", marginTop: "8px", alignItems: "center" }}>
+                  <div style={{ flex: 1 }}>
+                    <label className="text-xs" style={{ color: "#8f8f8f", display: "block", marginBottom: "4px" }}>From</label>
+                    <input
+                      type="date"
+                      name="expectedTimelineStart"
+                      value={form.expectedTimelineStart}
+                      onChange={handleChange}
+                      className="block w-full rounded-[10px] px-3 py-2 text-sm"
+                      style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                    />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <label className="text-xs" style={{ color: "#8f8f8f", display: "block", marginBottom: "4px" }}>To</label>
+                    <input
+                      type="date"
+                      name="expectedTimelineEnd"
+                      value={form.expectedTimelineEnd}
+                      onChange={handleChange}
+                      className="block w-full rounded-[10px] px-3 py-2 text-sm"
+                      style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 

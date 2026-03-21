@@ -83,6 +83,14 @@ export default function LeadCard({ lead, onDelete }) {
             </div>
           )}
           
+          {(lead.expectedTimelineStart || lead.expectedTimelineEnd) && (
+            <div className="lead-card-info" style={{ marginTop: "8px", fontWeight: "600" }}>
+              Timeline: <span>
+                {lead.expectedTimelineStart ? new Date(lead.expectedTimelineStart).toLocaleDateString() : "—"} to {lead.expectedTimelineEnd ? new Date(lead.expectedTimelineEnd).toLocaleDateString() : "—"}
+              </span>
+            </div>
+          )}
+          
           {(lead.Requirements && lead.Requirements.length > 0) && (
             <div className="lead-card-tags">
               {lead.Requirements.map((req, idx) => (

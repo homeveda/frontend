@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import LoadingSpinner from "../../../../../../component/loadingSpinner";
 import Popup from "../../../../../../component/popup";
 import axios from "axios";
@@ -10,8 +10,10 @@ import { number } from "framer-motion";
 export default function UpdateQuotationPage() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { id: projectId } = params;
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const quotationIdFromUrl = searchParams.get("qid");
 
   const [isLoading, setIsLoading] = useState(true);
   const [catalogError, setCatalogError] = useState(false);
@@ -135,6 +137,8 @@ export default function UpdateQuotationPage() {
 
   // Fetch existing quotation and project details
   useEffect(() => {
+    if (!quotationIdFromUrl) return;
+    
     const adminToken = localStorage.getItem("adminToken");
     const fetchProjectAndQuotation = async () => {
       try {
@@ -153,7 +157,7 @@ export default function UpdateQuotationPage() {
         setProjectCategory(cat);
         setSelectedCategory(cat);
 
-        // Fetch existing quotation
+        // Fetch the specific quotation by ID
         const quotationRes = await axios.get(
           `${backendUrl}/quotation/${projectId}`,
           {
@@ -162,35 +166,39 @@ export default function UpdateQuotationPage() {
             },
           },
         );
-        console.log("Fetched quotation:", quotationRes.data.quotations[0]);
-        if (quotationRes.data) {
-          const quotation = quotationRes.data.quotations[0];
-          setQuotationId(quotation._id);
+        
+        // Find the specific quotation from the list
+        const quotation = quotationRes.data?.quotations?.find(q => q._id === quotationIdFromUrl);
+        if (!quotation) {
+          triggerPopup("Quotation not found", "red");
+          return;
+        }
 
-          // Load existing items into staged items
-          if (quotation.items && Array.isArray(quotation.items)) {
-            const loadedItems = quotation.items.map((it, index) => ({
-              id: `${it._id || index}-${Date.now()}`,
-              name: it.name,
-              price: it.price,
-              quantity: it.quantity,
-              totalPrice: it.totalPrice,
-              department: it.department,
-              workType: it.workType,
-            }));
-            setStagedItems(loadedItems);
-          }
+        setQuotationId(quotation._id);
 
-          // Load totals if they exist
-          if (quotation.totals) {
-            setDiscount(quotation.totals.discount || 0);
-            setFreightInstallationHandling(
-              quotation.totals.freightInstallationHandling || 0,
-            );
-            setTaxPercent(quotation.totals.taxPercent || 18);
-            // Check if tax was applied in the saved quotation
-            setIncludeTax(quotation.totals.taxAmount > 0);
-          }
+        // Load existing items into staged items
+        if (quotation.items && Array.isArray(quotation.items)) {
+          const loadedItems = quotation.items.map((it, index) => ({
+            id: `${it._id || index}-${Date.now()}`,
+            name: it.name,
+            price: it.price,
+            quantity: it.quantity,
+            totalPrice: it.totalPrice,
+            department: it.department,
+            workType: it.workType,
+          }));
+          setStagedItems(loadedItems);
+        }
+
+        // Load totals if they exist
+        if (quotation.totals) {
+          setDiscountPercent(quotation.totals.discountPercent || 0);
+          setFreightInstallationHandling(
+            quotation.totals.freightInstallationHandling || 0,
+          );
+          setTaxPercent(quotation.totals.taxPercent || 18);
+          // Check if tax was applied in the saved quotation
+          setIncludeTax(quotation.totals.taxAmount > 0);
         }
       } catch (err) {
         console.error(err);
@@ -200,7 +208,7 @@ export default function UpdateQuotationPage() {
       }
     };
     fetchProjectAndQuotation();
-  }, [projectId]);
+  }, [projectId, quotationIdFromUrl]);
 
   // Fetch catalog when category, department, or workType selection changes
   useEffect(() => {
@@ -333,7 +341,7 @@ export default function UpdateQuotationPage() {
     setStagedItems(updatedItems);
   };
 
-  const [discount, setDiscount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [freightInstallationHandling, setFreightInstallationHandling] =
     useState(0);
   const [taxPercent, setTaxPercent] = useState(18);
@@ -351,15 +359,16 @@ export default function UpdateQuotationPage() {
       0,
     );
     setGrossAmount(gross);
-    const beforeTax =
-      gross - Number(discount || 0) + Number(freightInstallationHandling || 0);
+    const totalBeforeDiscount = gross + Number(freightInstallationHandling || 0);
+    const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
+    const beforeTax = totalBeforeDiscount - discountAmount;
     setTotalBeforeTaxState(beforeTax);
     const tax = includeTax ? (Number(taxPercent || 0) / 100) * beforeTax : 0;
     setTaxAmount(tax);
     setGrandTotalState(beforeTax + tax);
   }, [
     stagedItems,
-    discount,
+    discountPercent,
     freightInstallationHandling,
     taxPercent,
     includeTax,
@@ -379,10 +388,11 @@ export default function UpdateQuotationPage() {
       setIsLoading(true);
       // Use derived state values that are kept in sync via useEffect
       const gross = grossAmount;
+      const totalBeforeDiscount = gross + Number(freightInstallationHandling || 0);
+      const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
       const totalBeforeTax = totalBeforeTaxState;
       const taxAmt = taxAmount;
       const grandTotal = grandTotalState;
-
       const payload = {
         projectId,
         category: selectedCategory,
@@ -396,7 +406,8 @@ export default function UpdateQuotationPage() {
         })),
         totals: {
           grossAmount: gross,
-          discount: Number(discount || 0),
+          discountPercent: Number(discountPercent || 0),
+          discountAmount,
           taxAmount: Number(taxAmt || 0),
           taxPercent: Number(taxPercent || 18),
           freightInstallationHandling: Number(freightInstallationHandling || 0),
@@ -729,26 +740,30 @@ export default function UpdateQuotationPage() {
 
             {/* Calculations and inputs */}
             <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <label style={{ width: 160, alignSelf: "center" }}>
-                  Discount (₹)
+                  Discount (%)
                 </label>
                 <input
                   type="number"
                   className="input-styled no-spinner"
-                  value={discount === 0 ? "" : discount}
-                  onFocus={() => discount === 0 && setDiscount("")}
+                  style={{ width: 80 }}
+                  value={discountPercent === 0 ? "" : discountPercent}
+                  onFocus={() => discountPercent === 0 && setDiscountPercent("")}
                   onBlur={(e) =>
-                    setDiscount(
+                    setDiscountPercent(
                       e.target.value === "" ? 0 : Number(e.target.value),
                     )
                   }
                   onChange={(e) =>
-                    setDiscount(
+                    setDiscountPercent(
                       e.target.value === "" ? "" : Number(e.target.value),
                     )
                   }
                 />
+                <span style={{ fontSize: 13, color: "#666" }}>
+                  ₹{((Number(discountPercent || 0) / 100) * (grossAmount + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                </span>
               </div>
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -822,9 +837,18 @@ export default function UpdateQuotationPage() {
                   Gross: ₹{grossAmount.toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
-                  Tax: ₹{(taxAmount || 0).toLocaleString("en-IN")}
+                  Freight/Installation: ₹{Number(freightInstallationHandling || 0).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
+                  Total Before Discount: ₹{(grossAmount + Number(freightInstallationHandling || 0)).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * (grossAmount + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  Tax: ₹{(taxAmount || 0).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl" style={{ fontWeight: "bold" }}>
                   Total: ₹{(grandTotalState || 0).toLocaleString("en-IN")}
                 </h1>
               </div>

@@ -265,10 +265,7 @@ export default function QuotationPage() {
                                   <td
                                     style={{ padding: 6, textAlign: "right" }}
                                   >
-                                    ₹
-                                    {quotation.totals?.discount?.toLocaleString(
-                                      "en-IN"
-                                    ) || 0}
+                                    {quotation.totals?.discountPercent ? `${quotation.totals.discountPercent}% - ₹${quotation.totals.discountAmount?.toLocaleString("en-IN") || 0}` : "₹0"}
                                   </td>
                                 </tr>
                                 <tr>
@@ -341,7 +338,7 @@ export default function QuotationPage() {
                     <div className="flex gap-2 mt-4">
                       <button
                         onClick={() => {
-                          router.push(`/admin/projects/${id}/quotation/update`);
+                          router.push(`/admin/projects/${id}/quotation/update?qid=${quotation._id}`);
                         }}
                         className="flex-1 bg-[#e07b63] text-white text-center py-2 rounded hover:bg-[#d56a52] transition-colors text-sm font-medium"
                       >

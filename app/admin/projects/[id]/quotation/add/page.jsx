@@ -216,19 +216,25 @@ export default function QuotationPage() {
 
   // Auto-stage all filtered items when workType is selected (only for specific work types)
   useEffect(() => {
-    // Only auto-stage for specified work types
-    if (!AUTO_STAGE_WORK_TYPES.includes(selectedWorkType) || filteredItems.length === 0) return;
+    // Only auto-stage if workType is selected, not empty, and in AUTO_STAGE_WORK_TYPES
+    if (!selectedWorkType || !AUTO_STAGE_WORK_TYPES.includes(selectedWorkType) || filteredItems.length === 0) return;
 
-    const staged = filteredItems.map((item, idx) => ({
-      id: item._id || `${item.name}-${idx}`,
-      name: item.name,
-      price: item.price,
-      quantity: 1,
-      totalPrice: Number(item.price || 0),
-      imageLink: item.imageLink,
-      department: item.department,
-      workType: item.workType,
-    }));
+    // Filter items to only include those matching the selected workType
+    const staged = filteredItems
+      .filter((item) => item.workType === selectedWorkType)
+      .map((item, idx) => ({
+        id: item._id || `${item.name}-${idx}`,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+        totalPrice: Number(item.price || 0),
+        imageLink: item.imageLink,
+        department: item.department,
+        workType: item.workType,
+      }));
+
+    // Guard: if no items match after filtering, don't stage anything
+    if (staged.length === 0) return;
 
     // Merge newly staged items with existing ones, avoid duplicates by name
     setStagedItems((prev) => {
@@ -303,7 +309,7 @@ export default function QuotationPage() {
     );
   };
 
-  const [discount, setDiscount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
   const [freightInstallationHandling, setFreightInstallationHandling] =
     useState(0);
   const [taxPercent, setTaxPercent] = useState(18);
@@ -324,18 +330,13 @@ export default function QuotationPage() {
         (s, it) => s + (Number(it.totalPrice) || 0),
         0
       );
-      const totalBeforeTax =
-        grossAmount -
-        Number(discount || 0) +
-        Number(freightInstallationHandling || 0);
+      const totalBeforeDiscount = grossAmount + Number(freightInstallationHandling || 0);
+      const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
+      const totalBeforeTax = totalBeforeDiscount - discountAmount;
       const taxAmount = includeTax
         ? (Number(taxPercent || 0) / 100) * totalBeforeTax
         : 0;
-      const grandTotal =
-        grossAmount -
-        Number(discount || 0) +
-        Number(freightInstallationHandling || 0) +
-        taxAmount;
+      const grandTotal = totalBeforeTax + taxAmount;
 
       const payload = {
         projectId,
@@ -350,7 +351,8 @@ export default function QuotationPage() {
         })),
         totals: {
           grossAmount,
-          discount: Number(discount || 0),
+          discountPercent: Number(discountPercent || 0),
+          discountAmount,
           taxAmount,
           freightInstallationHandling: Number(freightInstallationHandling || 0),
           grandTotal,
@@ -676,26 +678,30 @@ export default function QuotationPage() {
 
             {/* Calculations and inputs */}
             <div style={{ marginTop: 16, display: "grid", gap: 8 }}>
-              <div style={{ display: "flex", gap: 8 }}>
+              <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
                 <label style={{ width: 160, alignSelf: "center" }}>
-                  Discount (₹)
+                  Discount (%)
                 </label>
                 <input
                   type="number"
                   className="input-styled no-spinner"
-                  value={discount === 0 ? "" : discount}
-                  onFocus={() => discount === 0 && setDiscount("")}
+                  style={{ width: 80 }}
+                  value={discountPercent === 0 ? "" : discountPercent}
+                  onFocus={() => discountPercent === 0 && setDiscountPercent("")}
                   onBlur={(e) =>
-                    setDiscount(
+                    setDiscountPercent(
                       e.target.value === "" ? 0 : Number(e.target.value)
                     )
                   }
                   onChange={(e) =>
-                    setDiscount(
+                    setDiscountPercent(
                       e.target.value === "" ? "" : Number(e.target.value)
                     )
                   }
                 />
+                <span style={{ fontSize: 13, color: "#666" }}>
+                  ₹{((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0))).toLocaleString("en-IN")}
+                </span>
               </div>
 
               <div style={{ display: "flex", gap: 8 }}>
@@ -768,35 +774,34 @@ export default function QuotationPage() {
                     .toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
+                  Freight/Installation: ₹{Number(freightInstallationHandling || 0).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  Total Before Discount: ₹{(stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0)).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
                   Tax: ₹
                   {(
                     includeTax
-                      ? (stagedItems.reduce(
-                          (s, it) => s + (Number(it.totalPrice) || 0),
-                          0
-                        ) -
-                          Number(discount || 0) +
-                          Number(freightInstallationHandling || 0)) *
+                      ? (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0) - ((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0)))) *
                         (Number(taxPercent || 0) / 100)
                       : 0
                   ).toLocaleString("en-IN")}
                 </h1>
-                <h1 className="text-xl">
+                <h1 className="text-xl" style={{ fontWeight: "bold" }}>
                   Total: ₹
                   {(
                     stagedItems.reduce(
                       (s, it) => s + (Number(it.totalPrice) || 0),
                       0
-                    ) -
-                      Number(discount || 0) +
-                      Number(freightInstallationHandling || 0) +
+                    ) +
+                      Number(freightInstallationHandling || 0) -
+                      ((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0))) +
                       (includeTax
-                        ? (stagedItems.reduce(
-                            (s, it) => s + (Number(it.totalPrice) || 0),
-                            0
-                          ) -
-                            Number(discount || 0) +
-                            Number(freightInstallationHandling || 0)) *
+                        ? (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0) - ((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0)))) *
                           (Number(taxPercent || 0) / 100)
                         : 0) || 0
                   ).toLocaleString("en-IN")}

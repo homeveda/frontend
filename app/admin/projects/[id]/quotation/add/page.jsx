@@ -330,9 +330,9 @@ export default function QuotationPage() {
         (s, it) => s + (Number(it.totalPrice) || 0),
         0
       );
-      const totalBeforeDiscount = grossAmount + Number(freightInstallationHandling || 0);
+      const totalBeforeDiscount = grossAmount ;
       const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
-      const totalBeforeTax = totalBeforeDiscount - discountAmount;
+      const totalBeforeTax = totalBeforeDiscount + freightInstallationHandling- discountAmount;
       const taxAmount = includeTax
         ? (Number(taxPercent || 0) / 100) * totalBeforeTax
         : 0;
@@ -706,7 +706,7 @@ export default function QuotationPage() {
 
               <div style={{ display: "flex", gap: 8 }}>
                 <label style={{ width: 160, alignSelf: "center" }}>
-                  Freight / Installation (₹)
+                  Handling charges (₹)
                 </label>
                 <input
                   type="number"
@@ -774,13 +774,13 @@ export default function QuotationPage() {
                     .toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
-                  Freight/Installation: ₹{Number(freightInstallationHandling || 0).toLocaleString("en-IN")}
+                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  Handling charges: ₹{Number(freightInstallationHandling || 0).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
                   Total Before Discount: ₹{(stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0)).toLocaleString("en-IN")}
-                </h1>
-                <h1 className="text-xl">
-                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * (stagedItems.reduce((s, it) => s + (Number(it.totalPrice) || 0), 0) + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
                   Tax: ₹

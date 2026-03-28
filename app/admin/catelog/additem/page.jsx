@@ -352,7 +352,7 @@ function AddCatalogItemPage() {
     );
 }
 
-export default AddItemPage=()=>{
+export default function AddItemPage(){
     return (
         <Suspense fallback={<LoadingSpinner />}>
             <AddCatalogItemPage />

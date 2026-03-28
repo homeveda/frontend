@@ -12,6 +12,20 @@ function UpdateItemContent() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
   const itemId = searchParams.get("id") ? decodeURIComponent(searchParams.get("id")) : null;
+  
+  // Get filter parameters
+  const filterParams = new URLSearchParams();
+  const category = searchParams.get('category');
+  const type = searchParams.get('type');
+  const department = searchParams.get('department');
+  const workType = searchParams.get('workType');
+  console.log(itemId);
+  if (category) filterParams.set('category', category);
+  if (type) filterParams.set('type', type);
+  if (department) filterParams.set('department', department);
+  if (workType) filterParams.set('workType', workType);
+  
+  const filterQueryString = filterParams.toString() ? '?' + filterParams.toString() : '';
 
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);

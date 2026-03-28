@@ -4,11 +4,26 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { Upload, Camera } from "lucide-react";
 import Popup from "../../../../component/popup";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function AddItemPage() {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
     const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    // Get filter parameters
+    const filterParams = new URLSearchParams();
+    const category = searchParams.get('category');
+    const type = searchParams.get('type');
+    const department = searchParams.get('department');
+    const workType = searchParams.get('workType');
+    
+    if (category) filterParams.set('category', category);
+    if (type) filterParams.set('type', type);
+    if (department) filterParams.set('department', department);
+    if (workType) filterParams.set('workType', workType);
+    
+    const filterQueryString = filterParams.toString() ? '?' + filterParams.toString() : '';
 
     const [showPopup, setShowPopup] = useState(false);
     const [popupMessage, setPopupMessage] = useState("");
@@ -122,7 +137,7 @@ export default function AddItemPage() {
                 if (imageInputRef.current) imageInputRef.current.value = "";
                 if (videoInputRef.current) videoInputRef.current.value = "";
                 // redirect to display page after 2 seconds
-                setTimeout(() => router.push("/admin/catelog/display"), 2000);
+                setTimeout(() => router.push(`/admin/catelog/display${filterQueryString}`), 2000);
             } else {
                 setPopupMessage(resp.data?.message || "Failed to create item.");
                 setPopupColor("red");

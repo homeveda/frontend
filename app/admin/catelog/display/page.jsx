@@ -4,13 +4,14 @@ import axios from "axios";
 import CatelogCard from "../../../../component/catelogCard";
 import ConfirmationDialogueBox from "../../../../component/confirmationDialogueBox";
 import LoadingSpinner from "../../../../component/loadingSpinner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CatelogSearchPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
   const router = useRouter();
+  const searchParams = useSearchParams();
   const categories = ["Builder","Economy","Standard","VedaX"];
   const types = ["All","Normal","Premium"];
   const DEPARTMENT_WORKTYPE_MAP = {
@@ -21,11 +22,12 @@ export default function CatelogSearchPage() {
   };
   const departments = ["All", ...Object.keys(DEPARTMENT_WORKTYPE_MAP)];
 
-  const [category, setCategory] = useState("Economy");
-  const [type, setType] = useState("All");
-  const [department, setDepartment] = useState("All");
-  const [workType, setWorkType] = useState("All");
-  const [query, setQuery] = useState("");
+  // Initialize filters from URL or defaults
+  const [category, setCategory] = useState(searchParams.get('category') || "Economy");
+  const [type, setType] = useState(searchParams.get('type') || "All");
+  const [department, setDepartment] = useState(searchParams.get('department') || "All");
+  const [workType, setWorkType] = useState(searchParams.get('workType') || "All");
+  const [query, setQuery] = useState(searchParams.get('query') || "");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -62,6 +64,21 @@ export default function CatelogSearchPage() {
     }
   };
 
+  // Update URL when filters change
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (category !== "Economy") params.set('category', category);
+    if (type !== "All") params.set('type', type);
+    if (department !== "All") params.set('department', department);
+    if (workType !== "All") params.set('workType', workType);
+    if (query) params.set('query', query);
+    
+    const queryString = params.toString();
+    const newUrl = queryString ? `?${queryString}` : window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+  }, [category, type, department, workType, query]);
+
+  // Fetch items when filters change
   useEffect(() => {
     fetchItems();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -108,7 +125,13 @@ export default function CatelogSearchPage() {
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <button
               onClick={() => {
-                router.push(`/admin/catelog/additem`);
+                const params = new URLSearchParams();
+                if (category !== "Economy") params.set('category', category);
+                if (type !== "All") params.set('type', type);
+                if (department !== "All") params.set('department', department);
+                if (workType !== "All") params.set('workType', workType);
+                const queryString = params.toString();
+                router.push(`/admin/catelog/additem${queryString ? '?' + queryString : ''}`);
               }}
               className="cursor-pointer bg-[#e07b63] text-white px-4 py-2 rounded hover:bg-[#f7f4f1] hover:text-[#e07b63] hover:border-[#e07b63] border rounded-lg border-transparent transition-colors text-sm sm:text-base whitespace-nowrap"
             >
@@ -166,11 +189,19 @@ export default function CatelogSearchPage() {
 
       <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <AnimatePresence>
-          {filtered.map(it=> (
-            <motion.div key={it._id} layout>
-              <CatelogCard item={it} onDelete={requestDelete} />
-            </motion.div>
-          ))}
+          {filtered.map(it=> {
+            const params = new URLSearchParams();
+            if (category !== "Economy") params.set('category', category);
+            if (type !== "All") params.set('type', type);
+            if (department !== "All") params.set('department', department);
+            if (workType !== "All") params.set('workType', workType);
+            const queryString = params.toString();
+            return (
+              <motion.div key={it._id} layout>
+                <CatelogCard item={it} onDelete={requestDelete} filters={queryString ? '&' + queryString : ''} />
+              </motion.div>
+            );
+          })}
         </AnimatePresence>
       </motion.div>
 

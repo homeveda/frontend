@@ -3,12 +3,12 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
-export default function CatelogCard({ item, onDelete }) {
+export default function CatelogCard({ item, onDelete, filters = '' }) {
   const router = useRouter();
 
   const handleClick = () => {
     const id = encodeURIComponent(item._id);
-    router.push(`/admin/catelog/updateitem?id=${id}`);
+    router.push(`/admin/catelog/updateitem?id=${id}${filters}`);
   };
 
   return (

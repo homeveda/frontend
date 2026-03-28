@@ -6,8 +6,9 @@ import ConfirmationDialogueBox from "../../../../component/confirmationDialogueB
 import LoadingSpinner from "../../../../component/loadingSpinner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { Suspense } from "react";
 
-export default function CatelogSearchPage() {
+function CatelogSearchPage() {
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
   const router = useRouter();
@@ -217,5 +218,13 @@ export default function CatelogSearchPage() {
         onCancel={cancelDelete}
       />
     </div>
+  );
+}
+
+export default function CatelogSearchPageWrapper() {
+  return(
+    <Suspense fallback={<LoadingSpinner />}>
+      <CatelogSearchPage />
+    </Suspense>
   );
 }

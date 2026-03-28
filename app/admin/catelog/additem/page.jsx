@@ -5,8 +5,10 @@ import axios from "axios";
 import { Upload, Camera } from "lucide-react";
 import Popup from "../../../../component/popup";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import LoadingSpinner from "../../../../component/loadingSpinner";
 
-export default function AddItemPage() {
+function AddCatalogItemPage() {
     const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:3000";
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -348,4 +350,12 @@ export default function AddItemPage() {
             </motion.div>
         </div>
     );
+}
+
+export default AddItemPage=()=>{
+    return (
+        <Suspense fallback={<LoadingSpinner />}>
+            <AddCatalogItemPage />
+        </Suspense>
+    )
 }

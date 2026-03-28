@@ -19,7 +19,6 @@ function UpdateItemContent() {
   const type = searchParams.get('type');
   const department = searchParams.get('department');
   const workType = searchParams.get('workType');
-  console.log(itemId);
   if (category) filterParams.set('category', category);
   if (type) filterParams.set('type', type);
   if (department) filterParams.set('department', department);

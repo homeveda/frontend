@@ -193,9 +193,6 @@ export default function ManageAdminsPage() {
           <p>View all admins and update their roles</p>
         </div>
         <div className="ma-header-actions">
-          <button onClick={() => router.push("/admin/dashboard")} className="ma-back-btn">
-            ← Dashboard
-          </button>
           <button onClick={fetchAdmins} className="ma-btn">
             Refresh
           </button>

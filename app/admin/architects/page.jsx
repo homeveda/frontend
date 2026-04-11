@@ -25,6 +25,11 @@ export default function ArchitectsPage() {
 
   const [popup, setPopup] = useState({ show: false, message: "", color: "green" });
 
+  // Add architect state
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [newArchitect, setNewArchitect] = useState({ architectName: "", architectContact: "", architectAddress: "" });
+  const [adding, setAdding] = useState(false);
+
   const showPopup = (message, color = "green") =>
     setPopup({ show: true, message, color });
 
@@ -46,6 +51,26 @@ export default function ArchitectsPage() {
     fetchArchitects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handleAddArchitect = async () => {
+    if(!newArchitect.architectName || !newArchitect.architectContact){
+      return showPopup("Name and Contact are required", "red");
+    }
+    setAdding(true);
+    try {
+      const res = await axios.post(`${backendUrl}/architect`, newArchitect, {
+        headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
+      });
+      setArchitects((prev) => [res.data.architect, ...prev]);
+      showPopup("Architect created successfully", "green");
+      setIsAddModalOpen(false);
+      setNewArchitect({ architectName: "", architectContact: "", architectAddress: "" });
+    } catch (err) {
+      showPopup(err?.response?.data?.message || "Failed to add architect", "red");
+    } finally {
+      setAdding(false);
+    }
+  };
 
   const startEdit = (architect) => {
     setEditing((prev) => ({
@@ -199,8 +224,8 @@ export default function ArchitectsPage() {
           <p>View and update registered architects</p>
         </div>
         <div className="arch-header-actions">
-          <button onClick={() => router.push("/admin/dashboard")} className="arch-back-btn">
-            ← Dashboard
+          <button onClick={() => setIsAddModalOpen(true)} className="arch-btn" style={{backgroundColor: "#111", color: "#fff"}}>
+            + Add Architect
           </button>
           <button onClick={fetchArchitects} className="arch-btn">
             Refresh
@@ -331,6 +356,95 @@ export default function ArchitectsPage() {
           </AnimatePresence>
         </motion.div>
       )}
+
+      {/* Add Architect Modal */}
+      <AnimatePresence>
+        {isAddModalOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: "fixed",
+              top: 0, left: 0, right: 0, bottom: 0,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "20px"
+            }}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              style={{
+                background: "#fff",
+                borderRadius: "16px",
+                padding: "24px",
+                width: "100%",
+                maxWidth: "400px",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "16px"
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: "20px", fontWeight: "600", color: "#111" }}>Add New Architect</h3>
+              
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "13px", fontWeight: "600", color: "#8f8f8f" }}>Name <span style={{color:"red"}}>*</span></label>
+                <input
+                  type="text"
+                  placeholder="Architect Name"
+                  value={newArchitect.architectName}
+                  onChange={(e) => setNewArchitect({ ...newArchitect, architectName: e.target.value })}
+                  style={{ padding: "10px 12px", border: "1px solid #e9e6e3", borderRadius: "10px", outline: "none", fontFamily: "inherit", fontSize: "14px" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "13px", fontWeight: "600", color: "#8f8f8f" }}>Contact <span style={{color:"red"}}>*</span></label>
+                <input
+                  type="text"
+                  placeholder="Contact Number"
+                  value={newArchitect.architectContact}
+                  onChange={(e) => setNewArchitect({ ...newArchitect, architectContact: e.target.value })}
+                  style={{ padding: "10px 12px", border: "1px solid #e9e6e3", borderRadius: "10px", outline: "none", fontFamily: "inherit", fontSize: "14px" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "13px", fontWeight: "600", color: "#8f8f8f" }}>Address</label>
+                <textarea
+                  placeholder="Architect Address (Optional)"
+                  value={newArchitect.architectAddress}
+                  onChange={(e) => setNewArchitect({ ...newArchitect, architectAddress: e.target.value })}
+                  rows={3}
+                  style={{ padding: "10px 12px", border: "1px solid #e9e6e3", borderRadius: "10px", outline: "none", fontFamily: "inherit", fontSize: "14px", resize: "none" }}
+                />
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
+                <button
+                  onClick={() => { setIsAddModalOpen(false); setNewArchitect({ architectName: "", architectContact: "", architectAddress: "" }); }}
+                  style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #e9e6e3", background: "#fff", cursor: "pointer", fontWeight: "600", fontSize: "14px" }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddArchitect}
+                  disabled={adding}
+                  style={{ padding: "10px 16px", borderRadius: "10px", border: "none", background: "#e07b63", color: "#fff", cursor: "pointer", fontWeight: "600", fontSize: "14px", opacity: adding ? 0.7 : 1 }}
+                >
+                  {adding ? "Adding..." : "Add Architect"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

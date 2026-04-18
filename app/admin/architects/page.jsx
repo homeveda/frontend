@@ -27,7 +27,8 @@ export default function ArchitectsPage() {
 
   // Add architect state
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [newArchitect, setNewArchitect] = useState({ architectName: "", architectContact: "", architectAddress: "" });
+  const CATEGORY_OPTIONS = ["A", "B", "C"];
+  const [newArchitect, setNewArchitect] = useState({ architectName: "", architectContact: "", architectAddress: "", architectCategory: "" });
   const [adding, setAdding] = useState(false);
 
   const showPopup = (message, color = "green") =>
@@ -64,7 +65,7 @@ export default function ArchitectsPage() {
       setArchitects((prev) => [res.data.architect, ...prev]);
       showPopup("Architect created successfully", "green");
       setIsAddModalOpen(false);
-      setNewArchitect({ architectName: "", architectContact: "", architectAddress: "" });
+      setNewArchitect({ architectName: "", architectContact: "", architectAddress: "", architectCategory: "" });
     } catch (err) {
       showPopup(err?.response?.data?.message || "Failed to add architect", "red");
     } finally {
@@ -79,6 +80,7 @@ export default function ArchitectsPage() {
         architectName: architect.architectName || "",
         architectContact: architect.architectContact || "",
         architectAddress: architect.architectAddress || "",
+        architectCategory: architect.architectCategory || "",
       },
     }));
   };
@@ -270,6 +272,7 @@ export default function ArchitectsPage() {
                       <p className="arch-name">{architect.architectName || "—"}</p>
                       <p className="arch-contact">{architect.architectContact || "—"}</p>
                       <p className="arch-address">{architect.architectAddress || "—"}</p>
+                      {architect.architectCategory && <p className="arch-contact" style={{marginTop:4}}><span style={{fontWeight:600,color:"#a855f7"}}>Category:</span> {architect.architectCategory}</p>}
                     </div>
                   </div>
 
@@ -298,6 +301,19 @@ export default function ArchitectsPage() {
                           value={editData.architectAddress}
                           onChange={(e) => handleEditChange(architect._id, "architectAddress", e.target.value)}
                         />
+                      </div>
+                      <div className="arch-field">
+                        <label>Category</label>
+                        <select
+                          className="arch-input"
+                          value={editData.architectCategory || ""}
+                          onChange={(e) => handleEditChange(architect._id, "architectCategory", e.target.value)}
+                        >
+                          <option value="">Select Category</option>
+                          {CATEGORY_OPTIONS.map((opt) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
                       </div>
                     </div>
                   )}
@@ -426,9 +442,23 @@ export default function ArchitectsPage() {
                 />
               </div>
 
+              <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <label style={{ fontSize: "13px", fontWeight: "600", color: "#8f8f8f" }}>Category</label>
+                <select
+                  value={newArchitect.architectCategory}
+                  onChange={(e) => setNewArchitect({ ...newArchitect, architectCategory: e.target.value })}
+                  style={{ padding: "10px 12px", border: "1px solid #e9e6e3", borderRadius: "10px", outline: "none", fontFamily: "inherit", fontSize: "14px", backgroundColor: "#fff" }}
+                >
+                  <option value="">Select Category</option>
+                  {CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+
               <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "8px" }}>
                 <button
-                  onClick={() => { setIsAddModalOpen(false); setNewArchitect({ architectName: "", architectContact: "", architectAddress: "" }); }}
+                  onClick={() => { setIsAddModalOpen(false); setNewArchitect({ architectName: "", architectContact: "", architectAddress: "", architectCategory: "" }); }}
                   style={{ padding: "10px 16px", borderRadius: "10px", border: "1px solid #e9e6e3", background: "#fff", cursor: "pointer", fontWeight: "600", fontSize: "14px" }}
                 >
                   Cancel

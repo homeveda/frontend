@@ -14,7 +14,8 @@ function UpdateLeadContent() {
   const leadId = searchParams.get("id") || null;
 
   const REQUIREMENTS_OPTIONS = ["Glass Work", "Kitchen", "Wardrobe", "Facade"];
-  const CATEGORY_OPTIONS = ["Builder", "Economy", "Standard", "VedaX"];
+  const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
+  const ARCHITECT_CATEGORY_OPTIONS = ["A", "B", "C"];
   const VISIBLE_TO_OPTIONS = [
     "designer",
     "site supervisor",
@@ -34,6 +35,7 @@ function UpdateLeadContent() {
     architectName: "",
     architectContact: "",
     architectAddress: "",
+    architectCategory: "",
     Requirements: [],
     category: [],
     leadSource: "",
@@ -95,6 +97,7 @@ function UpdateLeadContent() {
           architectName: data.architectName || "",
           architectContact: data.architectContact || "",
           architectAddress: data.architectAddress || "",
+          architectCategory: data.architectCategory || "",
           Requirements: data.Requirements || [],
           category: data.category || [],
           leadSource: data.leadSource || "",
@@ -196,6 +199,7 @@ function UpdateLeadContent() {
         architectName: form.architectName.trim(),
         architectContact: form.architectContact.trim(),
         architectAddress: form.architectAddress.trim(),
+        architectCategory: form.architectCategory || "",
         Requirements: form.Requirements || [],
         category: form.category || [],
         leadSource: form.leadSource.trim(),
@@ -254,7 +258,7 @@ function UpdateLeadContent() {
               <textarea name="address" value={form.address} onChange={handleChange} rows={3} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa', resize: 'vertical' }} />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Name</label>
                 <input name="architectName" value={form.architectName} onChange={handleChange} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }} />
@@ -268,6 +272,22 @@ function UpdateLeadContent() {
               <div>
                 <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Address</label>
                 <textarea name="architectAddress" value={form.architectAddress} onChange={handleChange} rows={3} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm" style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa', resize: 'vertical' }} />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: '#8f8f8f' }}>Architect Category</label>
+                <select
+                  name="architectCategory"
+                  value={form.architectCategory}
+                  onChange={handleChange}
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                  style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa' }}
+                >
+                  <option value="">Select Category</option>
+                  {ARCHITECT_CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

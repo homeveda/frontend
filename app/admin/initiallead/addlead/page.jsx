@@ -19,6 +19,7 @@ export default function AddLeadPage() {
     "wardrobes sales executive",
     "facade sales executive",
   ];
+  const ARCHITECT_CATEGORY_OPTIONS = ["A","B","C"];
 
   const [form, setForm] = useState({
     name: "",
@@ -27,6 +28,7 @@ export default function AddLeadPage() {
     architectName: "",
     architectContact: "",
     architectAddress: "",
+    architectCategory : "",
     Requirements: [],
     category: [],
     leadSource: "",
@@ -42,6 +44,7 @@ export default function AddLeadPage() {
   const requirementsRef = useRef(null);
   const categoryRef = useRef(null);
   const visibleToRef = useRef(null);
+  const architectCategoryRef = useRef(null); 
 
   const [loading, setLoading] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -143,6 +146,7 @@ export default function AddLeadPage() {
         architectName: form.architectName.trim(),
         architectContact: form.architectContact.trim(),
         architectAddress: form.architectAddress.trim(),
+        architectCategory: form.architectCategory || "",
         Requirements: form.Requirements || [],
         category: form.category || [],
         leadSource: form.leadSource.trim(),
@@ -166,6 +170,7 @@ export default function AddLeadPage() {
         architectName: "",
         architectContact: "",
         architectAddress: "",
+        architectCategory: "",
         Requirements: [],
         category: [],
         leadSource: "",
@@ -250,7 +255,7 @@ export default function AddLeadPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>
                   Architect Name
@@ -287,6 +292,22 @@ export default function AddLeadPage() {
                   className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
                   style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa", resize: "vertical" }}
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Architect Category</label>
+                <select
+                  name="architectCategory"
+                  value={form.architectCategory}
+                  onChange={handleChange}
+                  className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                  style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+                >
+                  <option value="">Select Category</option>
+                  {ARCHITECT_CATEGORY_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
               </div>
             </div>
 

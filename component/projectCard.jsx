@@ -14,11 +14,32 @@ export default function ProjectCard({ project }) {
   const [showPopup, setShowPopup] = useState(false);
   const [popupMessage, setPopupMessage] = useState("");
   const [popupColor, setPopupColor] = useState("green");
+  const [isActive, setIsActive] = useState(!!p.isActive);
+  const [toggling, setToggling] = useState(false);
 
   const triggerPopup = (message, color = "green") => {
     setPopupMessage(message);
     setPopupColor(color);
     setShowPopup(true);
+  };
+
+  const handleToggleActive = async (e) => {
+    e.stopPropagation();
+    setToggling(true);
+    try {
+      const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+      const res = await axios.patch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/project/${p.id || p._id}/active`,
+        { isActive: !isActive },
+        { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } }
+      );
+      setIsActive(res.data.isActive);
+      triggerPopup(`Project marked ${res.data.isActive ? "Active" : "Inactive"}`, "green");
+    } catch (err) {
+      triggerPopup(err?.response?.data?.message || "Toggle failed", "red");
+    } finally {
+      setToggling(false);
+    }
   };
 
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -104,9 +125,37 @@ export default function ProjectCard({ project }) {
         <div>
           <div>
             <div>
-              <h3 className="project-card-title">
-                Projects Head - {p.projectHead}{" "}
-              </h3>
+              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{
+                    width: 8, height: 8, borderRadius: '50%', flexShrink: 0,
+                    backgroundColor: isActive ? '#22c55e' : '#d1d5db',
+                    boxShadow: isActive ? '0 0 0 3px rgba(34,197,94,0.2)' : 'none',
+                    display: 'inline-block',
+                  }} />
+                  <h3 className="project-card-title" style={{ margin: 0 }}>
+                    Projects Head - {p.projectHead}
+                  </h3>
+                </div>
+                <button
+                  onClick={handleToggleActive}
+                  disabled={toggling}
+                  style={{
+                    background: isActive ? '#dcfce7' : '#f3f4f6',
+                    color: isActive ? '#16a34a' : '#6b7280',
+                    border: `1px solid ${isActive ? '#bbf7d0' : '#e5e7eb'}`,
+                    fontWeight: 700,
+                    fontSize: '11px',
+                    padding: '4px 10px',
+                    borderRadius: '20px',
+                    cursor: toggling ? 'not-allowed' : 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.02)'
+                  }}
+                  title={isActive ? "Click to deactivate" : "Click to activate"}
+                >
+                  {toggling ? '...' : isActive ? 'Active' : 'Inactive'}
+                </button>
+              </div>
               {p.architectName && (
                 <p className="project-card-subtitle">
                   Architect Name -{" "}
@@ -238,6 +287,7 @@ export default function ProjectCard({ project }) {
           >
             Update Project
           </button>
+
           <button
             className="project-card-btn project-card-btn-delete"
             onClick={() => setConfirmOpen(true)}

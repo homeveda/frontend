@@ -40,7 +40,15 @@ export default function AdminDashboardPage() {
             title: "Architects",
             desc: "View and update registered architects.",
             href: "/admin/architects",
-            bg: "#fdf4ff",
+            bg: "#ede9fe",
+        },
+        {
+            key: "activeProjects",
+            title: "Active Projects",
+            desc: "View all currently active projects with customer details.",
+            href: "/admin/activeprojects",
+            bg: "#f0fdf4",
+            accent: "#ffdfb3ff",
         },
         ...(isSuperAdmin ? [{
             key: "admins",
@@ -152,7 +160,18 @@ export default function AdminDashboardPage() {
                             aria-label={`Open ${c.title}`}
                         >
                             <div>
-                                <h3>{c.title}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                                    {c.accent && (
+                                        <span style={{
+                                            width: 9, height: 9, borderRadius: '50%',
+                                            backgroundColor: c.accent,
+                                            boxShadow: `0 0 0 3px ${c.accent}33`,
+                                            flexShrink: 0,
+                                            display: 'inline-block',
+                                        }} />
+                                    )}
+                                    <h3 style={{ margin: 0 }}>{c.title}</h3>
+                                </div>
                                 <div className="desc-panel">
                                     <p style={{ margin: 0 }}>{c.desc}</p>
                                 </div>

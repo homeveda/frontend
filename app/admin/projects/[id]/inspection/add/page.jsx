@@ -46,7 +46,7 @@ const AddInspectionPage = () => {
     flooring: "🪵",
   };
 
-  const statuses = ["Pending", "In Progress", "Completed", "Not Required"];
+  const statuses = ["Pending", "In Progress", "Completed","Point Marked", "Not Required"];
 
   const triggerPopup = (message, color) => {
     setPopupMessage(message);

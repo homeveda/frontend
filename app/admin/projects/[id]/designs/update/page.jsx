@@ -75,28 +75,47 @@ export default function AddDesignPage() {
     if (projectId) fetchDesigns();
   }, [projectId]);
 
+  const isImageFile = (file) => file && file.type && file.type.startsWith("image/");
+  const isImageUrl = (url) => {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return lower.match(/\.(png|jpg|jpeg|webp|gif)(\?.*)?$/);
+  };
+
   const handleImageFileChange = (e, idx) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    if (isImageFile(file)) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setItems((prev) =>
+          prev.map((it, i) => (i === idx ? { ...it, imageFile: file, imagePreview: reader.result } : it))
+        );
+      };
+      reader.readAsDataURL(file);
+    } else {
       setItems((prev) =>
-        prev.map((it, i) => (i === idx ? { ...it, imageFile: file, imagePreview: reader.result } : it))
+        prev.map((it, i) => (i === idx ? { ...it, imageFile: file, imagePreview: "__file__" } : it))
       );
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleDesignFileChange = (e, idx) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
+    if (isImageFile(file)) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setItems((prev) =>
+          prev.map((it, i) => (i === idx ? { ...it, designFile: file, designPreview: reader.result } : it))
+        );
+      };
+      reader.readAsDataURL(file);
+    } else {
       setItems((prev) =>
-        prev.map((it, i) => (i === idx ? { ...it, designFile: file, designPreview: reader.result } : it))
+        prev.map((it, i) => (i === idx ? { ...it, designFile: file, designPreview: "__file__" } : it))
       );
-    };
-    reader.readAsDataURL(file);
+    }
   };
 
   const handleAddItem = () => {
@@ -309,33 +328,59 @@ export default function AddDesignPage() {
               </div>
               <div>
                 <div className="mb-4">
-                  <label htmlFor="update-image-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Customer Layout File (png, jpeg, jpg)</label>
-                  <input id="update-image-file" type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => {
+                  <label htmlFor="update-image-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Customer Layout File (png, jpeg, jpg, pdf, doc, docx)</label>
+                  <input id="update-image-file" type="file" accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       setNewImageFile(file);
-                      const reader = new FileReader();
-                      reader.onloadend = () => setImagePreview(reader.result);
-                      reader.readAsDataURL(file);
+                      if (isImageFile(file)) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setImagePreview(reader.result);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setImagePreview("__file__");
+                      }
                     }
                   }} className="input-styled file-input-styled w-full" />
                   {imagePreview && (
-                    <div className="preview-container"><img src={imagePreview} alt="Image preview" className="preview-img" /></div>
+                    <div className="preview-container">
+                      {imagePreview === "__file__" ? (
+                        <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                          <span style={{ fontSize: 28 }}>📄</span>
+                          {newImageFile?.name}
+                        </div>
+                      ) : (
+                        <img src={imagePreview} alt="Image preview" className="preview-img" />
+                      )}
+                    </div>
                   )}
                 </div>
                 <div>
-                  <label htmlFor="update-design-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Proposed Layout File (png, jpeg, jpg)</label>
-                  <input id="update-design-file" type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => {
+                  <label htmlFor="update-design-file" className="text-sm font-medium mb-1 block" style={{ color: "var(--muted)" }}>Proposed Layout File (png, jpeg, jpg, pdf, doc, docx)</label>
+                  <input id="update-design-file" type="file" accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e) => {
                     const file = e.target.files[0];
                     if (file) {
                       setNewDesignFile(file);
-                      const reader = new FileReader();
-                      reader.onloadend = () => setDesignPreview(reader.result);
-                      reader.readAsDataURL(file);
+                      if (isImageFile(file)) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => setDesignPreview(reader.result);
+                        reader.readAsDataURL(file);
+                      } else {
+                        setDesignPreview("__file__");
+                      }
                     }
                   }} className="input-styled file-input-styled w-full" />
                   {designPreview && (
-                    <div className="preview-container"><img src={designPreview} alt="Design preview" className="preview-img" /></div>
+                    <div className="preview-container">
+                      {designPreview === "__file__" ? (
+                        <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                          <span style={{ fontSize: 28 }}>📄</span>
+                          {newDesignFile?.name}
+                        </div>
+                      ) : (
+                        <img src={designPreview} alt="Design preview" className="preview-img" />
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -359,21 +404,31 @@ export default function AddDesignPage() {
                     <div className="flex gap-4 flex-wrap">
                       <div>
                         <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Customer Layout: {item.imageFile ? item.imageFile.name : item.imagePreview ? 'Current' : 'None'}</p>
-                        {item.imagePreview ? (
+                        {item.imagePreview && item.imagePreview !== "__file__" && isImageUrl(item.imagePreview) || (item.imagePreview && item.imagePreview.startsWith("data:image")) ? (
                           <img src={item.imagePreview} alt={`${item.name} image`} className="preview-img" />
+                        ) : item.imagePreview ? (
+                          <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                            <span style={{ fontSize: 28 }}>📄</span>
+                            {item.imageFile?.name || 'Document'}
+                          </div>
                         ) : (
                           <div className="preview-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: 12 }}>No Image</div>
                         )}
-                        <div className="mt-2"><input type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => handleImageFileChange(e, idx)} className="input-styled file-input-styled" id={`image-file-${item.id}`} /></div>
+                        <div className="mt-2"><input type="file" accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e) => handleImageFileChange(e, idx)} className="input-styled file-input-styled" id={`image-file-${item.id}`} /></div>
                       </div>
                       <div>
                         <p className="text-xs mb-2" style={{ color: "var(--muted)" }}>Proposed Layout: {item.designFile ? item.designFile.name : item.designPreview ? 'Current' : 'None'}</p>
-                        {item.designPreview ? (
+                        {item.designPreview && item.designPreview !== "__file__" && isImageUrl(item.designPreview) || (item.designPreview && item.designPreview.startsWith("data:image")) ? (
                           <img src={item.designPreview} alt={`${item.name} design`} className="preview-img" />
+                        ) : item.designPreview ? (
+                          <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                            <span style={{ fontSize: 28 }}>📄</span>
+                            {item.designFile?.name || 'Document'}
+                          </div>
                         ) : (
                           <div className="preview-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: 12 }}>No Design</div>
                         )}
-                        <div className="mt-2"><input type="file" accept="image/png,image/jpeg,image/jpg" onChange={(e) => handleDesignFileChange(e, idx)} className="input-styled file-input-styled" id={`design-file-${item.id}`} /></div>
+                        <div className="mt-2"><input type="file" accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={(e) => handleDesignFileChange(e, idx)} className="input-styled file-input-styled" id={`design-file-${item.id}`} /></div>
                       </div>
                     </div>
                   </li>

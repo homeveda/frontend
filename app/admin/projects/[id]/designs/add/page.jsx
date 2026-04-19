@@ -26,15 +26,21 @@ const AddDesignPage = () => {
     setShowPopup(true);
   };
 
+  const isImageFile = (file) => file && file.type && file.type.startsWith("image/");
+
   const handleImageFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setNewImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      if (isImageFile(file)) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setImagePreview("__file__");
+      }
     }
   };
 
@@ -42,11 +48,15 @@ const AddDesignPage = () => {
     const file = e.target.files[0];
     if (file) {
       setNewDesignFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setDesignPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      if (isImageFile(file)) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setDesignPreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        setDesignPreview("__file__");
+      }
     }
   };
 
@@ -274,22 +284,29 @@ const AddDesignPage = () => {
                     className="text-sm font-medium mb-1 block"
                     style={{ color: "var(--muted)" }}
                   >
-                    Customer Layout File (png, jpeg, jpg)
+                    Customer Layout File (png, jpeg, jpg, pdf, doc, docx)
                   </label>
                   <input
                     id="image-file-input"
                     type="file"
-                    accept="image/png,image/jpeg,image/jpg"
+                    accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={handleImageFileChange}
                     className="input-styled file-input-styled w-full"
                   />
                   {imagePreview && (
                     <div className="preview-container">
-                      <img
-                        src={imagePreview}
-                        alt="Image preview"
-                        className="preview-img"
-                      />
+                      {imagePreview === "__file__" ? (
+                        <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                          <span style={{ fontSize: 28 }}>📄</span>
+                          {newImageFile?.name}
+                        </div>
+                      ) : (
+                        <img
+                          src={imagePreview}
+                          alt="Image preview"
+                          className="preview-img"
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -299,22 +316,29 @@ const AddDesignPage = () => {
                     className="text-sm font-medium mb-1 block"
                     style={{ color: "var(--muted)" }}
                   >
-                    Proposed Layout File (png, jpeg, jpg)
+                    Proposed Layout File (png, jpeg, jpg, pdf, doc, docx)
                   </label>
                   <input
                     id="design-file-input"
                     type="file"
-                    accept="image/png,image/jpeg,image/jpg"
+                    accept="image/png,image/jpeg,image/jpg,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     onChange={handleDesignFileChange}
                     className="input-styled file-input-styled w-full"
                   />
                   {designPreview && (
                     <div className="preview-container">
-                      <img
-                        src={designPreview}
-                        alt="Design preview"
-                        className="preview-img"
-                      />
+                      {designPreview === "__file__" ? (
+                        <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                          <span style={{ fontSize: 28 }}>📄</span>
+                          {newDesignFile?.name}
+                        </div>
+                      ) : (
+                        <img
+                          src={designPreview}
+                          alt="Design preview"
+                          className="preview-img"
+                        />
+                      )}
                     </div>
                   )}
                 </div>
@@ -375,13 +399,20 @@ const AddDesignPage = () => {
                             className="text-xs mb-2"
                             style={{ color: "var(--muted)" }}
                           >
-                            Customer Layout: {item.imageFile.name}
+                            Customer Layout: {item.imageFile?.name}
                           </p>
-                          <img
-                            src={item.imagePreview}
-                            alt={`${item.name} image`}
-                            className="preview-img"
-                          />
+                          {item.imagePreview === "__file__" ? (
+                            <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                              <span style={{ fontSize: 28 }}>📄</span>
+                              {item.imageFile?.name}
+                            </div>
+                          ) : (
+                            <img
+                              src={item.imagePreview}
+                              alt={`${item.name} image`}
+                              className="preview-img"
+                            />
+                          )}
                         </div>
                       )}
                       {item.designPreview && (
@@ -390,13 +421,20 @@ const AddDesignPage = () => {
                             className="text-xs mb-2"
                             style={{ color: "var(--muted)" }}
                           >
-                            Proposed Layout: {item.designFile.name}
+                            Proposed Layout: {item.designFile?.name}
                           </p>
-                          <img
-                            src={item.designPreview}
-                            alt={`${item.name} design`}
-                            className="preview-img"
-                          />
+                          {item.designPreview === "__file__" ? (
+                            <div className="preview-img" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', fontSize: 12, fontWeight: 600 }}>
+                              <span style={{ fontSize: 28 }}>📄</span>
+                              {item.designFile?.name}
+                            </div>
+                          ) : (
+                            <img
+                              src={item.designPreview}
+                              alt={`${item.name} design`}
+                              className="preview-img"
+                            />
+                          )}
                         </div>
                       )}
                     </div>

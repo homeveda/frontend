@@ -6,6 +6,12 @@ import LoadingSpinner from "../../../../../component/loadingSpinner";
 import axios from "axios";
 import Image from "next/image";
 
+const isImageUrl = (url) => {
+  if (!url) return false;
+  const lower = url.toLowerCase();
+  return !!lower.match(/\.(png|jpg|jpeg|webp|gif)(\?.*)?$/);
+};
+
 export default function DesignPage() {
   const params = useParams();
   const router = useRouter();
@@ -105,15 +111,22 @@ export default function DesignPage() {
                     {/* Design Image */}
                     {item.designLink && (
                       <div className="relative h-48  bg-gray-200">
-                        <img
-                          src={item.designLink}
-                          alt={`${item.name} design`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/400x300?text=Design+Image";
-                          }}
-                        />
+                        {isImageUrl(item.designLink) ? (
+                          <img
+                            src={item.designLink}
+                            alt={`${item.name} design`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src =
+                                "https://via.placeholder.com/400x300?text=Design+Image";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                            <span style={{ fontSize: 48 }}>📄</span>
+                            <span className="text-xs mt-2 font-semibold">{item.designFileType === 'pdf' ? 'PDF Document' : 'Document'}</span>
+                          </div>
+                        )}
                         <div className="absolute top-2 left-2 bg-[#e07b63] text-white px-2 py-1 rounded text-xs font-semibold">
                           Proposed Layout 
                         </div>
@@ -123,15 +136,22 @@ export default function DesignPage() {
                     {/* Item Image */}
                     {item.imageLink && (
                       <div className="relative h-48 bg-gray-100">
-                        <img
-                          src={item.imageLink}
-                          alt={`${item.name} image`}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/400x300?text=Item+Image";
-                          }}
-                        />
+                        {isImageUrl(item.imageLink) ? (
+                          <img
+                            src={item.imageLink}
+                            alt={`${item.name} image`}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.target.src =
+                                "https://via.placeholder.com/400x300?text=Item+Image";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex flex-col items-center justify-center text-gray-500">
+                            <span style={{ fontSize: 48 }}>📄</span>
+                            <span className="text-xs mt-2 font-semibold">{item.imageFileType === 'pdf' ? 'PDF Document' : 'Document'}</span>
+                          </div>
+                        )}
                         <div className="absolute top-2 left-2 bg-[#f7f4f1] text-[#e07b63] border-[#e07b63] border px-2 py-1 rounded text-xs font-semibold">
                           Customer Layout
                         </div>

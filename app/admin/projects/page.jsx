@@ -34,7 +34,8 @@ function UserProjectsContent(){
                     // Fetch projects
                     const projectRes = await axios.get(`${backendUrl}/project/user?userEmail=${encodeURIComponent(email)}`, { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } });
                     const data = projectRes.data?.projects || [];
-                    setProjects(Array.isArray(data) ? data : []);
+                    const inactiveProjects = data.filter(p => !p.isActive);
+                    setProjects(Array.isArray(inactiveProjects) ? inactiveProjects : []);
                 }catch(err){
                     setError(err?.response?.data?.message || err.message || 'Failed to load data');
                     setProjects([]);

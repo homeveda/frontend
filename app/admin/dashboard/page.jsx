@@ -13,6 +13,13 @@ export default function AdminDashboardPage() {
 
     const isSuperAdmin = adminRole === "super admin";
 
+    const handleLogout = () => {
+        localStorage.removeItem("adminToken");
+        localStorage.removeItem("adminRole");
+        localStorage.removeItem("adminEmail");
+        router.push("/accounts/login");
+    };
+
     const cards = [
         {
             key: "initialLead",
@@ -77,6 +84,9 @@ export default function AdminDashboardPage() {
                 .dash-header h1{font-size:26px;margin:0;color:#111}
                 .dash-header-sub{color:#8f8f8f;font-size:13px;margin-top:4px}
                 .dash-back-btn{color:#e07b63;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;padding:0;text-decoration:none}
+                .logout-btn{background:#e07b63;color:white;padding:8px 16px;border-radius:10px;font-weight:600;font-size:14px;border:none;cursor:pointer;transition:all 0.2s;font-family:inherit}
+                .logout-btn:hover{background:#d66b52}
+                .header-actions{display:flex;gap:12px;align-items:center}
 
                 @media (max-width:1024px){
                   .dash-grid{grid-template-columns:repeat(2,1fr);gap:16px}
@@ -90,10 +100,12 @@ export default function AdminDashboardPage() {
                   .dash-card h3{font-size:16px;margin-bottom:6px}
                   .dash-card p{font-size:12px}
                   .desc-panel{padding:8px;min-height:50px;margin-top:10px}
-                  .dash-header{margin-bottom:14px}
+                  .dash-header{margin-bottom:14px;flex-wrap:wrap}
                   .dash-header h1{font-size:22px}
                   .dash-header-sub{font-size:12px;margin-top:2px}
                   .dash-back-btn{font-size:13px}
+                  .header-actions{width:100%;gap:8px}
+                  .logout-btn{flex:1;padding:6px 12px;font-size:13px}
                 }
 
                 @media (max-width:480px){
@@ -107,6 +119,8 @@ export default function AdminDashboardPage() {
                   .dash-header h1{font-size:18px}
                   .dash-header-sub{font-size:11px}
                   .dash-back-btn{font-size:12px;padding:4px}
+                  .header-actions{width:100%;flex-direction:column;gap:8px}
+                  .logout-btn{width:100%;padding:8px 12px;font-size:12px;border-radius:8px}
                 }
 
                 @media (max-width:360px){
@@ -140,8 +154,9 @@ export default function AdminDashboardPage() {
                             </div>
                         )}
                     </div>
-                    <div>
+                    <div className="header-actions">
                         <button onClick={() => router.back()} className="dash-back-btn">← Back</button>
+                        <button onClick={handleLogout} className="logout-btn">Logout</button>
                     </div>
                 </div>
 

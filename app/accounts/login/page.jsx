@@ -58,7 +58,7 @@ export default function UserLoginPage() {
   const handleLogin = async () => {
     try {
       const response = await axios.post(`${backendUrl}/user/login`, {
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         password: form.password,
       });
 
@@ -88,7 +88,7 @@ export default function UserLoginPage() {
     try {
       const response = await axios.post(`${backendUrl}/user`, {
         name: form.name,
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         password: form.password,
         phone: form.phone || "",
         address: form.address || "",

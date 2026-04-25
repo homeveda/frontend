@@ -78,7 +78,7 @@ export default function AdminLoginPage() {
     // Implement login logic here
     try {
       const response = await axios.post(`${backendUrl}/user/admin/login`, {
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         password: form.password,
       });
 
@@ -112,7 +112,7 @@ export default function AdminLoginPage() {
     try {
       const response = await axios.post(`${backendUrl}/user/admin`, {
         name: form.name,
-        email: form.email,
+        email: form.email.trim().toLowerCase(),
         password: form.password,
         phone: form.phone,
         role: form.role,

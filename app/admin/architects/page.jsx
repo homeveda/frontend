@@ -155,7 +155,7 @@ export default function ArchitectsPage() {
     <div className="p-6 min-h-screen" style={{ backgroundColor: "#f7f4f1", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
         .arch-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-        .arch-header>div:first-child{flex:1;min-width:200px}
+        .arch-header>div:first-child{flex:1;min-width:200px;margin-left:60px}
         .arch-header h2{font-size:24px;font-weight:600;color:#111;letter-spacing:-0.02em;margin:0}
         .arch-header p{font-size:14px;color:#8f8f8f;margin:6px 0 0 0}
         .arch-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -226,6 +226,9 @@ export default function ArchitectsPage() {
           <p>View and update registered architects</p>
         </div>
         <div className="arch-header-actions">
+          <button onClick={() => router.back()} className="arch-back-btn">
+            ← Back
+          </button>
           <button onClick={() => setIsAddModalOpen(true)} className="arch-btn" style={{backgroundColor: "#111", color: "#fff"}}>
             + Add Architect
           </button>

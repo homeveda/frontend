@@ -120,7 +120,7 @@ function CatelogSearchPage() {
     <div className="p-4 sm:p-6" style={{ backgroundColor: '#f7f4f1', minHeight: '100vh', fontFamily: "'Space Grotesk', sans-serif" }}>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: '#111111', letterSpacing: '-0.02em' }}>Catalog Search</h2>
+          <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: '#111111', letterSpacing: '-0.02em', marginLeft: '60px' }}>Catalog Search</h2>
           <p className="text-sm mt-1" style={{ color: '#8f8f8f' }}>Browse and manage catalog items</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">

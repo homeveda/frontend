@@ -153,7 +153,7 @@ export default function LeadsDisplayPage() {
       `}</style>
       <div className="leads-header">
         <div>
-          <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
+          <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em", marginLeft: '60px' }}>
             All Leads
           </h2>
           <p className="text-sm mt-1" style={{ color: "#8f8f8f" }}>
@@ -161,6 +161,7 @@ export default function LeadsDisplayPage() {
           </p>
         </div>
         <div className="leads-header-actions">
+          <button onClick={() => router.back()} className="leads-button" style={{background: 'transparent', color: '#e07b63', padding: '0'}}>← Back</button>
           <button
             onClick={() => router.push("/admin/initiallead/addlead")}
             className="leads-button"

@@ -40,11 +40,15 @@ export default function DisplayAllUsers(){
     try {
       setLoading(true);
       setError(null);
-      const res = await axios.get(`${backendUrl}/user/all`, { headers: getAuthHeaders() });
+      const res = await axios.get(`${backendUrl}/user/inactive-projects`, { headers: getAuthHeaders() });
       const data = res.data?.users || res.data || [];
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
-      setError(err?.response?.data?.message || err.message || 'Failed to load users');
+      if (err?.response?.status === 404) {
+        // setError("No users with inactive projects found");
+      } else {
+        setError(err?.response?.data?.message || err.message || 'Failed to load users');
+      }
       setUsers([]);
     } finally {
       setLoading(false);
@@ -127,14 +131,13 @@ export default function DisplayAllUsers(){
   };
 
   const filtered = users
-    .filter(u => !u.isAdmin)
     .filter(u => (u.name || '').toLowerCase().includes(query.trim().toLowerCase()));
 
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
         .users-header{display:flex;items-align:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-        .users-header > div:first-child{flex:1;min-width:200px}
+        .users-header > div:first-child{flex:1;min-width:200px,margin-left:60px}
         .users-header h2{font-size:24px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin:0}
         .users-header p{font-size:14px;color:#8f8f8f;margin:8px 0 0 0}
         .users-refresh-btn{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
@@ -180,7 +183,7 @@ export default function DisplayAllUsers(){
           .p-6{padding:12px !important}
           .users-header{flex-direction:column;margin-bottom:16px;gap:8px}
           .users-header > div:first-child{width:100%}
-          .users-refresh-btn{width:100%;padding:8px 12px;font-size:12px}
+          .users-refresh-btn{padding:8px 12px;font-size:12px}
           .users-search-panel{padding:12px;margin-bottom:16px}
           .users-search-group label{font-size:12px;margin-bottom:6px}
           .users-search-group input{padding:8px 10px;font-size:12px}
@@ -194,7 +197,7 @@ export default function DisplayAllUsers(){
           .users-header{gap:8px;margin-bottom:12px}
           .users-header h2{font-size:16px}
           .users-header p{font-size:11px}
-          .users-refresh-btn{width:100%;padding:6px 10px;font-size:11px;border-radius:8px}
+          .users-refresh-btn{padding:6px 10px;font-size:11px;border-radius:8px}
           .users-search-panel{padding:8px;margin-bottom:12px;border-radius:10px}
           .users-search-group label{font-size:11px;margin-bottom:4px}
           .users-search-group input{padding:6px 8px;font-size:11px;border-radius:6px}
@@ -223,7 +226,7 @@ export default function DisplayAllUsers(){
       <div className="users-header">
         <div>
           <h2>Users</h2>
-          <p>Manage users — edit details, delete accounts, or view their projects</p>
+          <p>Users with inactive projects — edit details, delete accounts, or view their projects</p>
         </div>
         <button
           onClick={fetchUsers}

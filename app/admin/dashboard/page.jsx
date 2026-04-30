@@ -17,7 +17,7 @@ export default function AdminDashboardPage() {
         localStorage.removeItem("adminToken");
         localStorage.removeItem("adminRole");
         localStorage.removeItem("adminEmail");
-        router.push("/accounts/login");
+        router.push("/admin");
     };
 
     const cards = [

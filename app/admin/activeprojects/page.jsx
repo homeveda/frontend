@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "../../../component/loadingSpinner";
+import ProjectTimeline from "../../../component/projectTimeline";
 
 const STATUS_COLORS = {
   "LEAD": "#8b5cf6", "DESIGN": "#3b82f6", "QUOTATION": "#f59e0b",
@@ -239,13 +240,9 @@ export default function ActiveProjectsPage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p className="ap-section-label">🏗️ Project</p>
 
-                        <div className="flex items-center gap-2 mb-3 flex-wrap">
-                          <span
-                            className="ap-badge"
-                            style={{ backgroundColor: `${statusColor}18`, color: statusColor }}
-                          >
-                            {project.status || "No Status"}
-                          </span>
+                        {project.status && <ProjectTimeline status={project.status} />}
+
+                        <div className="flex items-center gap-2 mt-3 flex-wrap">
                           <span
                             className="ap-badge"
                             style={{ backgroundColor: "#f3f0ed", color: "#555" }}

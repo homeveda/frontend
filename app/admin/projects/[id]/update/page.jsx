@@ -39,7 +39,7 @@ export default function UpdateProjectPage() {
     const [email,setEmail]=useState("");
 
     const [kitchen, setKitchen] = useState({
-        kitchenType: "L-Shape",
+        kitchenType: "Semi Modular",
         requiremntsOfCounter: "Island",
         appliances: [],
         loftRequired: false,
@@ -291,10 +291,8 @@ export default function UpdateProjectPage() {
                                     Kitchen Type
                                 </label>
                                 <select value={kitchen.kitchenType} onChange={(e) => setKitchen((prev) => ({ ...prev, kitchenType: e.target.value }))} className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm focus:outline-none" style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}>
-                                    <option>L-Shape</option>
-                                    <option>U-Shape</option>
-                                    <option>Parallel</option>
-                                    <option>Straight</option>
+                                    <option>Semi Modular</option>
+                                    <option>Fully Modular</option>
                                 </select>
 
                                 <label className="text-xs font-medium mt-3" style={{ color: "#8f8f8f" }}>

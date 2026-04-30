@@ -52,7 +52,7 @@ function NewProjectContent() {
   ];
 
   const [kitchen, setKitchen] = useState({
-    kitchenType: "L-Shape",
+    kitchenType: "L-Semi Modular",
     requiremntsOfCounter: "Island",
     appliances: [],
     loftRequired: false,
@@ -317,10 +317,8 @@ function NewProjectContent() {
                     backgroundColor: "#fafafa",
                   }}
                 >
-                  <option>L-Shape</option>
-                  <option>U-Shape</option>
-                  <option>Parallel</option>
-                  <option>Straight</option>
+                  <option>Semi Modular</option>
+                  <option>Fully Modular</option>
                 </select>
 
                 <label

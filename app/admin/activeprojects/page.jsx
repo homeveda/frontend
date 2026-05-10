@@ -25,6 +25,7 @@ export default function ActiveProjectsPage() {
 
   const [projects, setProjects] = useState([]);
   const [usersMap, setUsersMap] = useState({}); // email → user object
+  const [inspectionsMap, setInspectionsMap] = useState({}); // projectId → inspections
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
@@ -50,8 +51,23 @@ export default function ActiveProjectsPage() {
         const map = {};
         userList.forEach((u) => { if (u.email) map[u.email] = u; });
 
+        // Fetch inspections for all projects
+        const inspMap = {};
+        await Promise.all(
+          projectList.map((proj) =>
+            axios
+              .get(`${backendUrl}/inspections/${proj.id || proj._id}`, { headers })
+              .then((res) => {
+                inspMap[proj.id || proj._id] = res.data?.inspections || [];
+              })
+              .catch(() => {
+                inspMap[proj.id || proj._id] = [];
+              })
+          )
+        );
         setProjects(projectList);
         setUsersMap(map);
+        setInspectionsMap(inspMap);
       } catch (err) {
         setError(err?.response?.data?.message || err.message || "Failed to load");
       } finally {
@@ -163,6 +179,10 @@ export default function ActiveProjectsPage() {
               const user = usersMap[project.userEmail] || {};
               const statusColor = STATUS_COLORS[project.status] || "#8f8f8f";
               const type = project.kitchen ? "Kitchen" : project.wardrobe ? "Wardrobe" : "—";
+              const projectInspections = inspectionsMap[project.id || project._id] || [];
+              const hasInspections = projectInspections.length > 0;
+              const lastInspection = hasInspections ? projectInspections[projectInspections.length - 1] : null;
+              const inspectionReady = lastInspection?.readyForNextPhase || false;
 
               return (
                 <motion.div
@@ -230,6 +250,71 @@ export default function ActiveProjectsPage() {
                             <span className="ap-label">📍 Address</span>
                             <span className="ap-val">{user.address || "—"}</span>
                           </div>
+
+                          {/* Inspection Statuses */}
+                          {lastInspection && (
+                            <>
+                              <div style={{ borderTop: "1px solid #f3f0ed", paddingTop: 8, marginTop: 8 }}>
+                                <p style={{ fontSize: 10, fontWeight: 700, color: "#8f8f8f", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>🔍 Inspection Status</p>
+                                
+                                {lastInspection.plumbingStatus && (
+                                  <div className="ap-row">
+                                    <span className="ap-label">Plumbing</span>
+                                    <span className="ap-val" style={{ color: lastInspection.plumbingStatus === "Completed" ? "#16a34a" : lastInspection.plumbingStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
+                                      {lastInspection.plumbingStatus}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {lastInspection.electricityStatus && (
+                                  <div className="ap-row">
+                                    <span className="ap-label">Electricity</span>
+                                    <span className="ap-val" style={{ color: lastInspection.electricityStatus === "Completed" ? "#16a34a" : lastInspection.electricityStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
+                                      {lastInspection.electricityStatus}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {lastInspection.chimneyPointStatus && (
+                                  <div className="ap-row">
+                                    <span className="ap-label">Chimney</span>
+                                    <span className="ap-val" style={{ color: lastInspection.chimneyPointStatus === "Completed" ? "#16a34a" : lastInspection.chimneyPointStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
+                                      {lastInspection.chimneyPointStatus}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {lastInspection.falseCeilingStatus && (
+                                  <div className="ap-row">
+                                    <span className="ap-label">Ceiling</span>
+                                    <span className="ap-val" style={{ color: lastInspection.falseCeilingStatus === "Completed" ? "#16a34a" : lastInspection.falseCeilingStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
+                                      {lastInspection.falseCeilingStatus}
+                                    </span>
+                                  </div>
+                                )}
+
+                                {lastInspection.flooringStatus && (
+                                  <div className="ap-row">
+                                    <span className="ap-label">Flooring</span>
+                                    <span className="ap-val" style={{ color: lastInspection.flooringStatus === "Completed" ? "#16a34a" : lastInspection.flooringStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
+                                      {lastInspection.flooringStatus}
+                                    </span>
+                                  </div>
+                                )}
+
+                                <div className="ap-row" style={{ borderTop: "1px solid #f3f0ed", paddingTop: 8, marginTop: 8 }}>
+                                  <span className="ap-label">Ready</span>
+                                  <span className="ap-val">
+                                    {lastInspection.readyForNextPhase ? (
+                                      <span style={{ color: "#16a34a", fontWeight: 700 }}>✓ Yes</span>
+                                    ) : (
+                                      <span style={{ color: "#ea580c", fontWeight: 700 }}>✗ No</span>
+                                    )}
+                                  </span>
+                                </div>
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
 
@@ -255,6 +340,17 @@ export default function ActiveProjectsPage() {
                               style={{ backgroundColor: "rgba(168,85,247,0.1)", color: "#7c3aed" }}
                             >
                               {project.category}
+                            </span>
+                          )}
+                          {hasInspections && (
+                            <span
+                              className="ap-badge"
+                              style={{
+                                backgroundColor: inspectionReady ? "rgba(34,197,94,0.1)" : "rgba(59,130,246,0.1)",
+                                color: inspectionReady ? "#16a34a" : "#2563eb"
+                              }}
+                            >
+                              🔍 {projectInspections.length} {projectInspections.length === 1 ? "Inspection" : "Inspections"} {inspectionReady ? "✓" : ""}
                             </span>
                           )}
                         </div>
@@ -284,6 +380,12 @@ export default function ActiveProjectsPage() {
                             <div className="ap-row">
                               <span className="ap-label">🚪 Wardrobe</span>
                               <span className="ap-val">{(project.wardrobe.type || []).join(", ") || "—"}</span>
+                            </div>
+                          )}
+                          {lastInspection && lastInspection.inspectionDate && (
+                            <div className="ap-row">
+                              <span className="ap-label">📅 Last Inspection</span>
+                              <span className="ap-val">{new Date(lastInspection.inspectionDate).toLocaleDateString("en-IN")}</span>
                             </div>
                           )}
                         </div>

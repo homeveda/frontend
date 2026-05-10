@@ -35,7 +35,7 @@ const AddInspectionPage = () => {
     electricity: "Electricity",
     chimneyPoint: "Chimney Point",
     falseCeiling: "False Ceiling",
-    flooring: "Flooring",
+    flooring: "Flooring and Wall Tiles",
   };
 
   const categoryIcons = {

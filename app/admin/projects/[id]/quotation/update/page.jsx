@@ -359,9 +359,9 @@ export default function UpdateQuotationPage() {
       0,
     );
     setGrossAmount(gross);
-    const totalBeforeDiscount = gross + Number(freightInstallationHandling || 0);
-    const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
-    const beforeTax = totalBeforeDiscount - discountAmount;
+    const discountAmount = (Number(discountPercent || 0) / 100) * gross;
+    const afterDiscount = gross - discountAmount;
+    const beforeTax = afterDiscount + Number(freightInstallationHandling || 0);
     setTotalBeforeTaxState(beforeTax);
     const tax = includeTax ? (Number(taxPercent || 0) / 100) * beforeTax : 0;
     setTaxAmount(tax);
@@ -388,9 +388,9 @@ export default function UpdateQuotationPage() {
       setIsLoading(true);
       // Use derived state values that are kept in sync via useEffect
       const gross = grossAmount;
-      const totalBeforeDiscount = gross + Number(freightInstallationHandling || 0);
-      const discountAmount = (Number(discountPercent || 0) / 100) * totalBeforeDiscount;
-      const totalBeforeTax = totalBeforeTaxState;
+      const discountAmount = (Number(discountPercent || 0) / 100) * gross;
+      const afterDiscount = gross - discountAmount;
+      const totalBeforeTax = afterDiscount + Number(freightInstallationHandling || 0);
       const taxAmt = taxAmount;
       const grandTotal = grandTotalState;
       const payload = {
@@ -762,7 +762,7 @@ export default function UpdateQuotationPage() {
                   }
                 />
                 <span style={{ fontSize: 13, color: "#666" }}>
-                  ₹{((Number(discountPercent || 0) / 100) * (grossAmount + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                  ₹{((Number(discountPercent || 0) / 100) * grossAmount).toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -837,13 +837,16 @@ export default function UpdateQuotationPage() {
                   Gross: ₹{grossAmount.toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
+                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * grossAmount).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
+                  After Discount: ₹{(grossAmount - ((Number(discountPercent || 0) / 100) * grossAmount)).toLocaleString("en-IN")}
+                </h1>
+                <h1 className="text-xl">
                   Freight/Installation: ₹{Number(freightInstallationHandling || 0).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
-                  Total Before Discount: ₹{(grossAmount + Number(freightInstallationHandling || 0)).toLocaleString("en-IN")}
-                </h1>
-                <h1 className="text-xl">
-                  Discount: {discountPercent}% - ₹{((Number(discountPercent || 0) / 100) * (grossAmount + Number(freightInstallationHandling || 0))).toLocaleString("en-IN")}
+                  Total Before Tax: ₹{(grossAmount - ((Number(discountPercent || 0) / 100) * grossAmount) + Number(freightInstallationHandling || 0)).toLocaleString("en-IN")}
                 </h1>
                 <h1 className="text-xl">
                   Tax: ₹{(taxAmount || 0).toLocaleString("en-IN")}

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import UserCard from "../../../component/userCard";
 import LoadingSpinner from "../../../component/loadingSpinner";
 import ConfirmationDialogueBox from "../../../component/confirmationDialogueBox";
@@ -19,14 +19,25 @@ export default function DisplayAllUsers(){
   // Edit modal state
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editUser, setEditUser] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", address: "", phone: "" });
+  const [editForm, setEditForm] = useState({ name: "", address: "", phone: "", assignedRoles: [] });
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState(null);
+  const [visibleToOpen, setVisibleToOpen] = useState(false);
+  const visibleToRef = useRef(null);
 
   // Delete confirmation state
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+
+  const VISIBLE_TO_OPTIONS = [
+    "designer",
+    "site supervisor",
+    "kitchen sales executive",
+    "glass sales executive",
+    "wardrobes sales executive",
+    "facade sales executive",
+  ];
 
   const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -34,6 +45,20 @@ export default function DisplayAllUsers(){
     const adminToken = typeof window !== 'undefined' ? localStorage.getItem('adminToken') : null;
     return { Authorization: adminToken ? `Bearer ${adminToken}` : undefined };
   };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (visibleToRef.current && !visibleToRef.current.contains(e.target)) {
+        setVisibleToOpen(false);
+      }
+    };
+
+    if (visibleToOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [visibleToOpen]);
 
   const fetchUsers = async () => {
     if (!backendUrl) return setError("Backend URL not configured");
@@ -71,7 +96,12 @@ export default function DisplayAllUsers(){
   // --- Edit handlers ---
   const handleEditOpen = (user) => {
     setEditUser(user);
-    setEditForm({ name: user.name || "", address: user.address || "", phone: user.phone || "" });
+    setEditForm({ 
+      name: user.name || "", 
+      address: user.address || "", 
+      phone: user.phone || "",
+      assignedRoles: user.assignedRoles || []
+    });
     setEditError(null);
     setEditModalOpen(true);
   };
@@ -86,6 +116,7 @@ export default function DisplayAllUsers(){
         name: editForm.name,
         address: editForm.address,
         phone: editForm.phone,
+        assignedRoles: editForm.assignedRoles,
       }, { headers: getAuthHeaders() });
       setEditModalOpen(false);
       setEditUser(null);
@@ -130,6 +161,17 @@ export default function DisplayAllUsers(){
     router.push(`/admin/projects?userEmail=${encodeURIComponent(user.email)}`);
   };
 
+  const handleVisibleToToggle = (role) => {
+    setEditForm((prev) => {
+      const current = Array.isArray(prev.assignedRoles) ? prev.assignedRoles : [];
+      const isSelected = current.includes(role);
+      return {
+        ...prev,
+        assignedRoles: isSelected ? current.filter((x) => x !== role) : [...current, role],
+      };
+    });
+  };
+
   const filtered = users
     .filter(u => (u.name || '').toLowerCase().includes(query.trim().toLowerCase()));
 
@@ -152,18 +194,18 @@ export default function DisplayAllUsers(){
         .users-success-toast{position:fixed;top:20px;right:20px;z-index:100;padding:12px 20px;background:#20c55e;color:white;border-radius:10px;font-size:13px;font-weight:600;box-shadow:0 4px 16px rgba(32,197,94,0.25);font-family:'Space Grotesk',sans-serif}
 
         /* Edit Modal */
-        .edit-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center}
+        .edit-modal-overlay{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;overflow:hidden}
         .edit-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:-1}
-        .edit-modal-card{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(16,16,16,0.12);border:1px solid #e9e6e3;max-width:480px;width:100%;margin:0 16px;z-index:51;overflow:hidden}
+        .edit-modal-card{background:#fff;border-radius:14px;box-shadow:0 10px 30px rgba(16,16,16,0.12);border:1px solid #e9e6e3;max-width:480px;width:100%;margin:0 16px;z-index:51;overflow:hidden;display:flex;flex-direction:column;max-height:90vh}
         .edit-modal-header{padding:20px 20px 0 20px}
         .edit-modal-header h3{font-size:18px;font-weight:600;color:#111;margin:0}
         .edit-modal-header p{font-size:13px;color:#8f8f8f;margin:6px 0 0 0}
-        .edit-modal-body{padding:16px 20px}
+        .edit-modal-body{padding:16px 20px;overflow-y:auto;flex:1}
         .edit-modal-field{display:flex;flex-direction:column;margin-bottom:14px}
         .edit-modal-field label{font-size:12px;font-weight:600;color:#8f8f8f;margin-bottom:6px}
         .edit-modal-field input{padding:10px 12px;border-radius:10px;border:1px solid #e9e6e3;background:#fafafa;font-size:13px;outline:none;font-family:'Space Grotesk',sans-serif}
         .edit-modal-field input:focus{border-color:#e07b63;background:rgba(224,123,99,0.02)}
-        .edit-modal-footer{padding:0 20px 20px 20px;display:flex;justify-content:flex-end;gap:10px}
+        .edit-modal-footer{padding:0 20px 20px 20px;display:flex;justify-content:flex-end;gap:10px;flex-shrink:0}
         .edit-modal-btn{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;font-family:'Space Grotesk',sans-serif}
         .edit-modal-btn-cancel{background:#f0f0f0;color:#111}
         .edit-modal-btn-cancel:hover{background:#e8e8e8}
@@ -311,13 +353,63 @@ export default function DisplayAllUsers(){
                     placeholder="Address"
                   />
                 </div>
-                <div className="edit-modal-field" style={{ marginBottom: 0 }}>
+                <div className="edit-modal-field">
                   <label>Phone</label>
                   <input
                     value={editForm.phone}
                     onChange={(e) => setEditForm(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="Phone number"
                   />
+                </div>
+                <div className="edit-modal-field" style={{ marginBottom: 0 }}>
+                  <label>Assigned Roles</label>
+                  <p style={{ fontSize: "12px", color: "#b0b0b0", margin: "6px 0" }}>Which admin roles can see this user</p>
+                  <div className="w-full relative" ref={visibleToRef}>
+                    <div
+                      onClick={(e) => { e.stopPropagation(); setVisibleToOpen(!visibleToOpen); }}
+                      className="w-full min-h-[44px] flex flex-wrap items-center gap-2 p-2 rounded-[10px]"
+                      style={{ border: '1px solid #e9e6e3', backgroundColor: '#fafafa', cursor: 'pointer' }}
+                    >
+                      {editForm.assignedRoles && editForm.assignedRoles.length > 0 ? (
+                        editForm.assignedRoles.map((role, idx) => (
+                          <div key={role + idx} className="flex items-center gap-2 bg-white px-3 py-1 rounded-full text-sm" style={{ boxShadow: '0 1px 0 rgba(16,16,16,0.04)' }}>
+                            <span>{role}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <span className="text-sm text-gray-500">All admins</span>
+                      )}
+                      <div className="ml-auto text-gray-400">▾</div>
+                    </div>
+                    {visibleToOpen && (
+                      <div 
+                        className="absolute mt-1 bg-white rounded shadow-md z-50" 
+                        style={{ 
+                          maxHeight: '220px', 
+                          overflowY: 'scroll', 
+                          width: '100%',
+                          overscrollBehavior: 'contain',
+                          pointerEvents: 'auto'
+                        }}
+                      >
+                        {VISIBLE_TO_OPTIONS.map((opt) => {
+                          const selected = (editForm.assignedRoles || []).includes(opt);
+                          return (
+                            <div
+                              key={opt}
+                              onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleVisibleToToggle(opt); }}
+                              className="p-2 flex items-center gap-2 cursor-pointer transition-colors hover:opacity-90"
+                              style={{ backgroundColor: selected ? '#6366f1' : 'white', color: selected ? 'white' : 'black' }}
+                            >
+                              <input type="checkbox" checked={selected} readOnly tabIndex={-1} className="accent-white pointer-events-none" />
+                              <span className="text-sm">{opt}</span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
               {editError && <div className="edit-modal-error">{editError}</div>}

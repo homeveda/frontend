@@ -37,6 +37,7 @@ export default function ActiveProjectsPage() {
         setLoading(true);
         setError(null);
         const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+        const adminRole = typeof window !== "undefined" ? localStorage.getItem("adminRole") : '';
         const headers = { Authorization: adminToken ? `Bearer ${adminToken}` : undefined };
 
         const [projectRes, userRes] = await Promise.all([
@@ -46,15 +47,30 @@ export default function ActiveProjectsPage() {
 
         const projectList = projectRes.data?.projects || [];
         const userList = userRes.data?.users || [];
+        const SUPER_ADMIN_ROLE = 'super admin';
 
-        // Build email → user map
+        // Filter users based on admin role
+        let visibleUsers = userList;
+        if (adminRole !== SUPER_ADMIN_ROLE) {
+          // Only show users assigned to this admin's role or with empty assignedRoles
+          visibleUsers = userList.filter(u => {
+            const assignedRoles = u.assignedRoles || [];
+            return assignedRoles.includes(adminRole) || assignedRoles.length === 0;
+          });
+        }
+
+        // Build email → user map from visible users only
         const map = {};
-        userList.forEach((u) => { if (u.email) map[u.email] = u; });
+        visibleUsers.forEach((u) => { if (u.email) map[u.email] = u; });
 
-        // Fetch inspections for all projects
+        // Filter projects to only show those from visible users
+        const visibleEmails = new Set(visibleUsers.map(u => u.email));
+        const filteredProjectList = projectList.filter(p => visibleEmails.has(p.userEmail));
+
+        // Fetch inspections for all filtered projects
         const inspMap = {};
         await Promise.all(
-          projectList.map((proj) =>
+          filteredProjectList.map((proj) =>
             axios
               .get(`${backendUrl}/inspections/${proj.id || proj._id}`, { headers })
               .then((res) => {
@@ -65,7 +81,7 @@ export default function ActiveProjectsPage() {
               })
           )
         );
-        setProjects(projectList);
+        setProjects(filteredProjectList);
         setUsersMap(map);
         setInspectionsMap(inspMap);
       } catch (err) {

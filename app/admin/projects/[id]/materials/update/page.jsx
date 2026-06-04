@@ -33,10 +33,11 @@ function UpdateMaterialContent() {
 
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
-  const [currentImageLink, setCurrentImageLink] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [removeImage, setRemoveImage] = useState(false);
+  const [currentFileLink, setCurrentFileLink] = useState(null);
+  const [fileData, setFileData] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileName, setFileName] = useState(null);
+  const [removeFile, setRemoveFile] = useState(false);
 
   useEffect(() => {
     if (!materialId) {
@@ -89,8 +90,8 @@ function UpdateMaterialContent() {
         if (currentMaterial) {
           setName(currentMaterial.name || "");
           setColor(currentMaterial.color || "");
-          setCurrentImageLink(currentMaterial.imageLink || null);
-          setImagePreview(currentMaterial.imageLink || null);
+          setCurrentFileLink(currentMaterial.fileLink || null);
+          setFilePreview(currentMaterial.fileLink || null);
         } else {
           triggerPopup("Material not found", "red");
           setTimeout(() => router.push(`/admin/projects/${projectId}/material`), 1500);
@@ -124,30 +125,39 @@ function UpdateMaterialContent() {
   const handleSelectCatalogItem = (item) => {
     setSelectedCatalogItem(item);
     setName(item.name);
-    setImagePreview(item.imageLink || null);
-    setRemoveImage(false);
-    setImageFile(null);
+    setFilePreview(item.imageLink || null);
+    setRemoveFile(false);
+    setFileData(null);
+    setFileName(null);
     setSearchTerm(""); // Clear search after selection
   };
 
-  const handleImageChange = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      setRemoveImage(false);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setFileData(file);
+      setFileName(file.name);
+      setRemoveFile(false);
+      // For image files, show preview
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // For non-image files, show file name
+        setFilePreview(null);
+      }
     }
   };
 
-  const handleRemoveImage = () => {
-    setRemoveImage(true);
-    setImageFile(null);
-    setImagePreview(null);
-    setCurrentImageLink(null);
+  const handleRemoveFile = () => {
+    setRemoveFile(true);
+    setFileData(null);
+    setFileName(null);
+    setFilePreview(null);
+    setCurrentFileLink(null);
   };
 
   const handleSubmit = async (e) => {
@@ -155,11 +165,11 @@ function UpdateMaterialContent() {
     
     if (!name.trim()) {
       return triggerPopup("Material name is required", "red");
-    }
-
-    try {
-      setIsLoading(true);
-      const adminToken = localStorage.getItem("adminToken");
+    }File) {
+        formData.append("removeImage", "true");
+      }
+      if (fileData) {
+        formData.append("file", fileDatatem("adminToken");
       
       const formData = new FormData();
       formData.append("name", name);
@@ -401,42 +411,53 @@ function UpdateMaterialContent() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Material Image
+                  Material File (Image/PDF/Document)
                 </label>
                 <input
                   type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
+                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                  onChange={handleFileChange}
                   className="input-styled"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported: Images (JPG, PNG, GIF, WebP), PDF, Word (DOC, DOCX), Excel (XLS, XLSX)
+                </p>
               </div>
 
-              {imagePreview && !removeImage && (
+              {filePreview && !removeFile && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
                     Current Image
                   </label>
                   <div className="relative inline-block">
                     <img
-                      src={imagePreview}
+                      src={filePreview}
                       alt="Preview"
                       className="w-full max-w-xs h-48 object-cover rounded-lg border"
                     />
                     <button
                       type="button"
-                      onClick={handleRemoveImage}
+                      onClick={handleRemoveFile}
                       className="btn-danger absolute top-2 right-2"
                     >
-                      Remove Image
+                      Remove File
                     </button>
                   </div>
                 </div>
               )}
 
-              {removeImage && (
+              {fileName && !filePreview && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    📄 File selected: <strong>{fileName}</strong>
+                  </p>
+                </div>
+              )}
+
+              {removeFile && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-sm text-red-800">
-                    Image will be removed on save
+                    File will be removed on save
                   </p>
                 </div>
               )}

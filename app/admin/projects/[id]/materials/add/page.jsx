@@ -34,8 +34,9 @@ export default function AddMaterialPage() {
 
   const [name, setName] = useState("");
   const [color, setColor] = useState("");
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
+  const [fileData, setFileData] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [fileName, setFileName] = useState(null);
 
   useEffect(() => {
     const adminToken = localStorage.getItem("adminToken");
@@ -107,19 +108,26 @@ export default function AddMaterialPage() {
   const handleSelectCatalogItem = (item) => {
     setSelectedCatalogItem(item);
     setName(item.name);
-    setImagePreview(item.imageLink || null);
+    setFilePreview(item.imageLink || null);
     setSearchTerm(""); // Clear search after selection
   };
 
-  const handleImageChange = (e) => {
+  const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
+      setFileData(file);
+      setFileName(file.name);
+      // For image files, show preview
+      if (file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setFilePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        // For non-image files, show file name
+        setFilePreview(null);
+      }
     }
   };
 
@@ -137,8 +145,8 @@ export default function AddMaterialPage() {
       const formData = new FormData();
       formData.append("name", name);
       formData.append("color", color);
-      if (imageFile) {
-        formData.append("image", imageFile);
+      if (fileData) {
+        formData.append("file", fileData);
       }
 
       await axios.post(
@@ -377,26 +385,37 @@ export default function AddMaterialPage() {
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Material Image
+                  Material File (Image/PDF/Document)
                 </label>
                 <input
                   type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
+                  accept="image/*,.pdf,.doc,.docx,.xls,.xlsx"
+                  onChange={handleFileChange}
                   className="input-styled"
                 />
+                <p className="text-xs text-gray-500 mt-1">
+                  Supported: Images (JPG, PNG, GIF, WebP), PDF, Word (DOC, DOCX), Excel (XLS, XLSX)
+                </p>
               </div>
 
-              {imagePreview && (
+              {filePreview && (
                 <div>
                   <label className="block text-sm font-medium mb-2">
-                    Preview
+                    Image Preview
                   </label>
                   <img
-                    src={imagePreview}
+                    src={filePreview}
                     alt="Preview"
                     className="w-full max-w-xs h-48 object-cover rounded-lg border"
                   />
+                </div>
+              )}
+
+              {fileName && !filePreview && (
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    📄 File selected: <strong>{fileName}</strong>
+                  </p>
                 </div>
               )}
 

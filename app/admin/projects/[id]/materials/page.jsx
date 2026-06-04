@@ -241,12 +241,30 @@ export default function MaterialsPage() {
           <div className="material-grid">
             {materials.map((material) => (
               <div key={material._id} className="material-card">
-                {material.imageLink ? (
-                  <img
-                    src={material.imageLink}
-                    alt={material.name}
-                    className="material-image"
-                  />
+                {material.fileLink ? (
+                  material.fileLink.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
+                    <img
+                      src={material.fileLink}
+                      alt={material.name}
+                      className="material-image"
+                    />
+                  ) : (
+                    <div
+                      className="material-image"
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "#e2e8f0",
+                        color: "#64748b",
+                        fontSize: "48px",
+                      }}
+                    >
+                      {material.fileLink.match(/\.pdf$/i) && "📄"}
+                      {material.fileLink.match(/\.(doc|docx)$/i) && "📝"}
+                      {material.fileLink.match(/\.(xls|xlsx)$/i) && "📊"}
+                    </div>
+                  )
                 ) : (
                   <div
                     className="material-image"
@@ -259,7 +277,7 @@ export default function MaterialsPage() {
                       fontSize: "14px",
                     }}
                   >
-                    No Image
+                    No File
                   </div>
                 )}
 

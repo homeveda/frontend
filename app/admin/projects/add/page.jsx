@@ -52,7 +52,7 @@ function NewProjectContent() {
   ];
 
   const [kitchen, setKitchen] = useState({
-    kitchenType: "L-Semi Modular",
+    kitchenType: "Semi Modular",
     requiremntsOfCounter: "Island",
     appliances: [],
     loftRequired: false,

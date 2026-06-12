@@ -421,7 +421,7 @@ export default function ActiveProjectsPage() {
                         Designs
                       </button>
                       <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/materials`)}>
-                        Materials
+                        Orders
                       </button>
                       <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/update`)}>
                         Update Project

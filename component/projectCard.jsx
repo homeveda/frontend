@@ -277,7 +277,7 @@ export default function ProjectCard({ project }) {
               router.push(`/admin/projects/${p.id || p._id}/materials`)
             }
           >
-            Materials
+            Orders
           </button>
           <button
             className="project-card-btn project-card-btn-edit"

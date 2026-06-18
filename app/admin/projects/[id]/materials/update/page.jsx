@@ -165,20 +165,21 @@ function UpdateMaterialContent() {
     
     if (!name.trim()) {
       return triggerPopup("Material name is required", "red");
-    }File) {
-        formData.append("removeImage", "true");
-      }
-      if (fileData) {
-        formData.append("file", fileDatatem("adminToken");
+    }
+
+    try {
+      setIsLoading(true);
+      const adminToken = localStorage.getItem("adminToken");
       
       const formData = new FormData();
       formData.append("name", name);
       formData.append("color", color);
-      if (removeImage) {
+      
+      if (removeFile) {
         formData.append("removeImage", "true");
       }
-      if (imageFile) {
-        formData.append("image", imageFile);
+      if (fileData) {
+        formData.append("file", fileData);
       }
 
       await axios.patch(
@@ -194,7 +195,7 @@ function UpdateMaterialContent() {
 
       triggerPopup("Material updated successfully!", "green");
       setTimeout(() => {
-        router.push(`/admin/projects/${projectId}/material`);
+        router.push(`/admin/projects/${projectId}/materials`);
       }, 1500);
     } catch (err) {
       console.error(err);

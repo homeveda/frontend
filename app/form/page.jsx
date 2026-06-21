@@ -151,9 +151,6 @@ export default function AddLeadPage() {
 
       <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl mx-auto">
         <div className="mb-6">
-          <button onClick={() => router.back()} className="text-sm font-semibold mb-4" style={{ color: "#e07b63" }}>
-            ← Back
-          </button>
           <h2 style={{ color: "#111111", letterSpacing: "-0.02em" }} className="text-2xl font-semibold">
             Form for your requirements
           </h2>

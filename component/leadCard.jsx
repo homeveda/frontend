@@ -30,6 +30,9 @@ export default function LeadCard({ lead, onDelete }) {
       .lead-card-tag.req{background:rgba(224,123,99,0.1);color:#e07b63}
       .lead-card-tag.cat{background:rgba(22,150,209,0.1);color:#1696d1}
       .lead-card-tag.role{background:rgba(99,102,241,0.08);color:#6366f1;border:1px solid rgba(99,102,241,0.15)}
+      .lead-card-notes{margin-top:10px;padding-top:10px;border-top:1px dashed #e9e6e3}
+      .lead-card-notes-label{font-size:10px;font-weight:600;color:#111111;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 5px 0}
+      .lead-card-notes-text{font-size:12px;color:#e07b63;margin:0;line-height:1.45;background:rgba(224,123,99,0.08);border-radius:8px;padding:8px 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
       .lead-card-visible{margin-top:10px;padding-top:10px;border-top:1px dashed #e9e6e3}
       .lead-card-visible-label{font-size:10px;font-weight:600;color:#8f8f8f;text-transform:uppercase;letter-spacing:0.05em;margin:0 0 5px 0}
       .lead-card-footer{display:flex;gap:12px;justify-content:flex-end;padding:12px 16px;border-top:1px solid #e9e6e3}
@@ -40,6 +43,7 @@ export default function LeadCard({ lead, onDelete }) {
         .lead-card-content{padding:12px}
         .lead-card-title{font-size:13px}
         .lead-card-address{font-size:11px}
+        .lead-card-notes-text{font-size:11px}
         .lead-card-footer{padding:10px 12px;gap:8px}
         .lead-card-delete-btn{padding:5px 10px;font-size:11px;flex:1}
       }
@@ -49,7 +53,7 @@ export default function LeadCard({ lead, onDelete }) {
         .lead-card-title{font-size:12px}
         .lead-card-address{font-size:10px}
         .lead-card-contact{font-size:10px}
-
+        .lead-card-notes-text{font-size:10px}
         .lead-card-tag{font-size:9px;padding:2px 4px}
         .lead-card-footer{padding:8px 10px;gap:6px}
         .lead-card-delete-btn{padding:5px 8px;font-size:10px}
@@ -88,6 +92,13 @@ export default function LeadCard({ lead, onDelete }) {
               Timeline: <span>
                 {lead.expectedTimelineStart ? new Date(lead.expectedTimelineStart).toLocaleDateString() : "—"} to {lead.expectedTimelineEnd ? new Date(lead.expectedTimelineEnd).toLocaleDateString() : "—"}
               </span>
+            </div>
+          )}
+
+          {lead.notes && (
+            <div className="lead-card-notes">
+              <p className="lead-card-notes-label">Notes</p>
+              <p className="lead-card-notes-text">{lead.notes}</p>
             </div>
           )}
           

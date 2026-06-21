@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import * as XLSX from "xlsx";
 import LeadCard from "../../../component/leadCard";
 import LoadingSpinner from "../../../component/loadingSpinner";
 import ConfirmationDialogueBox from "../../../component/confirmationDialogueBox";
@@ -20,7 +21,7 @@ export default function LeadsDisplayPage() {
   const [error, setError] = useState(null);
 
   const CATEGORY_OPTIONS = ["Builder( 50k to 2lac )", "Economy(2.5 lac to 5lac)", "Standard( 5 lac to 10 lac)", "VedaX(10 lac to 20lac)"];
-  
+
   // Extract all unique requirements from leads
   const getUniqueRequirements = () => {
     const requirementsSet = new Set();
@@ -96,6 +97,44 @@ export default function LeadsDisplayPage() {
     return matchQuery && matchCategory && matchRequirements;
   });
 
+  // Export the currently filtered/visible leads to an Excel file
+  const downloadExcel = () => {
+    if (!filtered.length) {
+      alert("No leads to export");
+      return;
+    }
+
+    // Collect every key that appears across all visible leads so columns stay consistent
+    const allKeys = Array.from(
+      filtered.reduce((set, lead) => {
+        Object.keys(lead).forEach((k) => set.add(k));
+        return set;
+      }, new Set())
+    );
+
+    const rows = filtered.map((lead) => {
+      const row = {};
+      allKeys.forEach((key) => {
+        const value = lead[key];
+        if (Array.isArray(value)) {
+          row[key] = value.join(", ");
+        } else if (value && typeof value === "object") {
+          row[key] = JSON.stringify(value);
+        } else {
+          row[key] = value ?? "";
+        }
+      });
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(rows, { header: allKeys });
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Leads");
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `leads-${dateStr}.xlsx`);
+  };
+
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
@@ -106,6 +145,8 @@ export default function LeadsDisplayPage() {
         .leads-header-actions{display:flex;gap:12px;flex-wrap:wrap}
         .leads-button{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
         .leads-button:hover{background:#d56a52}
+        .leads-button.download{background:#217346}
+        .leads-button.download:hover{background:#268052}
         .leads-filters{padding:16px;border-radius:14px;background:#ffffff;box-shadow:0 10px 30px rgba(16,16,16,0.08);margin-bottom:24px}
         .filters-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
         .filter-group{display:flex;flex-direction:column}
@@ -173,6 +214,12 @@ export default function LeadsDisplayPage() {
             className="leads-button"
           >
             Refresh
+          </button>
+          <button
+            onClick={downloadExcel}
+            className="leads-button download"
+          >
+            Download Excel
           </button>
         </div>
       </div>

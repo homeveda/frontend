@@ -7,12 +7,14 @@ import LoadingSpinner from "../../../component/loadingSpinner";
 import ProjectTimeline from "../../../component/projectTimeline";
 
 const STATUS_COLORS = {
-  "LEAD": "#8b5cf6", "DESIGN": "#3b82f6", "QUOTATION": "#f59e0b",
-  "10% TOKEN": "#10b981", "FINAL MEASUREMENT": "#06b6d4", "FINAL DRAWINGS": "#6366f1",
-  "50% PAYMENT": "#f97316", "FACTORY ORDER": "#ec4899", "SITE READY CHECK": "#14b8a6",
-  "FACTORY FULL PAYMENT": "#8b5cf6", "DISPATCH": "#22c55e", "90% CLIENT PAYMENT": "#eab308",
-  "INSTALLATION": "#ef4444", "QUALITY CHECK": "#a855f7", "HANDOVER": "#10b981",
-  "10% FINAL PAYMENT": "#f97316", "AFTER SALES": "#64748b",
+  "EPT AND CHYMNEY POINT MARKED": "#8b5cf6", "FINAL MEASUREMENTS": "#3b82f6",
+  "BOXES IN PRODUCTION": "#f59e0b", "BOXES RECIEVED": "#10b981",
+  "BOXES INSTALLED": "#06b6d4", "STONE DELIVERED": "#6366f1",
+  "STONE INSTALLED": "#f97316", "UPPER BOXES INSTALLED": "#ec4899",
+  "SHUTTERS IN PRODUCTION": "#14b8a6",
+  "SINK CHYMNEY HOB RO GYESER AND OTHER APPLIANCES INSTALLED": "#22c55e",
+  "SHUTTERS AND HARDWARE RECIEVED": "#eab308",
+  "SHUTTERS AND HARDWARE INSTALLED": "#a855f7", "FINAL PAYMENT": "#10b981",
 };
 
 function getInitials(name = "") {
@@ -266,71 +268,6 @@ export default function ActiveProjectsPage() {
                             <span className="ap-label">📍 Address</span>
                             <span className="ap-val">{user.address || "—"}</span>
                           </div>
-
-                          {/* Inspection Statuses */}
-                          {lastInspection && (
-                            <>
-                              <div style={{ borderTop: "1px solid #f3f0ed", paddingTop: 8, marginTop: 8 }}>
-                                <p style={{ fontSize: 10, fontWeight: 700, color: "#8f8f8f", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 6 }}>🔍 Inspection Status</p>
-                                
-                                {lastInspection.plumbingStatus && (
-                                  <div className="ap-row">
-                                    <span className="ap-label">Plumbing</span>
-                                    <span className="ap-val" style={{ color: lastInspection.plumbingStatus === "Completed" ? "#16a34a" : lastInspection.plumbingStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
-                                      {lastInspection.plumbingStatus}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {lastInspection.electricityStatus && (
-                                  <div className="ap-row">
-                                    <span className="ap-label">Electricity</span>
-                                    <span className="ap-val" style={{ color: lastInspection.electricityStatus === "Completed" ? "#16a34a" : lastInspection.electricityStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
-                                      {lastInspection.electricityStatus}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {lastInspection.chimneyPointStatus && (
-                                  <div className="ap-row">
-                                    <span className="ap-label">Chimney</span>
-                                    <span className="ap-val" style={{ color: lastInspection.chimneyPointStatus === "Completed" ? "#16a34a" : lastInspection.chimneyPointStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
-                                      {lastInspection.chimneyPointStatus}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {lastInspection.falseCeilingStatus && (
-                                  <div className="ap-row">
-                                    <span className="ap-label">Ceiling</span>
-                                    <span className="ap-val" style={{ color: lastInspection.falseCeilingStatus === "Completed" ? "#16a34a" : lastInspection.falseCeilingStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
-                                      {lastInspection.falseCeilingStatus}
-                                    </span>
-                                  </div>
-                                )}
-
-                                {lastInspection.flooringStatus && (
-                                  <div className="ap-row">
-                                    <span className="ap-label">Flooring</span>
-                                    <span className="ap-val" style={{ color: lastInspection.flooringStatus === "Completed" ? "#16a34a" : lastInspection.flooringStatus === "In Progress" ? "#2563eb" : "#ea580c" }}>
-                                      {lastInspection.flooringStatus}
-                                    </span>
-                                  </div>
-                                )}
-
-                                <div className="ap-row" style={{ borderTop: "1px solid #f3f0ed", paddingTop: 8, marginTop: 8 }}>
-                                  <span className="ap-label">Ready</span>
-                                  <span className="ap-val">
-                                    {lastInspection.readyForNextPhase ? (
-                                      <span style={{ color: "#16a34a", fontWeight: 700 }}>✓ Yes</span>
-                                    ) : (
-                                      <span style={{ color: "#ea580c", fontWeight: 700 }}>✗ No</span>
-                                    )}
-                                  </span>
-                                </div>
-                              </div>
-                            </>
-                          )}
                         </div>
                       </div>
 
@@ -341,9 +278,7 @@ export default function ActiveProjectsPage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <p className="ap-section-label">🏗️ Project</p>
 
-                        {project.status && <ProjectTimeline status={project.status} />}
-
-                        <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <span
                             className="ap-badge"
                             style={{ backgroundColor: "#f3f0ed", color: "#555" }}
@@ -358,20 +293,9 @@ export default function ActiveProjectsPage() {
                               {project.category}
                             </span>
                           )}
-                          {hasInspections && (
-                            <span
-                              className="ap-badge"
-                              style={{
-                                backgroundColor: inspectionReady ? "rgba(34,197,94,0.1)" : "rgba(59,130,246,0.1)",
-                                color: inspectionReady ? "#16a34a" : "#2563eb"
-                              }}
-                            >
-                              🔍 {projectInspections.length} {projectInspections.length === 1 ? "Inspection" : "Inspections"} {inspectionReady ? "✓" : ""}
-                            </span>
-                          )}
                         </div>
 
-                        <div>
+                        <div style={{ marginTop: 8 }}>
                           <div className="ap-row">
                             <span className="ap-label">🧑‍💼 Head</span>
                             <span className="ap-val">{project.projectHead || "—"}</span>
@@ -398,15 +322,17 @@ export default function ActiveProjectsPage() {
                               <span className="ap-val">{(project.wardrobe.type || []).join(", ") || "—"}</span>
                             </div>
                           )}
-                          {lastInspection && lastInspection.inspectionDate && (
-                            <div className="ap-row">
-                              <span className="ap-label">📅 Last Inspection</span>
-                              <span className="ap-val">{new Date(lastInspection.inspectionDate).toLocaleDateString("en-IN")}</span>
-                            </div>
-                          )}
                         </div>
                       </div>
                     </div>
+
+                    {/* ── Full-width Project Timeline ── */}
+                    {project.status && (
+                      <>
+                        <div className="ap-divider" />
+                        <ProjectTimeline status={project.status} />
+                      </>
+                    )}
 
                     {/* Footer Actions */}
                     <div className="ap-divider" />
@@ -420,7 +346,7 @@ export default function ActiveProjectsPage() {
                       <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/designs`)}>
                         Designs
                       </button>
-                      <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/materials`)}>
+                      <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/orders`)}>
                         Orders
                       </button>
                       <button className="ap-btn ap-btn-edit" onClick={() => router.push(`/admin/projects/${project.id || project._id}/update`)}>

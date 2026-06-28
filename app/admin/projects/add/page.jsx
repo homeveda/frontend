@@ -16,19 +16,19 @@ function NewProjectContent() {
   const [status, setStatus] = useState("LEAD");
   const [kind, setKind] = useState("kitchen"); // 'kitchen' or 'wardrobe'
   const STATUS_OPTIONS = [
-    "ept and chymney point marked",
-    "final measurements",
-    "boxes in production",
-    "boxes recieved",
-    "boxes installed",
-    "stone delivered",
-    "stone installed",
-    "upper boxes installed",
-    "shutters in production",
-    "sink chymney hob ro gyeser and other appliances installed",
-    "shutters and hardware recieved",
-    "shutters and hardware installed",
-    "final payment"
+    "EPT AND CHYMNEY POINT MARKED",
+    "FINAL MEASUREMENTS",
+    "BOXES IN PRODUCTION",
+    "BOXES RECIEVED",
+    "BOXES INSTALLED",
+    "STONE DELIVERED",
+    "STONE INSTALLED",
+    "UPPER BOXES INSTALLED",
+    "SHUTTERS IN PRODUCTION",
+    "SINK CHYMNEY HOB RO GYESER AND OTHER APPLIANCES INSTALLED",
+    "SHUTTERS AND HARDWARE RECIEVED",
+    "SHUTTERS AND HARDWARE INSTALLED",
+    "FINAL PAYMENT"
   ];
   const COUNTER_OPTIONS = [
     "Inbuilt microwave",

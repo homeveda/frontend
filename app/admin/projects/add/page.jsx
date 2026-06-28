@@ -16,23 +16,19 @@ function NewProjectContent() {
   const [status, setStatus] = useState("LEAD");
   const [kind, setKind] = useState("kitchen"); // 'kitchen' or 'wardrobe'
   const STATUS_OPTIONS = [
-    "LEAD",
-    "DESIGN",
-    "QUOTATION",
-    "10% TOKEN",
-    "FINAL MEASUREMENT",
-    "FINAL DRAWINGS",
-    "50% PAYMENT",
-    "FACTORY ORDER",
-    "SITE READY CHECK",
-    "FACTORY FULL PAYMENT",
-    "DISPATCH",
-    "90% CLIENT PAYMENT",
-    "INSTALLATION",
-    "QUALITY CHECK",
-    "HANDOVER",
-    "10% FINAL PAYMENT",
-    "AFTER SALES",
+    "ept and chymney point marked",
+    "final measurements",
+    "boxes in production",
+    "boxes recieved",
+    "boxes installed",
+    "stone delivered",
+    "stone installed",
+    "upper boxes installed",
+    "shutters in production",
+    "sink chymney hob ro gyeser and other appliances installed",
+    "shutters and hardware recieved",
+    "shutters and hardware installed",
+    "final payment"
   ];
   const COUNTER_OPTIONS = [
     "Inbuilt microwave",

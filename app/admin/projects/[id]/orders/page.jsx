@@ -61,6 +61,7 @@ export default function OrdersPage() {
   const [items, setItems] = useState([]);
   const [userEmail, setUserEmail] = useState("");
   const [isDragging, setIsDragging] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
 
   const triggerPopup = (message, color = "green") => {
     setPopupMessage(message);
@@ -160,8 +161,7 @@ export default function OrdersPage() {
   };
 
   const handleDelete = async (itemId) => {
-    if (!window.confirm("Are you sure you want to delete this file?")) return;
-
+    setConfirmDeleteId(null);
     try {
       setIsLoading(true);
       const adminToken = localStorage.getItem("adminToken");
@@ -288,6 +288,27 @@ export default function OrdersPage() {
         .ord-empty { text-align: center; padding: 64px 24px; color: #8f8f8f; }
         .ord-empty-icon { font-size: 56px; margin-bottom: 16px; }
         .ord-empty-text { font-size: 15px; }
+
+        .ord-modal-overlay {
+          position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+          display: flex; align-items: center; justify-content: center;
+          z-index: 100; backdrop-filter: blur(4px);
+        }
+        .ord-modal {
+          background: #fff; border-radius: 16px; padding: 28px 24px;
+          max-width: 380px; width: 90%; text-align: center;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+          font-family: 'Space Grotesk', sans-serif;
+        }
+        .ord-modal-icon { font-size: 44px; margin-bottom: 12px; }
+        .ord-modal-title { font-size: 18px; font-weight: 700; color: #111; margin: 0 0 6px; }
+        .ord-modal-text { font-size: 13px; color: #8f8f8f; margin: 0 0 24px; }
+        .ord-modal-actions { display: flex; gap: 10px; }
+        .ord-modal-btn { flex: 1; padding: 10px 16px; border-radius: 10px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; font-family: inherit; transition: all 0.2s; }
+        .ord-modal-cancel { background: #f3f0ed; color: #555; }
+        .ord-modal-cancel:hover { background: #e9e6e3; }
+        .ord-modal-confirm { background: #ef4444; color: #fff; }
+        .ord-modal-confirm:hover { background: #dc2626; }
       `}</style>
 
       <div className="ord-page">
@@ -408,7 +429,7 @@ export default function OrdersPage() {
                       </a>
                       <button
                         className="ord-card-btn ord-card-btn-delete"
-                        onClick={() => handleDelete(item._id)}
+                        onClick={() => setConfirmDeleteId(item._id)}
                         disabled={isLoading}
                       >
                         Delete
@@ -418,6 +439,25 @@ export default function OrdersPage() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {confirmDeleteId && (
+          <div className="ord-modal-overlay" onClick={() => setConfirmDeleteId(null)}>
+            <div className="ord-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="ord-modal-icon">🗑️</div>
+              <p className="ord-modal-title">Delete this file?</p>
+              <p className="ord-modal-text">This action cannot be undone. The file will be permanently removed.</p>
+              <div className="ord-modal-actions">
+                <button className="ord-modal-btn ord-modal-cancel" onClick={() => setConfirmDeleteId(null)}>
+                  Cancel
+                </button>
+                <button className="ord-modal-btn ord-modal-confirm" onClick={() => handleDelete(confirmDeleteId)}>
+                  Delete
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

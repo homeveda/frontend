@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-export default function ProjectTimeline({ status }) {
+export default function ProjectTimeline({ status, onStepClick }) {
   // Define the full timeline of project statuses in order
   const timeline = [
     { key: "LEAD", label: "Lead", index: 0 },
@@ -45,6 +45,8 @@ export default function ProjectTimeline({ status }) {
   const endIdx = Math.min(timeline.length, startIdx + showRange);
   const visibleSteps = timeline.slice(startIdx, endIdx);
 
+  const isClickable = typeof onStepClick === "function";
+
   return (
     <div className="w-full mt-4 px-2">
       <div className="flex items-center justify-between gap-1 sm:gap-2">
@@ -52,6 +54,7 @@ export default function ProjectTimeline({ status }) {
           const actualIndex = startIdx + idx;
           const color = getStepColor(actualIndex);
           const bgColor = getStepBgColor(actualIndex);
+          const isCurrent = actualIndex === currentStatusIndex;
 
           return (
             <React.Fragment key={step.key}>
@@ -59,8 +62,38 @@ export default function ProjectTimeline({ status }) {
               <div className="flex flex-col items-center">
                 <div
                   className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold text-white transition-all"
-                  style={{ backgroundColor: color }}
-                  title={step.label}
+                  style={{
+                    backgroundColor: color,
+                    cursor: isClickable ? "pointer" : "default",
+                    boxShadow: isCurrent
+                      ? `0 0 0 3px ${color}40`
+                      : "none",
+                  }}
+                  title={
+                    isClickable
+                      ? `Click to update status to "${step.label}"`
+                      : step.label
+                  }
+                  onClick={(e) => {
+                    if (isClickable) {
+                      e.stopPropagation();
+                      onStepClick(step.key, step.label);
+                    }
+                  }}
+                  onMouseEnter={(e) => {
+                    if (isClickable) {
+                      e.currentTarget.style.transform = "scale(1.2)";
+                      e.currentTarget.style.boxShadow = `0 0 0 4px ${color}50`;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (isClickable) {
+                      e.currentTarget.style.transform = "scale(1)";
+                      e.currentTarget.style.boxShadow = isCurrent
+                        ? `0 0 0 3px ${color}40`
+                        : "none";
+                    }
+                  }}
                 >
                   {actualIndex + 1}
                 </div>

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import LoadingSpinner from "../../../component/loadingSpinner";
 import ProjectTimeline from "../../../component/projectTimeline";
+import ConfirmationDialogueBox from "../../../component/confirmationDialogueBox";
 
 const STATUS_COLORS = {
   "EPT AND CHYMNEY POINT MARKED": "#8b5cf6", "FINAL MEASUREMENTS": "#3b82f6",
@@ -32,6 +33,8 @@ export default function ActiveProjectsPage() {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [timelineConfirm, setTimelineConfirm] = useState({ open: false, projectId: null, statusKey: null, statusLabel: null });
+  const [updatingTimeline, setUpdatingTimeline] = useState(null);
 
   useEffect(() => {
     const fetch = async () => {
@@ -139,6 +142,39 @@ export default function ActiveProjectsPage() {
       } finally {
         setDeletingId(null);
       }
+    }
+  };
+
+  // Timeline step click → open confirmation
+  const handleTimelineStepClick = (projectId, statusKey, statusLabel) => {
+    setTimelineConfirm({ open: true, projectId, statusKey, statusLabel });
+  };
+
+  // Confirmed → call API to update status
+  const handleTimelineUpdateConfirm = async () => {
+    const { projectId, statusKey } = timelineConfirm;
+    setTimelineConfirm({ open: false, projectId: null, statusKey: null, statusLabel: null });
+    setUpdatingTimeline(projectId);
+    try {
+      const adminToken = typeof window !== "undefined" ? localStorage.getItem("adminToken") : null;
+      const formData = new FormData();
+      formData.append("status", statusKey);
+      await axios.patch(
+        `${backendUrl}/project/${projectId}`,
+        formData,
+        { headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined } }
+      );
+      // Update local state
+      setProjects((prev) =>
+        prev.map((p) =>
+          (p.id || p._id) === projectId ? { ...p, status: statusKey } : p
+        )
+      );
+    } catch (err) {
+      console.error("Timeline update failed:", err);
+      alert(err?.response?.data?.message || err.message || "Failed to update project status");
+    } finally {
+      setUpdatingTimeline(null);
     }
   };
 
@@ -330,7 +366,18 @@ export default function ActiveProjectsPage() {
                     {project.status && (
                       <>
                         <div className="ap-divider" />
-                        <ProjectTimeline status={project.status} />
+                        {updatingTimeline === (project.id || project._id) ? (
+                          <div className="w-full mt-4 px-2 text-center text-sm" style={{ color: '#8f8f8f' }}>
+                            Updating status…
+                          </div>
+                        ) : (
+                          <ProjectTimeline
+                            status={project.status}
+                            onStepClick={(statusKey, statusLabel) =>
+                              handleTimelineStepClick(project.id || project._id, statusKey, statusLabel)
+                            }
+                          />
+                        )}
                       </>
                     )}
 
@@ -382,6 +429,17 @@ export default function ActiveProjectsPage() {
           </div>
         )}
       </div>
+
+      {/* Timeline Update Confirmation Dialog */}
+      <ConfirmationDialogueBox
+        open={timelineConfirm.open}
+        title="Update Project Timeline"
+        description={`Are you sure you want to update the project status to "${timelineConfirm.statusLabel || ''}"?`}
+        confirmText="Yes, Update"
+        cancelText="Cancel"
+        onConfirm={handleTimelineUpdateConfirm}
+        onCancel={() => setTimelineConfirm({ open: false, projectId: null, statusKey: null, statusLabel: null })}
+      />
     </div>
   );
 }

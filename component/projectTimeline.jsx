@@ -3,24 +3,21 @@ import React from "react";
 
 export default function ProjectTimeline({ status, onStepClick }) {
   // Define the full timeline of project statuses in order
+  // These must match the STATUS_OPTIONS used in project create/update
   const timeline = [
-    { key: "LEAD", label: "Lead", index: 0 },
-    { key: "DESIGN", label: "Design", index: 1 },
-    { key: "QUOTATION", label: "Quotation", index: 2 },
-    { key: "10% TOKEN", label: "10% Token", index: 3 },
-    { key: "FINAL MEASUREMENT", label: "Measurement", index: 4 },
-    { key: "FINAL DRAWINGS", label: "Drawings", index: 5 },
-    { key: "50% PAYMENT", label: "50% Payment", index: 6 },
-    { key: "FACTORY ORDER", label: "Factory Order", index: 7 },
-    { key: "SITE READY CHECK", label: "Site Ready", index: 8 },
-    { key: "FACTORY FULL PAYMENT", label: "Full Payment", index: 9 },
-    { key: "DISPATCH", label: "Dispatch", index: 10 },
-    { key: "90% CLIENT PAYMENT", label: "90% Payment", index: 11 },
-    { key: "INSTALLATION", label: "Installation", index: 12 },
-    { key: "QUALITY CHECK", label: "Quality Check", index: 13 },
-    { key: "HANDOVER", label: "Handover", index: 14 },
-    { key: "10% FINAL PAYMENT", label: "Final Payment", index: 15 },
-    { key: "AFTER SALES", label: "After Sales", index: 16 },
+    { key: "EPT AND CHYMNEY POINT MARKED", label: "EPT & Chimney", index: 0 },
+    { key: "FINAL MEASUREMENTS", label: "Measurements", index: 1 },
+    { key: "BOXES IN PRODUCTION", label: "Boxes Prod.", index: 2 },
+    { key: "BOXES RECIEVED", label: "Boxes Recv.", index: 3 },
+    { key: "BOXES INSTALLED", label: "Boxes Install", index: 4 },
+    { key: "STONE DELIVERED", label: "Stone Deliv.", index: 5 },
+    { key: "STONE INSTALLED", label: "Stone Install", index: 6 },
+    { key: "UPPER BOXES INSTALLED", label: "Upper Boxes", index: 7 },
+    { key: "SHUTTERS IN PRODUCTION", label: "Shutters Prod.", index: 8 },
+    { key: "SINK CHYMNEY HOB RO GYESER AND OTHER APPLIANCES INSTALLED", label: "Appliances", index: 9 },
+    { key: "SHUTTERS AND HARDWARE RECIEVED", label: "Shutters Recv.", index: 10 },
+    { key: "SHUTTERS AND HARDWARE INSTALLED", label: "Shutters Install", index: 11 },
+    { key: "FINAL PAYMENT", label: "Final Payment", index: 12 },
   ];
 
   // Find current status index

@@ -42,6 +42,7 @@ function UpdateLeadContent() {
     expectedTimelineStart: "",
     expectedTimelineEnd: "",
     notes: "",
+    priority: "none",
     assignedRoles: [],
   });
 
@@ -104,6 +105,7 @@ function UpdateLeadContent() {
           expectedTimelineStart: data.expectedTimelineStart || "",
           expectedTimelineEnd: data.expectedTimelineEnd || "",
           notes: data.notes || "",
+          priority: data.priority || "none",
           assignedRoles: data.assignedRoles || [],
         });
       } catch (err) {
@@ -206,6 +208,7 @@ function UpdateLeadContent() {
         expectedTimelineStart: form.expectedTimelineStart,
         expectedTimelineEnd: form.expectedTimelineEnd,
         notes: form.notes.trim(),
+        priority: form.priority,
         visibleTo: form.assignedRoles || [],
       };
       await axios.patch(`${backendUrl}/initialLead/${leadId}`, payload, {
@@ -335,6 +338,22 @@ function UpdateLeadContent() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Priority</label>
+              <select
+                name="priority"
+                value={form.priority}
+                onChange={handleChange}
+                className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+              >
+                <option value="none">None</option>
+                <option value="low">Low</option>
+                <option value="med">Medium</option>
+                <option value="high">High</option>
+              </select>
             </div>
 
             <div className="mb-4">

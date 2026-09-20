@@ -16,6 +16,7 @@ export default function LeadsDisplayPage() {
   const [query, setQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("");
   const [requirementsFilter, setRequirementsFilter] = useState("");
+  const [priorityFilter, setPriorityFilter] = useState("");
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -94,7 +95,8 @@ export default function LeadsDisplayPage() {
     const matchQuery = query === "" || lead.name.toLowerCase().includes(query.toLowerCase());
     const matchCategory = categoryFilter === "" || (Array.isArray(lead.category) && lead.category.includes(categoryFilter));
     const matchRequirements = requirementsFilter === "" || (Array.isArray(lead.Requirements) && lead.Requirements.includes(requirementsFilter));
-    return matchQuery && matchCategory && matchRequirements;
+    const matchPriority = priorityFilter === "" || (lead.priority || "none") === priorityFilter;
+    return matchQuery && matchCategory && matchRequirements && matchPriority;
   });
 
   // Export the currently filtered/visible leads to an Excel file
@@ -266,6 +268,21 @@ export default function LeadsDisplayPage() {
                   {req}
                 </option>
               ))}
+            </select>
+          </div>
+          <div className="filter-group">
+            <label>
+              Filter by Priority
+            </label>
+            <select
+              value={priorityFilter}
+              onChange={(e) => setPriorityFilter(e.target.value)}
+            >
+              <option value="">All Priorities</option>
+              <option value="none">None</option>
+              <option value="low">Low</option>
+              <option value="med">Medium</option>
+              <option value="high">High</option>
             </select>
           </div>
         </div>

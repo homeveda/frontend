@@ -35,6 +35,7 @@ export default function AddLeadPage() {
     expectedTimelineStart: "",
     expectedTimelineEnd: "",
     notes: "",
+    priority: "none",
     assignedRoles: [],
   });
 
@@ -153,6 +154,7 @@ export default function AddLeadPage() {
         expectedTimelineStart: form.expectedTimelineStart,
         expectedTimelineEnd: form.expectedTimelineEnd,
         notes: form.notes.trim(),
+        priority: form.priority,
         visibleTo: form.assignedRoles || [],
       };
       const res = await axios.post(`${backendUrl}/initiallead`, payload, {
@@ -177,6 +179,7 @@ export default function AddLeadPage() {
         expectedTimelineStart: "",
         expectedTimelineEnd: "",
         notes: "",
+        priority: "none",
         assignedRoles: [],
       });
       setTimeout(() => router.push("/admin/initiallead"), 1200);
@@ -355,6 +358,22 @@ export default function AddLeadPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-xs font-medium" style={{ color: "#8f8f8f" }}>Priority</label>
+              <select
+                name="priority"
+                value={form.priority}
+                onChange={handleChange}
+                className="mt-2 block w-full rounded-[10px] px-3 py-2 text-sm"
+                style={{ border: "1px solid #e9e6e3", backgroundColor: "#fafafa" }}
+              >
+                <option value="none">None</option>
+                <option value="low">Low</option>
+                <option value="med">Medium</option>
+                <option value="high">High</option>
+              </select>
             </div>
 
             <div className="mb-4">

@@ -13,6 +13,8 @@ export default function LeadCard({ lead, onDelete }) {
   const [lastSavedNotes, setLastSavedNotes] = useState(lead.notes || "");
   const [notesStatus, setNotesStatus] = useState("");
   const [priority, setPriority] = useState(lead.priority || "none");
+  const [lastSavedPriority, setLastSavedPriority] = useState(lead.priority || "none");
+  const [priorityStatus, setPriorityStatus] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
 
   const openDetails = () => {
@@ -23,6 +25,7 @@ export default function LeadCard({ lead, onDelete }) {
   const handleUpdateField = async (field, value) => {
     try {
       if (field === "notes") setNotesStatus("Saving...");
+      if (field === "priority") setPriorityStatus("Saving...");
       setIsUpdating(true);
       await axios.patch(`${backendUrl}/initiallead/${lead.id || lead._id}`, {
         id: lead.id || lead._id,
@@ -34,9 +37,14 @@ export default function LeadCard({ lead, onDelete }) {
         setNotesStatus("Saved ✓");
         setTimeout(() => setNotesStatus(""), 2000);
       }
+      if (field === "priority") {
+        setPriorityStatus("Saved ✓");
+        setTimeout(() => setPriorityStatus(""), 2000);
+      }
     } catch (error) {
       console.error(`Failed to update ${field}`, error);
       if (field === "notes") setNotesStatus("Error!");
+      if (field === "priority") setPriorityStatus("Error!");
     } finally {
       setIsUpdating(false);
     }
@@ -75,6 +83,12 @@ export default function LeadCard({ lead, onDelete }) {
       .lead-card-priority-btn.active.priority-low{background:rgba(33,115,70,0.1);color:#217346;border-color:rgba(33,115,70,0.2)}
       .lead-card-priority-btn.active.priority-med{background:rgba(245,158,11,0.1);color:#d97706;border-color:rgba(245,158,11,0.2)}
       .lead-card-priority-btn.active.priority-high{background:rgba(220,38,38,0.1);color:#dc2626;border-color:rgba(220,38,38,0.2)}
+      .lead-card-priority-select{font-size:12px;color:#111111;background:#ffffff;border:1px solid #e9e6e3;border-radius:8px;padding:8px 10px;font-family:inherit;outline:none;transition:border-color 0.2s}
+      .lead-card-priority-select:focus{border-color:#e07b63}
+      .lead-card-priority-select.priority-none{background:#f0f0f0;color:#8f8f8f;border-color:#e9e6e3}
+      .lead-card-priority-select.priority-low{background:rgba(33,115,70,0.1);color:#217346;border-color:rgba(33,115,70,0.2)}
+      .lead-card-priority-select.priority-med{background:rgba(245,158,11,0.1);color:#d97706;border-color:rgba(245,158,11,0.2)}
+      .lead-card-priority-select.priority-high{background:rgba(220,38,38,0.1);color:#dc2626;border-color:rgba(220,38,38,0.2)}
       .border-left-none{border-left:4px solid transparent}
       .border-left-low{border-left:4px solid #217346}
       .border-left-med{border-left:4px solid #d97706}
@@ -178,21 +192,43 @@ export default function LeadCard({ lead, onDelete }) {
           )}
 
           <div className="lead-card-notes">
-            <p className="lead-card-notes-label">Priority</p>
-            <div style={{ display: "flex", gap: "6px", marginTop: "4px" }}>
-              {["none", "low", "med", "high"].map((p) => (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+              <p className="lead-card-notes-label" style={{ margin: 0 }}>Priority</p>
+              {priorityStatus && (
+                <span style={{ fontSize: '10px', color: priorityStatus === 'Error!' ? '#dc2626' : '#217346', fontWeight: 600 }}>
+                  {priorityStatus}
+                </span>
+              )}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <select
+                value={priority}
+                onChange={(e) => {
+                  setPriority(e.target.value);
+                  if (priorityStatus === "Saved ✓") setPriorityStatus("");
+                }}
+                className={`lead-card-priority-select priority-${priority}`}
+                onClick={(e) => e.stopPropagation()}
+                style={{ width: 'auto', padding: '4px 8px', fontSize: '11px', flex: '0 1 auto' }}
+              >
+                <option value="none">None</option>
+                <option value="low">Low</option>
+                <option value="med">Medium</option>
+                <option value="high">High</option>
+              </select>
+              {priority !== lastSavedPriority && (
                 <button
-                  key={p}
                   onClick={(e) => {
                     e.stopPropagation();
-                    setPriority(p);
-                    handleUpdateField("priority", p);
+                    handleUpdateField("priority", priority);
+                    setLastSavedPriority(priority);
                   }}
-                  className={`lead-card-priority-btn priority-${p} ${priority === p ? 'active' : 'inactive'}`}
+                  className="lead-card-save-notes-btn"
+                  style={{ whiteSpace: 'nowrap' }}
                 >
-                  {p}
+                  Save
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
@@ -214,6 +250,7 @@ export default function LeadCard({ lead, onDelete }) {
               }}
               placeholder="Add notes..."
               rows={2}
+              onClick={(e) => e.stopPropagation()}
             />
             {notes !== lastSavedNotes && (
               <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '6px' }}>

@@ -104,31 +104,66 @@ const AddDesignPage = () => {
     setIsLoading(true);
     setShowPopup(false);
 
-    const formData = new FormData();
-    formData.append("projectId", projectId);
-    console.log(formData);
-
-    items.forEach((item, index) => {
-      formData.append(`items[${index}][name]`, item.name);
-
-      if (item.imageFile) {
-        formData.append(`items[${index}][image]`, item.imageFile);
-      }
-
-      if (item.designFile) {
-        formData.append(`items[${index}][design]`, item.designFile);
-      }
-    });
+    const adminToken = localStorage.getItem("adminToken");
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    const itemsPayload = [];
 
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/designs`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-          },
+      for (const item of items) {
+        const payloadItem = { name: item.name };
+
+        // Upload Customer Layout (imageFile)
+        if (item.imageFile) {
+          const file = item.imageFile;
+          const presignedRes = await axios.get(`${backendUrl}/upload/presigned-url`, {
+            params: {
+              fileName: file.name,
+              fileType: file.type || "application/octet-stream",
+              folder: `projects/${projectId}/designs`,
+            },
+            headers: { Authorization: `Bearer ${adminToken}` },
+          });
+
+          const { presignedUrl, publicUrl } = presignedRes.data;
+
+          await axios.put(presignedUrl, file, {
+            headers: { "Content-Type": file.type || "application/octet-stream" },
+          });
+
+          payloadItem.imageLink = publicUrl;
+          payloadItem.imageFileType = file.type === "application/pdf" ? "pdf" : (file.name.match(/\.(doc|docx)$/i) ? "doc" : "image");
         }
+
+        // Upload Proposed Layout (designFile)
+        if (item.designFile) {
+          const file = item.designFile;
+          const presignedRes = await axios.get(`${backendUrl}/upload/presigned-url`, {
+            params: {
+              fileName: file.name,
+              fileType: file.type || "application/octet-stream",
+              folder: `projects/${projectId}/designs`,
+            },
+            headers: { Authorization: `Bearer ${adminToken}` },
+          });
+
+          const { presignedUrl, publicUrl } = presignedRes.data;
+
+          await axios.put(presignedUrl, file, {
+            headers: { "Content-Type": file.type || "application/octet-stream" },
+          });
+
+          payloadItem.designLink = publicUrl;
+          payloadItem.designFileType = file.type === "application/pdf" ? "pdf" : (file.name.match(/\.(doc|docx)$/i) ? "doc" : "image");
+        }
+
+        itemsPayload.push(payloadItem);
+      }
+
+      // Final POST to create design
+      const res = await axios.post(
+        `${backendUrl}/designs`,
+        { projectId, items: itemsPayload },
+        { headers: { Authorization: `Bearer ${adminToken}` } }
       );
 
       triggerPopup("Designs added successfully!", "green");

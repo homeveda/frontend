@@ -185,18 +185,45 @@ export default function AddDesignPage() {
       const patchPromises = [];
       const newItems = [];
 
-      items.forEach((item) => {
+      // Helper function to upload file and return S3 public URL and fileType
+      const uploadFileDirectly = async (file) => {
+        const presignedRes = await axios.get(`${backendUrl}/upload/presigned-url`, {
+          params: {
+            fileName: file.name,
+            fileType: file.type || "application/octet-stream",
+            folder: `projects/${projectId}/designs`,
+          },
+          headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
+        });
+        const { presignedUrl, publicUrl } = presignedRes.data;
+        await axios.put(presignedUrl, file, {
+          headers: { "Content-Type": file.type || "application/octet-stream" },
+        });
+        const fileType = file.type === "application/pdf" ? "pdf" : (file.name.match(/\.(doc|docx)$/i) ? "doc" : "image");
+        return { publicUrl, fileType };
+      };
+
+      for (const item of items) {
         const needsPatch =
           item.itemId && (item.imageFile || item.designFile || item.name !== item.originalName);
 
         if (item.itemId && needsPatch) {
-          const fd = new FormData();
-          if (item.name !== undefined) fd.append("name", item.name);
-          if (item.imageFile) fd.append("image", item.imageFile);
-          if (item.designFile) fd.append("design", item.designFile);
+          const payload = {};
+          if (item.name !== undefined) payload.name = item.name;
+          
+          if (item.imageFile) {
+            const { publicUrl, fileType } = await uploadFileDirectly(item.imageFile);
+            payload.imageLink = publicUrl;
+            payload.imageFileType = fileType;
+          }
+          if (item.designFile) {
+            const { publicUrl, fileType } = await uploadFileDirectly(item.designFile);
+            payload.designLink = publicUrl;
+            payload.designFileType = fileType;
+          }
 
           patchPromises.push(
-            axios.patch(`${backendUrl}/designs/${item.designId}/items/${item.itemId}`, fd, {
+            axios.patch(`${backendUrl}/designs/${item.designId}/items/${item.itemId}`, payload, {
               headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
             })
           );
@@ -204,20 +231,29 @@ export default function AddDesignPage() {
 
         // collect newly added items (no itemId)
         if (!item.itemId) newItems.push(item);
-      });
+      }
 
       await Promise.all(patchPromises);
 
       // 3) POST new items in one request (if any)
       if (newItems.length > 0) {
-        const fd = new FormData();
-        fd.append("projectId", projectId);
-        newItems.forEach((it, idx) => {
-          fd.append(`items[${idx}][name]`, it.name || "");
-          if (it.imageFile) fd.append(`items[${idx}][image]`, it.imageFile);
-          if (it.designFile) fd.append(`items[${idx}][design]`, it.designFile);
-        });
-        await axios.post(`${backendUrl}/designs`, fd, {
+        const itemsPayload = [];
+        for (const it of newItems) {
+          const payloadItem = { name: it.name || "" };
+          if (it.imageFile) {
+            const { publicUrl, fileType } = await uploadFileDirectly(it.imageFile);
+            payloadItem.imageLink = publicUrl;
+            payloadItem.imageFileType = fileType;
+          }
+          if (it.designFile) {
+            const { publicUrl, fileType } = await uploadFileDirectly(it.designFile);
+            payloadItem.designLink = publicUrl;
+            payloadItem.designFileType = fileType;
+          }
+          itemsPayload.push(payloadItem);
+        }
+
+        await axios.post(`${backendUrl}/designs`, { projectId, items: itemsPayload }, {
           headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
         });
       }

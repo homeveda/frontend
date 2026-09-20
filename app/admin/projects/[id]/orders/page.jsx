@@ -109,15 +109,49 @@ export default function OrdersPage() {
     setIsUploading(true);
     try {
       const adminToken = localStorage.getItem("adminToken");
-      const formData = new FormData();
+      const items = [];
+
       for (const file of files) {
-        formData.append("files", file);
+        // Get presigned URL
+        const presignedRes = await axios.get(`${backendUrl}/upload/presigned-url`, {
+          params: {
+            fileName: file.name,
+            fileType: file.type || "application/octet-stream",
+            folder: `projects/${projectId}/orders`,
+          },
+          headers: { Authorization: adminToken ? `Bearer ${adminToken}` : undefined },
+        });
+
+        const { presignedUrl, publicUrl } = presignedRes.data;
+
+        // Upload directly to S3
+        await axios.put(presignedUrl, file, {
+          headers: {
+            "Content-Type": file.type || "application/octet-stream",
+          },
+        });
+
+        // Determine fileType category for DB
+        let fileType = "image";
+        if (file.type === "application/pdf") fileType = "pdf";
+        else if (
+          file.type === "application/msword" ||
+          file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+          file.name.match(/\.(doc|docx)$/i)
+        ) {
+          fileType = "doc";
+        }
+
+        items.push({
+          fileLink: publicUrl,
+          fileType,
+        });
       }
 
-      await axios.post(`${backendUrl}/orders/${projectId}`, formData, {
+      // Send JSON payload to backend
+      await axios.post(`${backendUrl}/orders/${projectId}`, { items }, {
         headers: {
           Authorization: adminToken ? `Bearer ${adminToken}` : undefined,
-          "Content-Type": "multipart/form-data",
         },
       });
 

@@ -204,8 +204,10 @@ export default function LeadCard({ lead, onDelete }) {
               <select
                 value={priority}
                 onChange={(e) => {
-                  setPriority(e.target.value);
-                  if (priorityStatus === "Saved ✓") setPriorityStatus("");
+                  const val = e.target.value;
+                  setPriority(val);
+                  setLastSavedPriority(val);
+                  handleUpdateField("priority", val);
                 }}
                 className={`lead-card-priority-select priority-${priority}`}
                 onClick={(e) => e.stopPropagation()}
@@ -216,19 +218,6 @@ export default function LeadCard({ lead, onDelete }) {
                 <option value="med">Medium</option>
                 <option value="high">High</option>
               </select>
-              {priority !== lastSavedPriority && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleUpdateField("priority", priority);
-                    setLastSavedPriority(priority);
-                  }}
-                  className="lead-card-save-notes-btn"
-                  style={{ whiteSpace: 'nowrap' }}
-                >
-                  Save
-                </button>
-              )}
             </div>
           </div>
 

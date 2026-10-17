@@ -140,8 +140,8 @@ export default function LeadsDisplayPage() {
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
-        .leads-header{display:flex;items-align:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-        .leads-header > div:first-child{flex:1;min-width:200px}
+        .leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+        .leads-header > div:first-child{flex:1;min-width:200px;margin-left:60px}
         .leads-header h2{font-size:24px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin:0}
         .leads-header p{font-size:14px;color:#8f8f8f;margin:8px 0 0 0}
         .leads-header-actions{display:flex;gap:12px;flex-wrap:wrap}
@@ -183,6 +183,7 @@ export default function LeadsDisplayPage() {
         @media (max-width:480px){
           .p-6{padding:8px !important}
           .leads-header{gap:8px;margin-bottom:12px}
+          .leads-header > div:first-child{margin-left:52px}
           .leads-header h2{font-size:16px}
           .leads-header p{font-size:11px;margin-top:4px}
           .leads-header-actions{width:100%;gap:6px}
@@ -196,7 +197,7 @@ export default function LeadsDisplayPage() {
       `}</style>
       <div className="leads-header">
         <div>
-          <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em", marginLeft: '60px' }}>
+          <h2 className="text-2xl font-semibold" style={{ color: "#111111", letterSpacing: "-0.02em" }}>
             All Leads
           </h2>
           <p className="text-sm mt-1" style={{ color: "#8f8f8f" }}>

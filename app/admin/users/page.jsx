@@ -178,8 +178,8 @@ export default function DisplayAllUsers(){
   return (
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
-        .users-header{display:flex;items-align:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-        .users-header > div:first-child{flex:1;min-width:200px,margin-left:60px}
+        .users-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
+        .users-header > div:first-child{flex:1;min-width:200px;margin-left:60px}
         .users-header h2{font-size:24px;font-weight:600;color:#111111;letter-spacing:-0.02em;margin:0}
         .users-header p{font-size:14px;color:#8f8f8f;margin:8px 0 0 0}
         .users-refresh-btn{color:white;padding:8px 16px;border-radius:10px;font-weight:600;transition:all 0.2s;border:none;cursor:pointer;font-size:14px;background:#e07b63}
@@ -224,7 +224,7 @@ export default function DisplayAllUsers(){
         @media (max-width:768px){
           .p-6{padding:12px !important}
           .users-header{flex-direction:column;margin-bottom:16px;gap:8px}
-          .users-header > div:first-child{width:100%}
+          .users-header > div:first-child{width:auto;min-width:0;align-self:stretch}
           .users-refresh-btn{padding:8px 12px;font-size:12px}
           .users-search-panel{padding:12px;margin-bottom:16px}
           .users-search-group label{font-size:12px;margin-bottom:6px}
@@ -237,6 +237,7 @@ export default function DisplayAllUsers(){
         @media (max-width:480px){
           .p-6{padding:8px !important}
           .users-header{gap:8px;margin-bottom:12px}
+          .users-header > div:first-child{margin-left:52px}
           .users-header h2{font-size:16px}
           .users-header p{font-size:11px}
           .users-refresh-btn{padding:6px 10px;font-size:11px;border-radius:8px}

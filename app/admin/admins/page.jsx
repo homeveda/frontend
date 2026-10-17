@@ -126,7 +126,7 @@ export default function ManageAdminsPage() {
     <div className="p-6" style={{ backgroundColor: "#f7f4f1", minHeight: "100vh", fontFamily: "'Space Grotesk', sans-serif" }}>
       <style>{`
         .ma-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;flex-wrap:wrap}
-        .ma-header > div:first-child{flex:1;min-width:200px}
+        .ma-header > div:first-child{flex:1;min-width:200px;margin-left:60px}
         .ma-header h2{font-size:24px;font-weight:600;color:#111;letter-spacing:-0.02em;margin:0}
         .ma-header p{font-size:14px;color:#8f8f8f;margin:6px 0 0 0}
         .ma-header-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
@@ -170,6 +170,7 @@ export default function ManageAdminsPage() {
         }
         @media(max-width:480px){
           .p-6{padding:8px !important}
+          .ma-header > div:first-child{margin-left:52px}
           .ma-header h2{font-size:18px}
           .ma-btn{font-size:12px;padding:6px 12px}
           .ma-search{padding:10px}

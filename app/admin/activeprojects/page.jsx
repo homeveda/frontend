@@ -164,13 +164,15 @@ export default function ActiveProjectsPage() {
         .ap-btn-edit:hover { background: #d56a52; }
         .ap-btn-delete { background: #dc2626; color: white; }
         .ap-btn-delete:hover { background: #b91c1c; }
+        .ap-header-title { margin-left: 60px; }
+        @media(max-width:480px) { .ap-header-title { margin-left: 52px; } }
         @media(max-width:640px) { .ap-label { min-width: 66px; } }
       `}</style>
 
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
+          <div className="ap-header-title">
             <div className="flex items-center gap-2 mb-1">
               <span style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "#22c55e", display: "inline-block", boxShadow: "0 0 0 3px rgba(34,197,94,0.2)" }} />
               <h2 className="text-xl sm:text-2xl font-semibold" style={{ color: "#111", letterSpacing: "-0.02em" }}>

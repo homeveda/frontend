@@ -28,7 +28,6 @@ export default function ActiveProjectsPage() {
 
   const [projects, setProjects] = useState([]);
   const [usersMap, setUsersMap] = useState({}); // email → user object
-  const [inspectionsMap, setInspectionsMap] = useState({}); // projectId → inspections
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
@@ -56,23 +55,8 @@ export default function ActiveProjectsPage() {
         const map = {};
         userList.forEach((u) => { if (u.email) map[u.email] = u; });
 
-        // Fetch inspections for all projects
-        const inspMap = {};
-        await Promise.all(
-          projectList.map((proj) =>
-            axios
-              .get(`${backendUrl}/inspections/${proj.id || proj._id}`, { headers })
-              .then((res) => {
-                inspMap[proj.id || proj._id] = res.data?.inspections || [];
-              })
-              .catch(() => {
-                inspMap[proj.id || proj._id] = [];
-              })
-          )
-        );
         setProjects(projectList);
         setUsersMap(map);
-        setInspectionsMap(inspMap);
       } catch (err) {
         setError(err?.response?.data?.message || err.message || "Failed to load");
       } finally {
@@ -217,7 +201,7 @@ export default function ActiveProjectsPage() {
               const user = usersMap[project.userEmail] || {};
               const statusColor = STATUS_COLORS[project.status] || "#8f8f8f";
               const type = project.kitchen ? "Kitchen" : project.wardrobe ? "Wardrobe" : "—";
-              const projectInspections = inspectionsMap[project.id || project._id] || [];
+              const projectInspections = project.inspections || [];
               const hasInspections = projectInspections.length > 0;
               const lastInspection = hasInspections ? projectInspections[projectInspections.length - 1] : null;
               const inspectionReady = lastInspection?.readyForNextPhase || false;
